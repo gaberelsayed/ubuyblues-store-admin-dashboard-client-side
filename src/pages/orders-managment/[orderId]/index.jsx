@@ -5,7 +5,7 @@ import axios from "axios";
 import LoaderPage from "@/components/LoaderPage";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
-import { getAdminInfo } from "../../../../../public/global_functions/validations";
+import { getAdminInfo } from "../../../../public/global_functions/popular";
 
 export default function OrderDetails({ orderId }) {
 

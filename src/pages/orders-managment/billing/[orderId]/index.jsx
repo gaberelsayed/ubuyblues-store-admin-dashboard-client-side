@@ -6,7 +6,7 @@ import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import { FaRegSmileWink } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
-import { getAdminInfo } from "../../../../../../public/global_functions/validations";
+import { getAdminInfo } from "../../../../../public/global_functions/popular";
 import { useRouter } from "next/router";
 
 export default function ShowBilling({ orderId }) {

@@ -7,7 +7,7 @@ const nextConfig = {
   },
   env: {
       BASE_API_URL: process.env.NODE_ENV === "development" ? "http://localhost:5200" : "https://api.ubuyblues.com",
-      WEBSITE_URL: process.env.NODE_ENV === "development" ? "http://localhost:3001" : "https://ubuyblues.com",
+      WEBSITE_URL: process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://ubuyblues.com",
       adminTokenNameInLocalStorage: "as-s-a-t"
   },
   async headers() {
@@ -18,7 +18,7 @@ const nextConfig = {
                   { key: "Access-Control-Allow-Credentials", value: "true" },
                   {
                       key: "Access-Control-Allow-Origin",
-                      value: process.env.NODE_ENV === "development" ? "http://localhost:3001" : "https://ubuyblues.com",
+                      value: process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://ubuyblues.com",
                   },
                   {
                       key: "Access-Control-Allow-Methods",

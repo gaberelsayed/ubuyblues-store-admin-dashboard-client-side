@@ -5,9 +5,9 @@ import axios from "axios";
 import LoaderPage from "@/components/LoaderPage";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
-import { inputValuesValidation } from "../../../../../public/global_functions/validations";
+import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { getAdminInfo } from "../../../../public/global_functions/popular";
-import { getDateFormated, getStoreDetails } from "../../../../../public/global_functions/popular";
+import { getDateFormated, getStoreDetails } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 
 export default function StoreDetails({ storeId }) {

@@ -24,12 +24,12 @@ export default function Home() {
                 .then(async (result) => {
                     if (result.error) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                        await router.push("/admin-dashboard/login");
+                        await router.replace("/login");
                     } else {
                         const adminDetails = result.data;
                         if (adminDetails.isBlocked) {
                             localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                            await router.push("/admin-dashboard/login");
+                            await router.replace("/login");
                         }
                         else {
                             setAdminInfo(adminDetails);
@@ -40,14 +40,14 @@ export default function Home() {
                 .catch(async (err) => {
                     if (err?.response?.data?.msg === "Unauthorized Error") {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                        await router.push("/admin-dashboard/login");
+                        await router.replace("/login");
                     }
                     else {
                         setIsLoadingPage(false);
                         setIsErrorMsgOnLoadingThePage(true);
                     }
                 });
-        } else router.push("/admin-dashboard/login");
+        } else router.replace("/login");
     }, []);
 
     return (

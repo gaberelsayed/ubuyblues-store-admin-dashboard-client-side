@@ -1,6 +1,3 @@
-import { isValidPhoneNumber }  from 'libphonenumber-js';
-import axios from "axios";
-
 // تعريف دالة للتحقق من الإيميل هل صالح أم لا
 function isEmail(email) {
     return email.match(/[^\s@]+@[^\s@]+\.[^\s@]+/);

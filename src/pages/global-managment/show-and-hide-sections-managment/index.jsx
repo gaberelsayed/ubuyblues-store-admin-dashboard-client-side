@@ -6,7 +6,7 @@ import LoaderPage from "@/components/LoaderPage";
 import axios from "axios";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { useRouter } from "next/router";
-import { getAdminInfo } from "../../../../public/global_functions/validations";
+import { getAdminInfo } from "../../../../public/global_functions/popular";
 
 export default function ShowAndHideSections() {
 

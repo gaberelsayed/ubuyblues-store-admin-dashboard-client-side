@@ -7,7 +7,7 @@ import LoaderPage from "@/components/LoaderPage";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import PaginationBar from "@/components/PaginationBar";
-import { inputValuesValidation } from "../../../../public/global_functions/validations";
+import { inputValuesValidation } from "../../../public/global_functions/validations";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import ChangeStoreStatusBox from "@/components/ChangeStoreStatusBox";
 import { getAdminInfo, getStoresCount, getAllStoresInsideThePage } from "../../../public/global_functions/popular"; 
@@ -615,7 +615,7 @@ export default function StoresManagment() {
                                                     </button>}
                                                     {!isUpdatingStatus && !isDeletingStatus && !isErrorStatus && !isSuccessStatus && <>
                                                         <Link
-                                                            href={`/admin-dashboard/stores-managment/${store._id}`}
+                                                            href={`/stores-managment/${store._id}`}
                                                             className="btn btn-success d-block mx-auto mb-4 global-button"
                                                         >Show Full Details</Link>
                                                     </>}

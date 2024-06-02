@@ -1,6 +1,5 @@
 import "../Scss/index.css";
 import "@/components/Header/header.css";
-import "../components/Footer/footer.css";
 import "../components/AdminPanelHeader/admin_panel_header.css";
 import "../components/ErrorOnLoadingThePage/error_on_loading_the_page.css";
 import "../pages/login/login.css";

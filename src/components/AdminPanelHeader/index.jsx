@@ -12,7 +12,7 @@ export default function AdminPanelHeader({ isWebsiteOwner = false }) {
 
     const adminLogout = async () => {
         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-        await router.push("/admin-dashboard/login");
+        await router.replace("/login");
     }
 
     return (
@@ -25,48 +25,48 @@ export default function AdminPanelHeader({ isWebsiteOwner = false }) {
                         <Nav>
                             {isWebsiteOwner && <>
                                 <NavDropdown title="Stores" id="stores-nav-dropdown">
-                                    <NavDropdown.Item href="/admin-dashboard/stores-managment" as={Link}>All Stores</NavDropdown.Item>
+                                    <NavDropdown.Item href="/stores-managment" as={Link}>All Stores</NavDropdown.Item>
                                 </NavDropdown>
                                 <NavDropdown title="Global" id="global-nav-dropdown">
-                                    <NavDropdown.Item href="/admin-dashboard/show-and-hide-sections-managment" as={Link}>Show / Hide Sections</NavDropdown.Item>
+                                    <NavDropdown.Item href="/global-managment/show-and-hide-sections-managment" as={Link}>Show / Hide Sections</NavDropdown.Item>
                                     <NavDropdown.Divider />
-                                    <NavDropdown.Item href="/admin-dashboard/change-bussiness-email-password" as={Link}>
+                                    <NavDropdown.Item href="/global-managment/change-bussiness-email-password" as={Link}>
                                         Change Bussiness Email Password
                                     </NavDropdown.Item>
                                     <NavDropdown.Divider />
-                                    <NavDropdown.Item href="/admin-dashboard/change-admin-password" as={Link}>
+                                    <NavDropdown.Item href="/global-managment/change-admin-password" as={Link}>
                                         Change Admin Password
                                     </NavDropdown.Item>
                                 </NavDropdown>
                             </>}
                             <NavDropdown title="Admins" id="admins-nav-dropdown">
-                                <NavDropdown.Item href="/admin-dashboard/add-new-admin" as={Link}>Add New</NavDropdown.Item>
+                                <NavDropdown.Item href="/admins-managment/add-new-admin" as={Link}>Add New</NavDropdown.Item>
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item href="/admin-dashboard/update-and-delete-admins" as={Link}>
+                                <NavDropdown.Item href="/admins-managment/update-and-delete-admins" as={Link}>
                                     Update / Delete
                                 </NavDropdown.Item>
                             </NavDropdown>
                             <NavDropdown title="Products" id="products-nav-dropdown">
-                                <NavDropdown.Item href="/admin-dashboard/add-new-product" as={Link}>Add New</NavDropdown.Item>
+                                <NavDropdown.Item href="/products-managment/add-new-product" as={Link}>Add New</NavDropdown.Item>
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item href="/admin-dashboard/update-and-delete-products" as={Link}>
+                                <NavDropdown.Item href="/products-managment/update-and-delete-products" as={Link}>
                                     Update / Delete
                                 </NavDropdown.Item>
                             </NavDropdown>
                             <NavDropdown title="Categories" id="categories-nav-dropdown">
-                                <NavDropdown.Item href="/admin-dashboard/add-new-category" as={Link}>Add New</NavDropdown.Item>
+                                <NavDropdown.Item href="/categories-managment/add-new-category" as={Link}>Add New</NavDropdown.Item>
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item href="/admin-dashboard/update-and-delete-categories" as={Link}>
+                                <NavDropdown.Item href="/categories-managment/update-and-delete-categories" as={Link}>
                                     Update / Delete
                                 </NavDropdown.Item>
                             </NavDropdown>
                             <NavDropdown title="Orders" id="orders-nav-dropdown">
-                                <NavDropdown.Item href="/admin-dashboard/orders-managment" as={Link}>All Orders</NavDropdown.Item>
+                                <NavDropdown.Item href="/orders-managment" as={Link}>All Orders</NavDropdown.Item>
                             </NavDropdown>
                             <NavDropdown title="Brands" id="brands-nav-dropdown">
-                                <NavDropdown.Item href="/admin-dashboard/add-new-brand" as={Link}>Add New</NavDropdown.Item>
+                                <NavDropdown.Item href="/brands-managment/add-new-brand" as={Link}>Add New</NavDropdown.Item>
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item href="/admin-dashboard/update-and-delete-brands" as={Link}>
+                                <NavDropdown.Item href="/brands-managment/update-and-delete-brands" as={Link}>
                                     Update / Delete
                                 </NavDropdown.Item>
                             </NavDropdown>

@@ -105,7 +105,7 @@ export default function ShowBilling({ orderId }) {
             <Head>
                 <title>Ubuyblues Store Admin Dashboard - Billing</title>
             </Head>
-            {!isLoadingPage && <>
+            {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <Header />
                 <div className="page-content p-4 bg-white">
                     <h1 className="welcome-msg text-center mb-5">{t("Your Order Billing From Ubuyblues Store")}</h1>

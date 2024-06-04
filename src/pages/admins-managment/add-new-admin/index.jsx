@@ -18,7 +18,7 @@ export default function AddNewAdmin() {
 
     const [adminInfo, setAdminInfo] = useState({});
 
-    const [adminData, setAdminData] = useState({
+    const [newAdminData, setNewAdminData] = useState({
         firstName: "",
         lastName: "",
         email: "",
@@ -45,12 +45,16 @@ export default function AddNewAdmin() {
                         await router.replace("/login");
                     } else {
                         const adminDetails = result.data;
-                        if (adminDetails.isBlocked) {
-                            localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                            await router.replace("/login");
+                        if (adminDetails.isMerchant) {
+                            if (adminDetails.isBlocked) {
+                                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                                await router.replace("/login");
+                            } else {
+                                setAdminInfo(adminDetails);
+                                setIsLoadingPage(false);
+                            }
                         } else {
-                            setAdminInfo(adminDetails);
-                            setIsLoadingPage(false);
+                            await router.replace("/");
                         }
                     }
                 })
@@ -71,14 +75,14 @@ export default function AddNewAdmin() {
         } else router.replace("/login");
     }, []);
 
-    const addNewAdmin = async (e, adminData) => {
+    const addNewAdmin = async (e, newAdminData) => {
         try {
             e.preventDefault();
             setFormValidationErrors({});
             const errorsObject = inputValuesValidation([
                 {
                     name: "firstName",
-                    value: adminData.firstName,
+                    value: newAdminData.firstName,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -90,7 +94,7 @@ export default function AddNewAdmin() {
                 },
                 {
                     name: "lastName",
-                    value: adminData.lastName,
+                    value: newAdminData.lastName,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -102,7 +106,7 @@ export default function AddNewAdmin() {
                 },
                 {
                     name: "email",
-                    value: adminData.email,
+                    value: newAdminData.email,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -114,7 +118,7 @@ export default function AddNewAdmin() {
                 },
                 {
                     name: "password",
-                    value: adminData.password,
+                    value: newAdminData.password,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -128,7 +132,7 @@ export default function AddNewAdmin() {
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 setIsWaitStatus(true);
-                const res = await axios.post(`${process.env.BASE_API_URL}/admins/add-new-admin`, adminData, {
+                const res = await axios.post(`${process.env.BASE_API_URL}/admins/add-new-admin`, newAdminData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
@@ -139,7 +143,7 @@ export default function AddNewAdmin() {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
-                        setAdminData({
+                        setNewAdminData({
                             firstName: "",
                             lastName: "",
                             email: "",
@@ -177,20 +181,20 @@ export default function AddNewAdmin() {
                 <title>Ubuyblues Store Admin Dashboard - Add New Admin</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
-                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} />
+                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content d-flex justify-content-center align-items-center flex-column pt-5 pb-5 p-4">
                     <h1 className="fw-bold w-fit pb-2 mb-3">
                         <PiHandWavingThin className="me-2" />
                         Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Add New Admin Page
                     </h1>
-                    <form className="add-new-product-form admin-dashbboard-form" onSubmit={(e) => addNewAdmin(e, adminData)}>
+                    <form className="add-new-product-form admin-dashbboard-form" onSubmit={(e) => addNewAdmin(e, newAdminData)}>
                         <section className="first-name mb-4">
                             <input
                                 type="text"
                                 className={`form-control p-2 border-2 product-name-field ${formValidationErrors["firstName"] ? "border-danger mb-3" : "mb-4"}`}
                                 placeholder="Please Enter First Name"
-                                onChange={(e) => setAdminData({ ...adminData, firstName: e.target.value })}
-                                value={adminData.firstName}
+                                onChange={(e) => setNewAdminData({ ...newAdminData, firstName: e.target.value })}
+                                value={newAdminData.firstName}
                             />
                             {formValidationErrors["firstName"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
@@ -202,8 +206,8 @@ export default function AddNewAdmin() {
                                 type="text"
                                 className={`form-control p-2 border-2 product-name-field ${formValidationErrors["lastName"] ? "border-danger mb-3" : "mb-4"}`}
                                 placeholder="Please Enter Last Name"
-                                onChange={(e) => setAdminData({ ...adminData, lastName: e.target.value })}
-                                value={adminData.lastName}
+                                onChange={(e) => setNewAdminData({ ...newAdminData, lastName: e.target.value })}
+                                value={newAdminData.lastName}
                             />
                             {formValidationErrors["lastName"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
@@ -215,8 +219,8 @@ export default function AddNewAdmin() {
                                 type="text"
                                 className={`form-control p-2 border-2 admin-email-field ${formValidationErrors["email"] ? "border-danger mb-3" : "mb-4"}`}
                                 placeholder="Please Enter Email"
-                                onChange={(e) => setAdminData({ ...adminData, email: e.target.value })}
-                                value={adminData.email}
+                                onChange={(e) => setNewAdminData({ ...newAdminData, email: e.target.value })}
+                                value={newAdminData.email}
                             />
                             {formValidationErrors["email"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
@@ -228,8 +232,8 @@ export default function AddNewAdmin() {
                                 type="text"
                                 className={`form-control p-2 border-2 admin-password-field ${formValidationErrors["password"] ? "border-danger mb-3" : "mb-4"}`}
                                 placeholder="Please Enter Password"
-                                onChange={(e) => setAdminData({ ...adminData, password: e.target.value })}
-                                value={adminData.password}
+                                onChange={(e) => setNewAdminData({ ...newAdminData, password: e.target.value })}
+                                value={newAdminData.password}
                             />
                             {formValidationErrors["password"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>

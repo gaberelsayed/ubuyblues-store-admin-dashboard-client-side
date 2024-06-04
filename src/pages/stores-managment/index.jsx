@@ -344,7 +344,7 @@ export default function StoresManagment() {
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 {/* Start Admin Dashboard Side Bar */}
-                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} />
+                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 {/* Start Admin Dashboard Side Bar */}
                 {/* Start Share Options Box */}
                 {isDisplayChangeStoreStatusBox && <ChangeStoreStatusBox

@@ -59,14 +59,19 @@ export default function UpdateAndDeleteAdmins() {
                         await router.replace("/login");
                     } else {
                         const adminDetails = result.data;
-                        if (adminDetails.isWebsiteOwner) {
-                            setAdminInfo(adminDetails);
-                            result = await getAdminsCount();
-                            if (result.data > 0) {
-                                setAllAdminsInsideThePage((await getAllAdminsInsideThePage(1, pageSize)).data);
-                                setTotalPagesCount(Math.ceil(result.data / pageSize));
+                        if (adminDetails.isMerchant) {
+                            if (adminDetails.isBlocked) {
+                                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                                await router.replace("/login");
+                            } else {
+                                setAdminInfo(adminDetails);
+                                result = await getAdminsCount();
+                                if (result.data > 0) {
+                                    setAllAdminsInsideThePage((await getAllAdminsInsideThePage(1, pageSize)).data);
+                                    setTotalPagesCount(Math.ceil(result.data / pageSize));
+                                }
+                                setIsLoadingPage(false);
                             }
-                            setIsLoadingPage(false);
                         } else {
                             await router.replace("/");
                         }
@@ -314,7 +319,7 @@ export default function UpdateAndDeleteAdmins() {
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 {/* Start Admin Dashboard Side Bar */}
-                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} />
+                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 {/* Start Admin Dashboard Side Bar */}
                 {/* Start Content Section */}
                 <section className="page-content d-flex justify-content-center align-items-center flex-column text-center pt-5 pb-5">

@@ -39,7 +39,7 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
                                     </NavDropdown.Item>
                                 </NavDropdown>
                             </>}
-                            {!isMerchant && <NavDropdown title="Admins" id="admins-nav-dropdown">
+                            {isMerchant && <NavDropdown title="Admins" id="admins-nav-dropdown">
                                 <NavDropdown.Item href="/admins-managment/add-new-admin" as={Link}>Add New</NavDropdown.Item>
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item href="/admins-managment/update-and-delete-admins" as={Link}>

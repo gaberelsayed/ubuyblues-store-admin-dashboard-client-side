@@ -589,7 +589,7 @@ export default function UpdateAndDeleteProducts() {
                 <title>Ubuyblues Store Admin Dashboard - Update / Delete Products</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
-                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} />
+                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 {productIndex > -1 && <div className="overlay">
                     <div className="gallery-images-box d-flex flex-column align-items-center justify-content-center p-4">
                         <GrFormClose className="close-overlay-icon" onClick={() => setProductIndex(-1)} />

@@ -107,7 +107,7 @@ export default function ShowAndHideSections() {
                 <title>Ubuyblues Store Admin Dashboard - Show And Hide Sections</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
-                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} />
+                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-5">
                     <h1 className="fw-bold w-fit pb-2 mb-3">
                         <PiHandWavingThin className="me-2" />

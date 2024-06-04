@@ -56,7 +56,7 @@ export default function Home() {
                 <title>Ubuyblues Store - Admin Dashboard</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
-                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} />
+                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content d-flex justify-content-center align-items-center">
                     <h1 className="fw-bold w-fit pb-2 text-center">
                         <PiHandWavingThin className="me-2" />

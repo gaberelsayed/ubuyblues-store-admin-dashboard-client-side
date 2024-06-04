@@ -19,7 +19,7 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
         <header className="admin-panel-header">
             <Navbar expand="lg" className="bg-body-tertiary">
                 <Container fluid>
-                    <Navbar.Brand href="/admin-dashboard" as={Link}>Ubuyblues Dashboard</Navbar.Brand>
+                    <Navbar.Brand href="/" as={Link}>Ubuyblues Dashboard</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                         <Nav>

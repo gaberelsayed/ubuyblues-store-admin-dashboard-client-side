@@ -6,7 +6,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 
-export default function AdminPanelHeader({ isWebsiteOwner = false }) {
+export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = false }) {
 
     const router = useRouter();
 
@@ -39,13 +39,13 @@ export default function AdminPanelHeader({ isWebsiteOwner = false }) {
                                     </NavDropdown.Item>
                                 </NavDropdown>
                             </>}
-                            <NavDropdown title="Admins" id="admins-nav-dropdown">
+                            {!isMerchant && <NavDropdown title="Admins" id="admins-nav-dropdown">
                                 <NavDropdown.Item href="/admins-managment/add-new-admin" as={Link}>Add New</NavDropdown.Item>
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item href="/admins-managment/update-and-delete-admins" as={Link}>
                                     Update / Delete
                                 </NavDropdown.Item>
-                            </NavDropdown>
+                            </NavDropdown>}
                             <NavDropdown title="Products" id="products-nav-dropdown">
                                 <NavDropdown.Item href="/products-managment/add-new-product" as={Link}>Add New</NavDropdown.Item>
                                 <NavDropdown.Divider />

@@ -156,6 +156,9 @@ export default function AdminLogin() {
                             <span className="me-2">{errMsg}</span>
                             <FiLogIn />
                         </button>}
+                        <a href={`${process.env.WEBSITE_URL}/forget-password?userType=admin`} className="btn btn-danger mx-auto mb-4">
+                            <span className="me-2">Forget Password</span>
+                        </a>
                         {errMsg && Object.keys(blockingDateAndReason).length > 0 && <div className="blocking-date-and-reason-box bg-white border border-danger p-3">
                             <h6 className="blocking-date fw-bold">Blocking Date: { getDateFormated(blockingDateAndReason.blockingDate) }</h6>
                             <h6 className="blocking-reason m-0 fw-bold">Blocking Reason: { blockingDateAndReason.blockingReason }</h6>

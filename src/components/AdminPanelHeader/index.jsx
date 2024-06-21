@@ -33,10 +33,6 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
                                     <NavDropdown.Item href="/global-managment/change-bussiness-email-password" as={Link}>
                                         Change Bussiness Email Password
                                     </NavDropdown.Item>
-                                    <NavDropdown.Divider />
-                                    <NavDropdown.Item href="/global-managment/change-admin-password" as={Link}>
-                                        Change Admin Password
-                                    </NavDropdown.Item>
                                 </NavDropdown>
                             </>}
                             {isMerchant && <NavDropdown title="Admins" id="admins-nav-dropdown">

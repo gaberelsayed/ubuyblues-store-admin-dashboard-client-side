@@ -77,14 +77,14 @@ export default function UpdateAndDeleteProducts() {
 
     const [filters, setFilters] = useState({
         storeId: "",
-        category: "",
+        categoryId: "",
     });
 
     const [formValidationErrors, setFormValidationErrors] = useState({});
 
     const router = useRouter();
 
-    const pageSize = 2;
+    const pageSize = 10;
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
@@ -152,7 +152,7 @@ export default function UpdateAndDeleteProducts() {
 
     const getFilteringString = (filters) => {
         let filteringString = "";
-        if (filters.category) filteringString += `category=${filters.category}&`;
+        if (filters.categoryId) filteringString += `categoryId=${filters.categoryId}&`;
         if (filters.storeId) filteringString += `storeId=${filters.storeId}&`;
         if (filteringString) filteringString = filteringString.substring(0, filteringString.length - 1);
         return filteringString;
@@ -165,7 +165,7 @@ export default function UpdateAndDeleteProducts() {
             let filteringString = getFilteringString(filters);
             const result = await getProductsCount(filteringString);
             if (result.data > 0) {
-                setAllProductsInsideThePage((await getAllProductsInsideThePage(1, pageSize, filteringString)).data);
+                setAllProductsInsideThePage((await getAllProductsInsideThePage(1, pageSize, filteringString)).data.products);
                 setTotalPagesCount(Math.ceil(result.data / pageSize));
                 setIsFilteringProductsStatus(false);
             } else {
@@ -745,12 +745,12 @@ export default function UpdateAndDeleteProducts() {
                                 <h6 className="me-2 fw-bold text-center">Category</h6>
                                 <select
                                     className="select-product-category form-select"
-                                    onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                                    onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
                                 >
                                     <option value="" hidden>Pleae Select Category</option>
                                     <option value="">All</option>
                                     {allCategories.map((category) => (
-                                        <option value={category.name} key={category._id}>{category.name}</option>
+                                        <option value={category._id} key={category._id}>{category.name}</option>
                                     ))}
                                 </select>
                             </div>

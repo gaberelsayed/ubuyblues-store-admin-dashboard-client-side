@@ -51,7 +51,7 @@ export default function OrdersManagment() {
 
     const router = useRouter();
 
-    const pageSize = 3;
+    const pageSize = 10;
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);

@@ -121,7 +121,7 @@ export default function UpdateAndDeleteBrands() {
     const getPreviousPage = async () => {
         setIsWaitGetBrandsStatus(true);
         const newCurrentPage = currentPage - 1;
-        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize)).data);
+        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
         setIsWaitGetBrandsStatus(false);
     }
@@ -129,14 +129,14 @@ export default function UpdateAndDeleteBrands() {
     const getNextPage = async () => {
         setIsWaitGetBrandsStatus(true);
         const newCurrentPage = currentPage + 1;
-        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize)).data);
+        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
         setIsWaitGetBrandsStatus(false);
     }
 
     const getSpecificPage = async (pageNumber) => {
         setIsWaitGetBrandsStatus(true)
-        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(pageNumber, pageSize)).data);
+        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
         setCurrentPage(pageNumber);
         setIsWaitGetBrandsStatus(false);
     }

@@ -74,19 +74,19 @@ export default function OrderDetails({ orderId }) {
     }
 
     const changeOrderProductData = (productIndex, fieldName, newValue) => {
-        let orderLinesTemp = orderDetails.order_products;
-        orderLinesTemp[productIndex][fieldName] = newValue;
-        setOrderDetails({ ...orderDetails, order_products: orderLinesTemp });
+        let productsTemp = orderDetails.products;
+        productsTemp[productIndex][fieldName] = newValue;
+        setOrderDetails({ ...orderDetails, products: productsTemp });
     }
 
     const updateOrderProductData = async (orderProductIndex) => {
         try {
             setIsUpdatingStatus(true);
-            const res = await axios.put(`${process.env.BASE_API_URL}/orders/products/update-product/${orderDetails._id}/${orderDetails.order_products[orderProductIndex].productId}`, {
-                quantity: orderDetails.order_products[orderProductIndex].quantity,
-                name: orderDetails.order_products[orderProductIndex].name,
-                total_amount: orderDetails.order_products[orderProductIndex].total_amount,
-                unit_price: orderDetails.order_products[orderProductIndex].unit_price,
+            const res = await axios.put(`${process.env.BASE_API_URL}/orders/products/update-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}`, {
+                quantity: orderDetails.products[orderProductIndex].quantity,
+                name: orderDetails.products[orderProductIndex].name,
+                totalAmount: orderDetails.products[orderProductIndex].totalAmount,
+                unitPrice: orderDetails.products[orderProductIndex].unitPrice,
             }, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -178,7 +178,7 @@ export default function OrderDetails({ orderId }) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {orderDetails.order_products.map((orderProduct, orderProductIndex) => (
+                                    {orderDetails.products.map((orderProduct, orderProductIndex) => (
                                         <tr key={orderProduct._id}>
                                             <td>{orderProduct._id}</td>
                                             <td>
@@ -203,8 +203,8 @@ export default function OrderDetails({ orderId }) {
                                                 <input
                                                     type="number"
                                                     className="form-control unit-price"
-                                                    defaultValue={orderProduct.unit_price}
-                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "unit_price", e.target.valueAsNumber)}
+                                                    defaultValue={orderProduct.unitPrice}
+                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "unitPrice", e.target.valueAsNumber)}
                                                     disabled={orderDetails.isDeleted}
                                                 />
                                             </td>
@@ -212,14 +212,14 @@ export default function OrderDetails({ orderId }) {
                                                 <input
                                                     type="number"
                                                     className="form-control total-amount"
-                                                    defaultValue={orderProduct.total_amount}
-                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "total_amount", e.target.valueAsNumber)}
+                                                    defaultValue={orderProduct.totalAmount}
+                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "totalAmount", e.target.valueAsNumber)}
                                                     disabled={orderDetails.isDeleted}
                                                 />
                                             </td>
                                             <td>
                                                 <img
-                                                    src={`${process.env.BASE_API_URL}/${orderProduct.image_path}`}
+                                                    src={`${process.env.BASE_API_URL}/${orderProduct.imagePath}`}
                                                     alt="product Image !!"
                                                     width="100"
                                                     height="100"
@@ -239,7 +239,7 @@ export default function OrderDetails({ orderId }) {
                                                     >
                                                         Updating ...
                                                     </button>}
-                                                    {!isUpdatingStatus && !isDeletingStatus && !errorMsg && !successMsg && orderDetails.order_products.length > 1 && <button
+                                                    {!isUpdatingStatus && !isDeletingStatus && !errorMsg && !successMsg && orderDetails.products.length > 1 && <button
                                                         className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                         onClick={() => deleteProductFromOrder(orderProductIndex)}
                                                     >
@@ -272,28 +272,28 @@ export default function OrderDetails({ orderId }) {
                                         <div className="billing-address-box text-start p-3">
                                             <h6 className="fw-bold">Billing Address</h6>
                                             <hr />
-                                            <p className="city fw-bold info">City: {orderDetails.billing_address.city}</p>
-                                            <p className="email fw-bold info">Email: {orderDetails.billing_address.email}</p>
-                                            <p className="name fw-bold info">Name: {orderDetails.billing_address.first_name}</p>
-                                            <p className="family-name fw-bold info">Family Name: {orderDetails.billing_address.last_name}</p>
-                                            <p className="phone fw-bold info">Phone: {orderDetails.billing_address.phone}</p>
-                                            <p className="postal-code fw-bold info">Postal Code: {orderDetails.billing_address.postal_code}</p>
-                                            <p className="street-address fw-bold info">Street Address: {orderDetails.billing_address.street_address}</p>
-                                            <p className="apartment-number fw-bold info">Apartment Number: {orderDetails.billing_address.apartment_number}</p>
+                                            <p className="city fw-bold info">City: {orderDetails.billingAddress.city}</p>
+                                            <p className="email fw-bold info">Email: {orderDetails.billingAddress.email}</p>
+                                            <p className="name fw-bold info">Name: {orderDetails.billingAddress.firstName}</p>
+                                            <p className="family-name fw-bold info">Family Name: {orderDetails.billingAddress.lastName}</p>
+                                            <p className="phone fw-bold info">Phone: {orderDetails.billingAddress.phone}</p>
+                                            <p className="postal-code fw-bold info">Postal Code: {orderDetails.billingAddress.postalCode}</p>
+                                            <p className="street-address fw-bold info">Street Address: {orderDetails.billingAddress.streetAddress}</p>
+                                            <p className="apartment-number fw-bold info">Apartment Number: {orderDetails.billingAddress.apartmentNumber}</p>
                                         </div>
                                     </div>
                                     <div className="col-md-6 bg-white border border-2 border-dark">
                                         <div className="shipping-address-box text-start p-3">
                                             <h6 className="fw-bold">Shipping Address</h6>
                                             <hr />
-                                            <p className="city fw-bold info">City: {orderDetails.shipping_address.city}</p>
-                                            <p className="email fw-bold info">Email: {orderDetails.shipping_address.email}</p>
-                                            <p className="name fw-bold info">Name: {orderDetails.shipping_address.first_name}</p>
-                                            <p className="family-name fw-bold info">Family Name: {orderDetails.shipping_address.last_name}</p>
-                                            <p className="phone fw-bold info">Phone: {orderDetails.shipping_address.phone}</p>
-                                            <p className="postal-code fw-bold info">Postal Code: {orderDetails.shipping_address.postal_code}</p>
-                                            <p className="street-address fw-bold info">Street Address: {orderDetails.shipping_address.street_address}</p>
-                                            <p className="apartment-number fw-bold info">Apartment Number: {orderDetails.shipping_address.apartment_number}</p>
+                                            <p className="city fw-bold info">City: {orderDetails.shippingAddress.city}</p>
+                                            <p className="email fw-bold info">Email: {orderDetails.shippingAddress.email}</p>
+                                            <p className="name fw-bold info">Name: {orderDetails.shippingAddress.firstName}</p>
+                                            <p className="family-name fw-bold info">Family Name: {orderDetails.shippingAddress.lastName}</p>
+                                            <p className="phone fw-bold info">Phone: {orderDetails.shippingAddress.phone}</p>
+                                            <p className="postal-code fw-bold info">Postal Code: {orderDetails.shippingAddress.postalCode}</p>
+                                            <p className="street-address fw-bold info">Street Address: {orderDetails.shippingAddress.streetAddress}</p>
+                                            <p className="apartment-number fw-bold info">Apartment Number: {orderDetails.shippingAddress.apartmentNumber}</p>
                                         </div>
                                     </div>
                                 </div>

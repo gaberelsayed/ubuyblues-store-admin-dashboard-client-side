@@ -388,7 +388,7 @@ export default function OrdersManagment() {
                                         <tr key={order._id}>
                                             <td>{order.orderNumber}</td>
                                             <td>{order._id}</td>
-                                            <td>{order.checkout_status}</td>
+                                            <td>{order.checkoutStatus}</td>
                                             <td>
                                                 <h6 className="fw-bold">{order.status}</h6>
                                                 <hr />
@@ -406,7 +406,7 @@ export default function OrdersManagment() {
                                                 <section className="order-total-amount mb-4">
                                                     <input
                                                         type="number"
-                                                        defaultValue={order.order_amount}
+                                                        defaultValue={order.orderAmount}
                                                         className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["totalAmount"] && orderIndex === selectedOrderIndex ? "border-danger mb-3" : "mb-4"}`}
                                                         placeholder="Pleae Enter Order Amount"
                                                         onChange={(e) => changeOrderData(orderIndex, "order_amount", e.target.valueAsNumber ? e.target.valueAsNumber : "")}
@@ -417,7 +417,7 @@ export default function OrdersManagment() {
                                                     </p>}
                                                 </section>
                                             </td>
-                                            <td>{getDateFormated(order.added_date)}</td>
+                                            <td>{getDateFormated(order.addedDate)}</td>
                                             <td>
                                                 {!isUpdatingStatus && !isDeletingStatus && !isSuccessStatus && !isErrorStatus && !order.isDeleted && <button
                                                     className="btn btn-info d-block mx-auto mb-3 global-button"

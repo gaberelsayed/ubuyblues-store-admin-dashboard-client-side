@@ -5,9 +5,9 @@ import axios from "axios";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import { FaRegSmileWink } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import Header from "@/components/Header";
 import { getAdminInfo } from "../../../../../public/global_functions/popular";
 import { useRouter } from "next/router";
+import AdminPanelHeader from "@/components/AdminPanelHeader";
 
 export default function ShowBilling({ orderId }) {
 
@@ -47,8 +47,8 @@ export default function ShowBilling({ orderId }) {
                                 if (!result.error) {
                                     setOrderDetails(result.data);
                                     setPricesDetailsSummary({
-                                        totalPriceBeforeDiscount: calcTotalOrderPriceBeforeDiscount(result.data.order_products),
-                                        totalDiscount: calcTotalOrderDiscount(result.data.order_products),
+                                        totalPriceBeforeDiscount: calcTotalOrderPriceBeforeDiscount(result.data.products),
+                                        totalDiscount: calcTotalOrderDiscount(result.data.products),
                                     });
                                 }
                                 setIsLoadingPage(false);
@@ -87,7 +87,7 @@ export default function ShowBilling({ orderId }) {
     const calcTotalOrderPriceBeforeDiscount = (allProductsData) => {
         let tempTotalPriceBeforeDiscount = 0;
         allProductsData.forEach((product) => {
-            tempTotalPriceBeforeDiscount += product.unit_price * product.quantity;
+            tempTotalPriceBeforeDiscount += product.unitPrice * product.quantity;
         });
         return tempTotalPriceBeforeDiscount;
     }
@@ -106,10 +106,10 @@ export default function ShowBilling({ orderId }) {
                 <title>Ubuyblues Store Admin Dashboard - Billing</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
-                <Header />
+                <AdminPanelHeader />
                 <div className="page-content p-4 bg-white">
                     <h1 className="welcome-msg text-center mb-5">{t("Your Order Billing From Ubuyblues Store")}</h1>
-                    <section className="order-total border border-3 border-dark p-4 ps-md-5 pe-md-5 text-center" id="order-total">
+                    {Object.keys(orderDetails).length > 0 ? <section className="order-total border border-3 border-dark p-4 ps-md-5 pe-md-5 text-center" id="order-total">
                         <h5 className="fw-bold mb-4 text-center">{t("Your Request")}</h5>
                         <div className="order-id-and-number border border-2 border-dark p-4 mb-5">
                             <h5 className="mb-4 text-center">{t("Order Id")}: {orderDetails._id}</h5>
@@ -130,7 +130,7 @@ export default function ShowBilling({ orderId }) {
                                 {t("Sum")}
                             </div>
                         </div>
-                        {orderDetails.order_products.map((product, productIndex) => (
+                        {orderDetails.products.map((product, productIndex) => (
                             <div className="row total pb-3 mb-5" key={productIndex}>
                                 <div className="col-md-3 fw-bold p-0">
                                     {i18n.language !== "ar" ? <span>
@@ -140,13 +140,13 @@ export default function ShowBilling({ orderId }) {
                                     </span>}
                                 </div>
                                 <div className="col-md-3 fw-bold p-0">
-                                    {product.unit_price} {t("KWD")}
+                                    {product.unitPrice} {t("KWD")}
                                 </div>
                                 <div className="col-md-3 fw-bold p-0">
                                     {product.discount} {t("KWD")}
                                 </div>
                                 <div className="col-md-3 fw-bold p-0">
-                                    {(product.unit_price - product.discount) * product.quantity} {t("KWD")}
+                                    {(product.unitPrice - product.discount) * product.quantity} {t("KWD")}
                                 </div>
                             </div>
                         ))}
@@ -171,7 +171,7 @@ export default function ShowBilling({ orderId }) {
                                 {t("Total Price After Discount")}
                             </div>
                             <div className={`col-md-9 fw-bold p-0 ${i18n.language !== "ar" ? "text-md-end" : "text-md-start"}`}>
-                                {orderDetails.order_amount} {t("KWD")}
+                                {orderDetails.orderAmount} {t("KWD")}
                             </div>
                         </div>
                         <div className="thanks-icon-box mb-4">
@@ -180,7 +180,7 @@ export default function ShowBilling({ orderId }) {
                         <h4 className="mb-4">
                             {t("Thanks For Purchase From Ubuyblues Store")}
                         </h4>
-                    </section>
+                    </section> : <p className="alert alert-danger">Sorry, This Order Is Not Found !!</p>}
                 </div>
             </>}
             {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}

@@ -16,7 +16,7 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
     }
 
     return (
-        <header className="admin-panel-header mb-5">
+        <header className="admin-panel-header">
             <Navbar expand="lg" className="bg-body-tertiary">
                 <Container fluid>
                     <Navbar.Brand href="/" as={Link}>Ubuyblues Dashboard</Navbar.Brand>

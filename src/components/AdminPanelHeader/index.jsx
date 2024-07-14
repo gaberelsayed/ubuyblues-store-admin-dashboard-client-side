@@ -15,6 +15,53 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
         await router.replace("/login");
     }
 
+    const handleSelectCountry = async (country) => {
+        try {
+            switch (country) {
+                case "kuwait": {
+                    localStorage.setItem("asfour-store-country", country);
+                    await router.replace({
+                        pathname: router.pathname,
+                        query: {
+                            ...router.query,
+                            country,
+                        }
+                    });
+                    return;
+                }
+                case "germany": {
+                    localStorage.setItem("asfour-store-country", country);
+                    await router.replace({
+                        pathname: router.pathname,
+                        query: {
+                            ...router.query,
+                            country,
+                        }
+                    });
+                    return;
+                }
+                case "turkey": {
+                    localStorage.setItem("asfour-store-country", country);
+                    await router.replace({
+                        pathname: router.pathname,
+                        query: {
+                            ...router.query,
+                            country,
+                        }
+                    });
+                    return
+                }
+                default: {
+                    return "Sorry, Invalid Country !!";
+                }
+            }
+
+        }
+        catch (err) {
+            return err;
+        }
+    }
+
     return (
         <header className="admin-panel-header">
             <Navbar expand="lg" className="bg-body-tertiary">
@@ -23,6 +70,13 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                         <Nav>
+                            {router.pathname === "/orders-managment/billing/[orderId]" && <NavDropdown title="Countries" id="products-nav-dropdown">
+                                <NavDropdown.Item onClick={() => handleSelectCountry("kuwait")}>KW</NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item onClick={() => handleSelectCountry("germany")}>DE</NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item onClick={() => handleSelectCountry("turkey")}>TR</NavDropdown.Item>
+                            </NavDropdown>}
                             {isWebsiteOwner && <>
                                 <NavDropdown title="Stores" id="stores-nav-dropdown">
                                     <NavDropdown.Item href="/stores-managment" as={Link}>All Stores</NavDropdown.Item>

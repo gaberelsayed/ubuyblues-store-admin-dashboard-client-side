@@ -8,12 +8,19 @@ import { useTranslation } from "react-i18next";
 import { getAdminInfo } from "../../../../../public/global_functions/popular";
 import { useRouter } from "next/router";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
+import { getCurrencyNameByCountry, getUSDPriceAgainstCurrency } from "../../../../../public/global_functions/prices";
 
-export default function ShowBilling({ orderId }) {
+export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
     const [isErrorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState(false);
+
+    const [usdPriceAgainstCurrency, setUsdPriceAgainstCurrency] = useState(1);
+
+    const [currencyNameByCountry, setCurrencyNameByCountry] = useState("");
+
+    const [isGetOrderDetails, setIsGetOrderDetails] = useState(true);
 
     const [orderDetails, setOrderDetails] = useState({});
 
@@ -27,7 +34,22 @@ export default function ShowBilling({ orderId }) {
     const { t, i18n } = useTranslation();
 
     useEffect(() => {
-        if (orderId) {
+        setIsLoadingPage(true);
+        getUSDPriceAgainstCurrency(countryAsProperty).then((price) => {
+            setUsdPriceAgainstCurrency(price);
+            setCurrencyNameByCountry(getCurrencyNameByCountry(countryAsProperty));
+            if (!isGetOrderDetails) {
+                setIsLoadingPage(false);
+            }
+        })
+            .catch(() => {
+                setIsLoadingPage(false);
+                setIsErrorMsgOnLoadingThePage(true);
+            });
+    }, [countryAsProperty]);
+
+    useEffect(() => {
+        if (orderIdAsProperty) {
             const userLanguage = localStorage.getItem("asfour-store-language");
             handleSelectUserLanguage(userLanguage === "ar" || userLanguage === "en" || userLanguage === "tr" || userLanguage === "de" ? userLanguage : "en");
             const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
@@ -43,7 +65,7 @@ export default function ShowBilling({ orderId }) {
                                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                                 await router.replace("/login");
                             } else {
-                                result = await getOrderDetails(orderId);
+                                result = await getOrderDetails(orderIdAsProperty);
                                 if (!result.error) {
                                     setOrderDetails(result.data);
                                     setPricesDetailsSummary({
@@ -51,7 +73,7 @@ export default function ShowBilling({ orderId }) {
                                         totalDiscount: calcTotalOrderDiscount(result.data.products),
                                     });
                                 }
-                                setIsLoadingPage(false);
+                                setIsGetOrderDetails(false);
                             }
                         }
                     })
@@ -69,9 +91,15 @@ export default function ShowBilling({ orderId }) {
         }
     }, []);
 
+    useEffect(() => {
+        if (!isGetOrderDetails) {
+            setIsLoadingPage(false);
+        }
+    }, [isGetOrderDetails]);
+
     const getOrderDetails = async () => {
         try {
-            const res = await axios.get(`${process.env.BASE_API_URL}/orders/order-details/${orderId}`);
+            const res = await axios.get(`${process.env.BASE_API_URL}/orders/order-details/${orderIdAsProperty}`);
             return res.data;
         }
         catch (err) {
@@ -140,13 +168,13 @@ export default function ShowBilling({ orderId }) {
                                     </span>}
                                 </div>
                                 <div className="col-md-3 fw-bold p-0">
-                                    {product.unitPrice} {t("KWD")}
+                                    {(product.unitPrice * usdPriceAgainstCurrency).toFixed(2)} {t(currencyNameByCountry)}
                                 </div>
                                 <div className="col-md-3 fw-bold p-0">
-                                    {product.discount} {t("KWD")}
+                                    {product.discount * usdPriceAgainstCurrency} {t(currencyNameByCountry)}
                                 </div>
                                 <div className="col-md-3 fw-bold p-0">
-                                    {(product.unitPrice - product.discount) * product.quantity} {t("KWD")}
+                                    {((product.unitPrice - product.discount) * product.quantity * usdPriceAgainstCurrency).toFixed(2)} {t(currencyNameByCountry)}
                                 </div>
                             </div>
                         ))}
@@ -155,7 +183,7 @@ export default function ShowBilling({ orderId }) {
                                 {t("Total Price Before Discount")}
                             </div>
                             <div className={`col-md-9 fw-bold p-0 ${i18n.language !== "ar" ? "text-md-end" : "text-md-start"}`}>
-                                {pricesDetailsSummary.totalPriceBeforeDiscount} {t("KWD")}
+                                {(pricesDetailsSummary.totalPriceBeforeDiscount * usdPriceAgainstCurrency).toFixed(2)} {t(currencyNameByCountry)}
                             </div>
                         </div>
                         <div className="row total-price-discount total pb-3 mb-5">
@@ -163,7 +191,7 @@ export default function ShowBilling({ orderId }) {
                                 {t("Total Discount")}
                             </div>
                             <div className={`col-md-9 fw-bold p-0 ${i18n.language !== "ar" ? "text-md-end" : "text-md-start"}`}>
-                                {pricesDetailsSummary.totalDiscount} {t("KWD")}
+                                {(pricesDetailsSummary.totalDiscount * usdPriceAgainstCurrency).toFixed(2)} {t(currencyNameByCountry)}
                             </div>
                         </div>
                         <div className="row total-price-after-discount total pb-3 mb-5">
@@ -171,7 +199,7 @@ export default function ShowBilling({ orderId }) {
                                 {t("Total Price After Discount")}
                             </div>
                             <div className={`col-md-9 fw-bold p-0 ${i18n.language !== "ar" ? "text-md-end" : "text-md-start"}`}>
-                                {orderDetails.orderAmount} {t("KWD")}
+                                {(orderDetails.orderAmount * usdPriceAgainstCurrency).toFixed(2)} {t(currencyNameByCountry)}
                             </div>
                         </div>
                         <div className="thanks-icon-box mb-4">
@@ -189,20 +217,55 @@ export default function ShowBilling({ orderId }) {
     );
 }
 
-export async function getServerSideProps(context) {
-    const orderId = context.query.orderId;
-    if (!orderId) {
+export async function getServerSideProps({ query, params }) {
+    if (!params.orderId) {
         return {
             redirect: {
                 permanent: false,
-                destination: "/order-managment",
+                destination: "/orders-managment",
+            },
+            props: {
+                countryAsProperty: "kuwait",
             },
         }
-    } else {
+    }
+    const allowedCountries = ["kuwait", "germany", "turkey"];
+    if (query.country) {
+        if (!allowedCountries.includes(query.country)) {
+            return {
+                redirect: {
+                    permanent: false,
+                    destination: `/orders-managment/${params.orderId}`,
+                },
+                props: {
+                    countryAsProperty: "kuwait",
+                    orderIdAsProperty: params.orderId,
+                },
+            }
+        }
+        if (Object.keys(query).filter((key) => key !== "country").length > 1) {
+            return {
+                redirect: {
+                    permanent: false,
+                    destination: `/orders-managment/${params.orderId}?country=${query.country}`,
+                },
+                props: {
+                    countryAsProperty: query.country,
+                    orderIdAsProperty: params.orderId,
+                },
+            }
+        }
         return {
             props: {
-                orderId,
+                countryAsProperty: query.country,
+                orderIdAsProperty: params.orderId,
             },
         }
+    }
+    return {
+        props: {
+            countryAsProperty: "kuwait",
+            orderIdAsProperty: params.orderId,
+        },
     }
 }

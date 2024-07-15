@@ -7,7 +7,7 @@ import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { getAdminInfo } from "../../../../public/global_functions/popular";
 
-export default function OrderDetails({ orderId }) {
+export default function OrderDetails({ orderIdAsProperty }) {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
@@ -42,7 +42,7 @@ export default function OrderDetails({ orderId }) {
                             await router.replace("/login");
                         } else {
                             setAdminInfo(adminDetails);
-                            result = await getOrderDetails(orderId);
+                            result = await getOrderDetails(orderIdAsProperty);
                             if (!result.error) {
                                 setOrderDetails(result.data);
                                 setIsLoadingPage(false);
@@ -320,7 +320,7 @@ export async function getServerSideProps(context) {
     } else {
         return {
             props: {
-                orderId,
+                orderIdAsProperty: orderId,
             },
         }
     }

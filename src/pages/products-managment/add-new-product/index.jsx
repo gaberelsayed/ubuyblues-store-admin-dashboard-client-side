@@ -167,6 +167,15 @@ export default function AddNewProduct() {
                     },
                 },
                 {
+                    name: "country",
+                    value: productData.country,
+                    rules: {
+                        isRequired: {
+                            msg: "Sorry, This Field Can't Be Empty !!",
+                        },
+                    },
+                },
+                {
                     name: "image",
                     value: productData.image,
                     rules: {

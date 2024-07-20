@@ -116,7 +116,7 @@ export default function AddNewAd() {
                     advertisementData.append("storeId", adminInfo.storeId);
                 }
                 setIsWaitStatus(true);
-                const res = await axios.post(`${process.env.BASE_API_URL}/ads/add-new-ad?advertisementType=${advertisementType}`, advertisementData, {
+                const res = await axios.post(`${process.env.BASE_API_URL}/ads/add-new-${advertisementType}-ad`, advertisementData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
@@ -129,7 +129,9 @@ export default function AddNewAd() {
                         setSuccessMsg("");
                         setAdContent("");
                         setAdImage(null);
-                        adImageFileRef.current.value = "";
+                        if (advertisementType === "image") {
+                            adImageFileRef.current.value = "";
+                        }
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {

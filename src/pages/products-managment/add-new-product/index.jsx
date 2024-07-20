@@ -9,6 +9,7 @@ import { inputValuesValidation } from "../../../../public/global_functions/valid
 import { getAdminInfo, getAllCategories } from "../../../../public/global_functions/popular";
 import { useRouter } from "next/router";
 import { HiOutlineBellAlert } from "react-icons/hi2";
+import { countries } from "countries-list";
 
 export default function AddNewProduct() {
 
@@ -27,6 +28,7 @@ export default function AddNewProduct() {
         category: "",
         categoryId: "",
         discount: "",
+        quantity: "",
         image: null,
         galleryImages: [],
     });
@@ -46,6 +48,8 @@ export default function AddNewProduct() {
     const productImageFileElementRef = useRef();
 
     const productGalleryImagesFilesElementRef = useRef();
+
+    const countryList = Object.keys(countries);
 
     const router = useRouter();
 
@@ -143,6 +147,23 @@ export default function AddNewProduct() {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
                         },
+                        minNumber: {
+                            value: 0,
+                            msg: "Sorry, Minimum Value Can't Be Less Than Zero !!",
+                        }
+                    },
+                },
+                {
+                    name: "quantity",
+                    value: productData.quantity,
+                    rules: {
+                        isRequired: {
+                            msg: "Sorry, This Field Can't Be Empty !!",
+                        },
+                        minNumber: {
+                            value: 0,
+                            msg: "Sorry, Minimum Value Can't Be Less Than Zero !!",
+                        }
                     },
                 },
                 {
@@ -179,6 +200,7 @@ export default function AddNewProduct() {
                 formData.append("category", productData.category);
                 formData.append("categoryId", productData.categoryId);
                 formData.append("discount", productData.discount);
+                formData.append("quantity", productData.quantity);
                 formData.append("productImage", productData.image);
                 formData.append("galleryImages", productData.galleryImages[0]);
                 formData.append("storeId", adminInfo.storeId);
@@ -315,6 +337,34 @@ export default function AddNewProduct() {
                             {formValidationErrors["discount"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                 <span>{formValidationErrors["discount"]}</span>
+                            </p>}
+                        </section>
+                        <section className="quantity mb-4">
+                            <input
+                                type="number"
+                                className={`form-control p-2 border-2 product-quantity-field ${formValidationErrors["quantity"] ? "border-danger mb-3" : "mb-4"}`}
+                                placeholder="Please Enter Quantity"
+                                onChange={(e) => setProductData({ ...productData, quantity: (e.target.valueAsNumber || e.target.valueAsNumber === 0) ? e.target.valueAsNumber : "" })}
+                                value={productData.quantity}
+                            />
+                            {formValidationErrors["quantity"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                <span>{formValidationErrors["quantity"]}</span>
+                            </p>}
+                        </section>
+                        <section className="country mb-4">
+                            <select
+                                className={`country-select form-select p-2 border-2 country-field ${formValidationErrors["country"] ? "border-danger mb-3" : "mb-4"}`}
+                                onChange={(e) => setProductData({ ...productData, country: e.target.value })}
+                            >
+                                <option defaultValue="" hidden>Please Select Country</option>
+                                {countryList.map((countryCode) => (
+                                    <option value={countryCode} key={countryCode}>{countries[countryCode].name}</option>
+                                ))}
+                            </select>
+                            {formValidationErrors["country"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                <span>{formValidationErrors["country"]}</span>
                             </p>}
                         </section>
                         <h6 className="mb-3 fw-bold">Please Select Product Image</h6>

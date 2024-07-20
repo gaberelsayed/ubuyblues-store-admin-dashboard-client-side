@@ -120,6 +120,13 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
                                     Update / Delete
                                 </NavDropdown.Item>
                             </NavDropdown>
+                            <NavDropdown title="Ads" id="ads-nav-dropdown">
+                                <NavDropdown.Item href="/ads-managment/add-new-ad" as={Link}>Add New</NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item href="/ads-managment/update-and-delete-ads" as={Link}>
+                                    Update / Delete
+                                </NavDropdown.Item>
+                            </NavDropdown>
                             <button className="btn btn-danger logout-btn" onClick={adminLogout}>
                                 <MdOutlineLogout className="me-2" />
                                 <span>Logout</span>

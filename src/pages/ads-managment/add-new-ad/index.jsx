@@ -107,7 +107,7 @@ export default function AddNewAd() {
                 let advertisementData = {};
                 if (advertisementType === "text") {
                     advertisementData = {
-                        adContent,
+                        content: adContent,
                         storeId: adminInfo.storeId
                     };
                 } else {

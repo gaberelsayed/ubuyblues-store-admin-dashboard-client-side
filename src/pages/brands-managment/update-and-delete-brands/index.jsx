@@ -25,7 +25,11 @@ export default function UpdateAndDeleteBrands() {
 
     const [isWaitStatus, setIsWaitStatus] = useState(false);
 
+    const [updatingBrandImageIndex, setUpdatingBrandImageIndex] = useState(-1);
+
     const [updatingBrandIndex, setUpdatingBrandIndex] = useState(-1);
+
+    const [deletingBrandIndex, setDeletingBrandIndex] = useState(-1);
 
     const [isWaitChangeBrandImage, setIsWaitChangeBrandImage] = useState(false);
 
@@ -164,8 +168,8 @@ export default function UpdateAndDeleteBrands() {
                     },
                 },
             ]);
+            setUpdatingBrandImageIndex(brandIndex);
             setFormValidationErrors(errorsObject);
-            setUpdatingBrandIndex(brandIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setIsWaitChangeBrandImage(true);
                 let formData = new FormData();
@@ -178,14 +182,14 @@ export default function UpdateAndDeleteBrands() {
                 const result = res.data;
                 if (!result.error) {
                     setIsWaitChangeBrandImage(false);
-                    setSuccessChangeBrandImageMsg(result.msg);
+                    setSuccessChangeBrandImageMsg("Change Image Successfull !!");
                     let successTimeout = setTimeout(async () => {
                         setSuccessChangeBrandImageMsg("");
+                        setUpdatingBrandImageIndex(-1)
                         setAllBrandsInsideThePage((await getAllBrandsInsideThePage(1, pageSize)).data);
                         clearTimeout(successTimeout);
                     }, 1500);
                 }
-                setUpdatingBrandIndex(-1);
             }
         }
         catch (err) {
@@ -194,7 +198,7 @@ export default function UpdateAndDeleteBrands() {
                 await router.replace("/login");
                 return;
             }
-            setUpdatingBrandIndex(-1);
+            setUpdatingBrandImageIndex(-1);
             setIsWaitChangeBrandImage(false);
             setErrorChangeBrandImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
@@ -259,31 +263,23 @@ export default function UpdateAndDeleteBrands() {
         }
     }
 
-    const deleteBrand = async (brandId) => {
+    const deleteBrand = async (brandIndex) => {
         try {
             setIsWaitStatus(true);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/brands/${brandId}`, {
+            const res = await axios.delete(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
             });
             const result = res.data;
             setIsWaitStatus(false);
+            setDeletingBrandIndex(brandIndex);
             if (!result.error) {
-                setSuccessMsg(result.msg);
+                setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
-                    setIsWaitGetBrandsStatus(true);
-                    setCurrentPage(1);
-                    const result = await getBrandsCount();
-                    if (result.data > 0) {
-                        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(1, pageSize)).data);
-                        setTotalPagesCount(Math.ceil(result.data / pageSize));
-                    } else {
-                        setAllBrandsInsideThePage([]);
-                        setTotalPagesCount(0);
-                    }
-                    setIsWaitGetBrandsStatus(false);
+                    setDeletingBrandIndex(-1);
+                    setAllBrandsInsideThePage(allBrandsInsideThePage.filter((brand) => brand._id !== allBrandsInsideThePage[brandIndex]._id))
                     clearTimeout(successTimeout);
                 }, 1500);
             }
@@ -353,35 +349,35 @@ export default function UpdateAndDeleteBrands() {
                                             <section className="brand-image mb-4">
                                                 <input
                                                     type="file"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && brandIndex === updatingBrandIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && brandIndex === updatingBrandImageIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeBrandData(brandIndex, "image", e.target.files[0])}
                                                     accept=".png, .jpg, .webp"
                                                 />
-                                                {formValidationErrors["image"] && brandIndex === updatingBrandIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["image"] && brandIndex === updatingBrandImageIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["image"]}</span>
                                                 </p>}
                                             </section>
-                                            {!isWaitChangeBrandImage && !errorChangeBrandImageMsg && !successChangeBrandImageMsg &&
+                                            {(updatingBrandImageIndex !== brandIndex && deletingBrandIndex !== brandIndex) &&
                                                 <button
                                                     className="btn btn-success d-block mb-3 w-50 mx-auto global-button"
                                                     onClick={() => changeBrandImage(brandIndex)}
                                                 >Change</button>
                                             }
-                                            {isWaitChangeBrandImage && <button
+                                            {isWaitChangeBrandImage && updatingBrandImageIndex === brandIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                             >Please Waiting</button>}
-                                            {successChangeBrandImageMsg && <button
+                                            {successChangeBrandImageMsg && updatingBrandImageIndex === brandIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successChangeBrandImageMsg}</button>}
-                                            {errorChangeBrandImageMsg && <button
+                                            {errorChangeBrandImageMsg && updatingBrandImageIndex === brandIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorChangeBrandImageMsg}</button>}
                                         </td>
                                         <td className="update-cell">
-                                            {updatingBrandIndex !== brandIndex && <>
+                                            {(updatingBrandIndex !== brandIndex && deletingBrandIndex !== brandIndex) && <>
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
                                                     onClick={() => updateBrandInfo(brandIndex)}
@@ -389,17 +385,17 @@ export default function UpdateAndDeleteBrands() {
                                                 <hr />
                                                 <button
                                                     className="btn btn-danger global-button"
-                                                    onClick={() => deleteBrand(brand._id)}
+                                                    onClick={() => deleteBrand(brandIndex)}
                                                 >Delete</button>
                                             </>}
-                                            {isWaitStatus && updatingBrandIndex === brandIndex && <button
+                                            {isWaitStatus && (updatingBrandIndex === brandIndex || deletingBrandIndex === brandIndex) && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                             >Please Waiting</button>}
-                                            {successMsg && updatingBrandIndex === brandIndex && <button
+                                            {successMsg && (updatingBrandIndex === brandIndex || deletingBrandIndex === brandIndex) && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && updatingBrandIndex === brandIndex && <button
+                                            {errorMsg && (updatingBrandIndex === brandIndex || deletingBrandIndex === brandIndex) && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}

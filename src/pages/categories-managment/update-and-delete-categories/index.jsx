@@ -238,27 +238,27 @@ export default function UpdateAndDeleteCategories() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {allCategoriesInsideThePage.map((category, index) => (
+                                {allCategoriesInsideThePage.map((category, categoryIndex) => (
                                     <tr key={category._id}>
                                         <td className="category-name-cell">
                                             <section className="category-name mb-4">
                                                 <input
                                                     type="text"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["categoryName"] && index === updatingCategoryIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["categoryName"] && categoryIndex === updatingCategoryIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     defaultValue={category.name}
-                                                    onChange={(e) => changeCategoryName(index, e.target.value.trim())}
+                                                    onChange={(e) => changeCategoryName(categoryIndex, e.target.value.trim())}
                                                 ></input>
-                                                {formValidationErrors["categoryName"] && index === updatingCategoryIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["categoryName"] && categoryIndex === updatingCategoryIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["categoryName"]}</span>
                                                 </p>}
                                             </section>
                                         </td>
                                         <td className="update-cell">
-                                            {!isWaitStatus && !errorMsg && !successMsg && <>
+                                            {updatingCategoryIndex !== categoryIndex && <>
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                    onClick={() => updateCategory(index)}
+                                                    onClick={() => updateCategory(categoryIndex)}
                                                 >Update</button>
                                                 <hr />
                                                 <button
@@ -266,14 +266,14 @@ export default function UpdateAndDeleteCategories() {
                                                     onClick={() => deleteCategory(category._id)}
                                                 >Delete</button>
                                             </>}
-                                            {isWaitStatus && <button
+                                            {isWaitStatus && updatingCategoryIndex === categoryIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                             >Please Waiting</button>}
-                                            {successMsg && <button
+                                            {successMsg && updatingCategoryIndex === categoryIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && <button
+                                            {errorMsg && updatingCategoryIndex === categoryIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}

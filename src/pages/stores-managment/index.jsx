@@ -528,10 +528,7 @@ export default function StoresManagment() {
                                                 </button>}
                                                 {store._id !== adminInfo.storeId && <>
                                                     {
-                                                        !isUpdatingStatus &&
-                                                        !isDeletingStatus &&
-                                                        !isSuccessStatus &&
-                                                        !isErrorStatus &&
+                                                        storeIndex !== selectedStoreIndex &&
                                                         <button
                                                             className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                             onClick={() => deleteStore(storeIndex)}

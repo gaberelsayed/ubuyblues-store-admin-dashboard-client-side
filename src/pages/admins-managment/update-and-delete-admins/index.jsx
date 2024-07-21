@@ -249,6 +249,8 @@ export default function UpdateAndDeleteAdmins() {
                         setSelectedAdminIndex(-1);
                         clearTimeout(successTimeout);
                     }, 3000);
+                } else {
+                    setSelectedAdminIndex(-1);
                 }
             }
         }
@@ -294,6 +296,8 @@ export default function UpdateAndDeleteAdmins() {
                     setIsFilteringStoresStatus(false);
                     clearTimeout(successTimeout);
                 }, 3000);
+            } else {
+                setSelectedAdminIndex(-1);
             }
         }
         catch (err) {
@@ -440,11 +444,7 @@ export default function UpdateAndDeleteAdmins() {
                                                 </section>
                                             </td>
                                             <td>
-                                                {
-                                                    !isUpdatingStatus &&
-                                                    !isDeletingStatus &&
-                                                    !isSuccessStatus &&
-                                                    !isErrorStatus &&
+                                                {adminIndex !== selectedAdminIndex &&
                                                     <button
                                                         className="btn btn-info d-block mx-auto mb-3 global-button"
                                                         onClick={() => updateAdminData(adminIndex)}
@@ -465,10 +465,7 @@ export default function UpdateAndDeleteAdmins() {
                                                     Success
                                                 </button>}
                                                 {
-                                                    !isUpdatingStatus &&
-                                                    !isDeletingStatus &&
-                                                    !isSuccessStatus &&
-                                                    !isErrorStatus &&
+                                                    adminIndex !== selectedAdminIndex &&
                                                     !admin.isMerchant &&
                                                     <button
                                                         className="btn btn-danger d-block mx-auto mb-3 global-button"
@@ -483,7 +480,7 @@ export default function UpdateAndDeleteAdmins() {
                                                 >
                                                     Deleting ...
                                                 </button>}
-                                                {isSuccessStatus && <button
+                                                {isSuccessStatus && adminIndex === selectedAdminIndex && <button
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >

@@ -101,7 +101,7 @@ export default function UpdateAndDeleteCategories() {
             setFormValidationErrors(errorsObject);
             setUpdatingAdIndex(adIndex);
             if (Object.keys(errorsObject).length == 0) {
-                const res = await axios.put(`${process.env.BASE_API_URL}/categories/${allAds[adIndex]._id}`, {
+                const res = await axios.put(`${process.env.BASE_API_URL}/ads/${allAds[adIndex]._id}`, {
                     newCategoryName: allAds[adIndex].name,
                 }, {
                     headers: {
@@ -136,10 +136,10 @@ export default function UpdateAndDeleteCategories() {
         }
     }
 
-    const deleteAd = async (categoryId) => {
+    const deleteAd = async (adId) => {
         try {
             setIsWaitStatus(true);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/categories/${categoryId}`, {
+            const res = await axios.delete(`${process.env.BASE_API_URL}/ads/${adId}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

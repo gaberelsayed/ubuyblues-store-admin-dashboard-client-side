@@ -235,6 +235,7 @@ export default function UpdateAndDeleteBrands() {
                     setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
+                        setUpdatingBrandIndex(-1);
                         clearTimeout(successTimeout);
                     }, 1500);
                 }

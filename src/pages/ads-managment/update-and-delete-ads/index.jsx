@@ -6,7 +6,6 @@ import LoaderPage from "@/components/LoaderPage";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { useRouter } from "next/router";
-import PaginationBar from "@/components/PaginationBar";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { getAdminInfo, getCategoriesCount, getAllCategoriesInsideThePage } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
@@ -19,31 +18,21 @@ export default function UpdateAndDeleteCategories() {
 
     const [adminInfo, setAdminInfo] = useState({});
 
-    const [isWaitGetCategoriesStatus, setIsWaitGetCategoriesStatus] = useState(false);
+    const [advertisementType, setAdvertisementType] = useState("text");
 
-    const [allCategoriesInsideThePage, setAllCategoriesInsideThePage] = useState([]);
+    const [allAds, setAllAds] = useState([]);
 
     const [isWaitStatus, setIsWaitStatus] = useState(false);
 
-    const [updatingCategoryIndex, setUpdatingCategoryIndex] = useState(-1);
+    const [updatingAdIndex, setUpdatingAdIndex] = useState(-1);
 
     const [errorMsg, setErrorMsg] = useState(false);
 
     const [successMsg, setSuccessMsg] = useState(false);
 
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const [totalPagesCount, setTotalPagesCount] = useState(0);
-
-    const [filters, setFilters] = useState({
-        storeId: "",
-    });
-
     const [formValidationErrors, setFormValidationErrors] = useState({});
 
     const router = useRouter();
-
-    const pageSize = 10;
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
@@ -61,13 +50,7 @@ export default function UpdateAndDeleteCategories() {
                         }
                         else {
                             setAdminInfo(adminDetails);
-                            const tempFilters = { ...filters, storeId: adminDetails.storeId };
-                            setFilters(tempFilters);
-                            result = await getCategoriesCount(getFiltersAsQuery(tempFilters));
-                            if (result.data > 0) {
-                                setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(tempFilters))).data);
-                                setTotalPagesCount(Math.ceil(result.data / pageSize));
-                            }
+                            setAllAds((await getAllAds()).data);
                             setIsLoadingPage(false);
                         }
                     }
@@ -85,49 +68,23 @@ export default function UpdateAndDeleteCategories() {
         } else router.replace("/login");
     }, []);
 
-    const getFiltersAsQuery = (filters) => {
-        let filteringString = "";
-        if (filters.storeId) filteringString += `storeId=${filters.storeId}&`;
-        if (filteringString) filteringString = filteringString.substring(0, filteringString.length - 1);
-        return filteringString;
+    const getAllAds = async () => {
+        return (await axios.get(`${process.env.BASE_API_URL}/ads/all-ads`)).data;
     }
 
-    const getPreviousPage = async () => {
-        setIsWaitGetCategoriesStatus(true);
-        const newCurrentPage = currentPage - 1;
-        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
-        setCurrentPage(newCurrentPage);
-        setIsWaitGetCategoriesStatus(false);
+    const changeAdContent = (adIndex, newValue) => {
+        let adsTemp = allAds;
+        adsTemp[adIndex].name = newValue;
+        setAllAds(adsTemp);
     }
 
-    const getNextPage = async () => {
-        setIsWaitGetCategoriesStatus(true);
-        const newCurrentPage = currentPage + 1;
-        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
-        setCurrentPage(newCurrentPage);
-        setIsWaitGetCategoriesStatus(false);
-    }
-
-    const getSpecificPage = async (pageNumber) => {
-        setIsWaitGetCategoriesStatus(true);
-        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(pageNumber, pageSize)).data);
-        setCurrentPage(pageNumber);
-        setIsWaitGetCategoriesStatus(false);
-    }
-
-    const changeCategoryName = (categoryIndex, newValue) => {
-        let categoriesTemp = allCategoriesInsideThePage;
-        categoriesTemp[categoryIndex].name = newValue;
-        setAllCategoriesInsideThePage(categoriesTemp);
-    }
-
-    const updateCategory = async (categoryIndex) => {
+    const updateAd = async (adIndex) => {
         try {
             setFormValidationErrors({});
             const errorsObject = inputValuesValidation([
                 {
-                    name: "categoryName",
-                    value: allCategoriesInsideThePage[categoryIndex].name,
+                    name: "adContent",
+                    value: allAds[adIndex].content,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -136,10 +93,10 @@ export default function UpdateAndDeleteCategories() {
                 },
             ]);
             setFormValidationErrors(errorsObject);
-            setUpdatingCategoryIndex(categoryIndex);
+            setUpdatingAdIndex(adIndex);
             if (Object.keys(errorsObject).length == 0) {
-                const res = await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
-                    newCategoryName: allCategoriesInsideThePage[categoryIndex].name,
+                const res = await axios.put(`${process.env.BASE_API_URL}/categories/${allAds[adIndex]._id}`, {
+                    newCategoryName: allAds[adIndex].name,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -154,7 +111,7 @@ export default function UpdateAndDeleteCategories() {
                         clearTimeout(successTimeout);
                     }, 1500);
                 }
-                setUpdatingCategoryIndex(-1);
+                setUpdatingAdIndex(-1);
             }
         }
         catch (err) {
@@ -163,7 +120,7 @@ export default function UpdateAndDeleteCategories() {
                 await router.push("/login");
                 return;
             }
-            setUpdatingCategoryIndex(-1);
+            setUpdatingAdIndex(-1);
             setIsWaitStatus(false);
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
@@ -173,7 +130,7 @@ export default function UpdateAndDeleteCategories() {
         }
     }
 
-    const deleteCategory = async (categoryId) => {
+    const deleteAd = async (categoryId) => {
         try {
             setIsWaitStatus(true);
             const res = await axios.delete(`${process.env.BASE_API_URL}/categories/${categoryId}`, {
@@ -218,18 +175,36 @@ export default function UpdateAndDeleteCategories() {
     }
 
     return (
-        <div className="update-and-delete-category admin-dashboard">
+        <div className="update-and-delete-ads admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Update / Delete Categories</title>
+                <title>Ubuyblues Store Admin Dashboard - Update / Delete Ads</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-5">
                     <h1 className="fw-bold w-fit pb-2 mb-4">
                         <PiHandWavingThin className="me-2" />
-                        Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Categories Page
+                        Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Ads Page
                     </h1>
-                    {allCategoriesInsideThePage.length > 0 && !isWaitGetCategoriesStatus && <section className="categories-box w-100">
+                    <section className="filters mb-3 bg-white border-3 border-info p-3 text-start w-100">
+                        <h5 className="section-name fw-bold text-center">Select Advertisement Type:</h5>
+                        <hr />
+                        <div className="row mb-4">
+                            <div className="col-md-12">
+                                <h6 className="me-2 fw-bold text-center">Advertisement Type</h6>
+                                <select
+                                    className="select-advertisement-type form-select"
+                                    onChange={(e) => setAdvertisementType(e.target.value)}
+                                    defaultValue="text"
+                                >
+                                    <option value="" hidden>Pleae Select Advertisement Type</option>
+                                    <option value="text">Text</option>
+                                    <option value="image">Image</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+                    {allAds.length > 0 && !isWaitStatus && <section className="ads-box w-100">
                         <table className="products-table mb-4 managment-table bg-white w-100">
                             <thead>
                                 <tr>
@@ -238,17 +213,17 @@ export default function UpdateAndDeleteCategories() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {allCategoriesInsideThePage.map((category, index) => (
-                                    <tr key={category._id}>
-                                        <td className="category-name-cell">
-                                            <section className="category-name mb-4">
+                                {allAds.map((ad, index) => (
+                                    <tr key={ad._id}>
+                                        <td className="ad-content-cell">
+                                            <section className="ad-content mb-4">
                                                 <input
                                                     type="text"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["categoryName"] && index === updatingCategoryIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 ad-content-field ${formValidationErrors["adContent"] && index === updatingAdIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     defaultValue={category.name}
-                                                    onChange={(e) => changeCategoryName(index, e.target.value.trim())}
+                                                    onChange={(e) => changeAdContent(index, e.target.value.trim())}
                                                 ></input>
-                                                {formValidationErrors["categoryName"] && index === updatingCategoryIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["categoryName"] && index === updatingAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["categoryName"]}</span>
                                                 </p>}
@@ -258,12 +233,12 @@ export default function UpdateAndDeleteCategories() {
                                             {!isWaitStatus && !errorMsg && !successMsg && <>
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                    onClick={() => updateCategory(index)}
+                                                    onClick={() => updateAd(index)}
                                                 >Update</button>
                                                 <hr />
                                                 <button
                                                     className="btn btn-danger global-button"
-                                                    onClick={() => deleteCategory(category._id)}
+                                                    onClick={() => deleteAd(category._id)}
                                                 >Delete</button>
                                             </>}
                                             {isWaitStatus && <button
@@ -283,19 +258,10 @@ export default function UpdateAndDeleteCategories() {
                             </tbody>
                         </table>
                     </section>}
-                    {allCategoriesInsideThePage.length === 0 && !isWaitGetCategoriesStatus && <p className="alert alert-danger w-100">Sorry, Can't Find Any Categories !!</p>}
-                    {isWaitGetCategoriesStatus && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
+                    {allAds.length === 0 && !isWaitStatus && <p className="alert alert-danger w-100">Sorry, Can't Find Any Ads !!</p>}
+                    {isWaitStatus && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
                         <span className="loader-table-data"></span>
                     </div>}
-                    {totalPagesCount > 1 && !isWaitGetCategoriesStatus &&
-                        <PaginationBar
-                            totalPagesCount={totalPagesCount}
-                            currentPage={currentPage}
-                            getPreviousPage={getPreviousPage}
-                            getNextPage={getNextPage}
-                            getSpecificPage={getSpecificPage}
-                        />
-                    }
                 </div>
             </>}
             {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}

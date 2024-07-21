@@ -218,7 +218,7 @@ export default function UpdateAndDeleteCategories() {
     }
 
     return (
-        <div className="update-and-delete-category admin-dashboard">
+        <div className="update-and-delete-categories admin-dashboard">
             <Head>
                 <title>Ubuyblues Store Admin Dashboard - Update / Delete Categories</title>
             </Head>

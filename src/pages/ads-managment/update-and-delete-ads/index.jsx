@@ -220,12 +220,12 @@ export default function UpdateAndDeleteCategories() {
                                                 <input
                                                     type="text"
                                                     className={`form-control d-block mx-auto p-2 border-2 ad-content-field ${formValidationErrors["adContent"] && index === updatingAdIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    defaultValue={category.name}
+                                                    defaultValue={ad.name}
                                                     onChange={(e) => changeAdContent(index, e.target.value.trim())}
                                                 ></input>
-                                                {formValidationErrors["categoryName"] && index === updatingAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["adContent"] && index === updatingAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                                    <span>{formValidationErrors["categoryName"]}</span>
+                                                    <span>{formValidationErrors["adContent"]}</span>
                                                 </p>}
                                             </section>
                                         </td>

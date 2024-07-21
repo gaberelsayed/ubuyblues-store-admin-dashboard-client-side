@@ -238,8 +238,9 @@ export default function UpdateAndDeleteBrands() {
                         setUpdatingBrandIndex(-1);
                         clearTimeout(successTimeout);
                     }, 1500);
+                } else {
+                    setUpdatingBrandIndex(-1);
                 }
-                setUpdatingBrandIndex(-1);
             }
         }
         catch (err) {

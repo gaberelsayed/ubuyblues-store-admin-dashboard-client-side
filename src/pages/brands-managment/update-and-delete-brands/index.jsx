@@ -29,13 +29,13 @@ export default function UpdateAndDeleteBrands() {
 
     const [isWaitChangeBrandImage, setIsWaitChangeBrandImage] = useState(false);
 
-    const [errorMsg, setErrorMsg] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     const [errorChangeBrandImageMsg, setErrorChangeBrandImageMsg] = useState(false);
 
-    const [successMsg, setSuccessMsg] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
 
-    const [successChangeBrandImageMsg, setSuccessChangeBrandImageMsg] = useState(false);
+    const [successChangeBrandImageMsg, setSuccessChangeBrandImageMsg] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -232,7 +232,7 @@ export default function UpdateAndDeleteBrands() {
                 const result = res.data;
                 setIsWaitStatus(false);
                 if (!result.error) {
-                    setSuccessMsg(result.msg);
+                    setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
                         clearTimeout(successTimeout);
@@ -323,7 +323,7 @@ export default function UpdateAndDeleteBrands() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {allBrandsInsideThePage.map((brand, index) => (
+                                {allBrandsInsideThePage.map((brand, brandIndex) => (
                                     <tr key={brand._id}>
                                         <td className="brand-title-cell">
                                             <section className="brand-title mb-4">
@@ -331,10 +331,10 @@ export default function UpdateAndDeleteBrands() {
                                                     type="text"
                                                     placeholder="Enter New Brand Title"
                                                     defaultValue={brand.title}
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["title"] && index === updatingBrandIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeBrandData(index, "title", e.target.value.trim())}
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["title"] && brandIndex === updatingBrandIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeBrandData(brandIndex, "title", e.target.value.trim())}
                                                 ></input>
-                                                {formValidationErrors["title"] && index === updatingBrandIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["title"] && brandIndex === updatingBrandIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["title"]}</span>
                                                 </p>}
@@ -351,11 +351,11 @@ export default function UpdateAndDeleteBrands() {
                                             <section className="brand-image mb-4">
                                                 <input
                                                     type="file"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && index === updatingBrandIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeBrandData(index, "image", e.target.files[0])}
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && brandIndex === updatingBrandIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeBrandData(brandIndex, "image", e.target.files[0])}
                                                     accept=".png, .jpg, .webp"
                                                 />
-                                                {formValidationErrors["image"] && index === updatingBrandIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["image"] && brandIndex === updatingBrandIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["image"]}</span>
                                                 </p>}
@@ -363,7 +363,7 @@ export default function UpdateAndDeleteBrands() {
                                             {!isWaitChangeBrandImage && !errorChangeBrandImageMsg && !successChangeBrandImageMsg &&
                                                 <button
                                                     className="btn btn-success d-block mb-3 w-50 mx-auto global-button"
-                                                    onClick={() => changeBrandImage(index)}
+                                                    onClick={() => changeBrandImage(brandIndex)}
                                                 >Change</button>
                                             }
                                             {isWaitChangeBrandImage && <button
@@ -379,10 +379,10 @@ export default function UpdateAndDeleteBrands() {
                                             >{errorChangeBrandImageMsg}</button>}
                                         </td>
                                         <td className="update-cell">
-                                            {!isWaitStatus && !errorMsg && !successMsg && <>
+                                            {updatingBrandIndex !== brandIndex && <>
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                    onClick={() => updateBrandInfo(index)}
+                                                    onClick={() => updateBrandInfo(brandIndex)}
                                                 >Update</button>
                                                 <hr />
                                                 <button
@@ -390,14 +390,14 @@ export default function UpdateAndDeleteBrands() {
                                                     onClick={() => deleteBrand(brand._id)}
                                                 >Delete</button>
                                             </>}
-                                            {isWaitStatus && <button
+                                            {isWaitStatus && updatingBrandIndex === brandIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                             >Please Waiting</button>}
-                                            {successMsg && <button
+                                            {successMsg && updatingBrandIndex === brandIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && <button
+                                            {errorMsg && updatingBrandIndex === brandIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}

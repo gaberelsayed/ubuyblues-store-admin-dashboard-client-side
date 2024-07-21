@@ -20,7 +20,9 @@ export default function UpdateAndDeleteCategories() {
 
     const [advertisementType, setAdvertisementType] = useState("text");
 
-    const [allAds, setAllAds] = useState([]);
+    const [allTextAds, setAllTextAds] = useState([]);
+
+    const [allImageAds, setAllImageAds] = useState([]);
 
     const [isWaitStatus, setIsWaitStatus] = useState(false);
 
@@ -50,7 +52,11 @@ export default function UpdateAndDeleteCategories() {
                         }
                         else {
                             setAdminInfo(adminDetails);
-                            setAllAds((await getAllAds()).data);
+                            const allAds = (await getAllAds()).data;
+                            allAds.forEach((ad) => {
+                                if (ad.type === "text") allTextAds.push(ad);
+                                else allImageAds.push(ad);
+                            });
                             setIsLoadingPage(false);
                         }
                     }
@@ -204,23 +210,23 @@ export default function UpdateAndDeleteCategories() {
                             </div>
                         </div>
                     </section>
-                    {allAds.length > 0 && !isWaitStatus && <section className="ads-box w-100">
-                        <table className="products-table mb-4 managment-table bg-white w-100">
+                    {allTextAds.length > 0 && advertisementType === "text" ? <section className="text-ads-box w-100">
+                        <table className="ads-table mb-4 managment-table bg-white w-100">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
+                                    <th>Content</th>
                                     <th>Process</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {allAds.map((ad, index) => (
+                                {allTextAds.map((ad, index) => (
                                     <tr key={ad._id}>
                                         <td className="ad-content-cell">
                                             <section className="ad-content mb-4">
                                                 <input
                                                     type="text"
                                                     className={`form-control d-block mx-auto p-2 border-2 ad-content-field ${formValidationErrors["adContent"] && index === updatingAdIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    defaultValue={ad.name}
+                                                    defaultValue={ad.content}
                                                     onChange={(e) => changeAdContent(index, e.target.value.trim())}
                                                 ></input>
                                                 {formValidationErrors["adContent"] && index === updatingAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
@@ -257,11 +263,68 @@ export default function UpdateAndDeleteCategories() {
                                 ))}
                             </tbody>
                         </table>
+                    </section> : <section className="image-ads-box w-100">
+                        <table className="ads-table mb-4 managment-table bg-white w-100">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Process</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {allImageAds.map((ad, index) => (
+                                    <tr key={ad._id}>
+                                        <td className="ad-image-cell">
+                                            <img
+                                                src={`${process.env.BASE_API_URL}/${ad.imagePath}`}
+                                                alt="Ad Image !!"
+                                                width="100"
+                                                height="100"
+                                                className="d-block mx-auto mb-4"
+                                            />
+                                            <section className="ad-image mb-4">
+                                                <input
+                                                    type="file"
+                                                    className={`form-control d-block mx-auto p-2 border-2 ad-image-field ${formValidationErrors["adImage"] && index === updatingAdIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeAdImage(index, "adImage", e.target.files[0])}
+                                                    accept=".png, .jpg, .webp"
+                                                />
+                                                {formValidationErrors["adImage"] && index === updatingAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                                    <span>{formValidationErrors["adImage"]}</span>
+                                                </p>}
+                                            </section>
+                                        </td>
+                                        <td className="update-cell">
+                                            {!isWaitStatus && !errorMsg && !successMsg && <>
+                                                <button
+                                                    className="btn btn-success d-block mb-3 mx-auto global-button"
+                                                    onClick={() => updateAd(index)}
+                                                >Update</button>
+                                                <hr />
+                                                <button
+                                                    className="btn btn-danger global-button"
+                                                    onClick={() => deleteAd(category._id)}
+                                                >Delete</button>
+                                            </>}
+                                            {isWaitStatus && <button
+                                                className="btn btn-info d-block mb-3 mx-auto global-button"
+                                            >Please Waiting</button>}
+                                            {successMsg && <button
+                                                className="btn btn-success d-block mx-auto global-button"
+                                                disabled
+                                            >{successMsg}</button>}
+                                            {errorMsg && <button
+                                                className="btn btn-danger d-block mx-auto global-button"
+                                                disabled
+                                            >{errorMsg}</button>}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </section>}
-                    {allAds.length === 0 && !isWaitStatus && <p className="alert alert-danger w-100">Sorry, Can't Find Any Ads !!</p>}
-                    {isWaitStatus && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                        <span className="loader-table-data"></span>
-                    </div>}
+                    {allTextAds.length === 0 && advertisementType === "text" && <p className="alert alert-danger w-100">Sorry, Can't Find Any Text Ads !!</p>}
                 </div>
             </>}
             {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}

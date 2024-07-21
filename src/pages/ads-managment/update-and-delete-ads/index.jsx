@@ -210,7 +210,7 @@ export default function UpdateAndDeleteCategories() {
                             </div>
                         </div>
                     </section>
-                    {allTextAds.length > 0 && advertisementType === "text" ? <section className="text-ads-box w-100">
+                    {allTextAds.length > 0 && advertisementType === "text" && <section className="text-ads-box w-100">
                         <table className="ads-table mb-4 managment-table bg-white w-100">
                             <thead>
                                 <tr>
@@ -263,7 +263,8 @@ export default function UpdateAndDeleteCategories() {
                                 ))}
                             </tbody>
                         </table>
-                    </section> : <section className="image-ads-box w-100">
+                    </section>}
+                    {allImageAds.length > 0 && advertisementType === "image" && <section className="image-ads-box w-100">
                         <table className="ads-table mb-4 managment-table bg-white w-100">
                             <thead>
                                 <tr>
@@ -325,6 +326,7 @@ export default function UpdateAndDeleteCategories() {
                         </table>
                     </section>}
                     {allTextAds.length === 0 && advertisementType === "text" && <p className="alert alert-danger w-100">Sorry, Can't Find Any Text Ads !!</p>}
+                    {allImageAds.length === 0 && advertisementType === "image" && <p className="alert alert-danger w-100">Sorry, Can't Find Any Image Ads !!</p>}
                 </div>
             </>}
             {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}

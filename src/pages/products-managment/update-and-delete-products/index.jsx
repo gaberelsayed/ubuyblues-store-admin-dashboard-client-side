@@ -891,7 +891,7 @@ export default function UpdateAndDeleteProducts() {
                                         </td>
                                         <td className="update-cell">
                                             {selectedProductIndex !== index && <>
-                                                <Link href={`/products-managment/add-new-gallery-images/${product._id}`}
+                                                <Link href={`/products-managment/update-and-delete-gallery-images/${product._id}`}
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
                                                 >Show Gallery</Link>
                                                 <Link href={`/products-managment/add-new-gallery-images/${product._id}`}

@@ -11,7 +11,7 @@ import { HiOutlineBellAlert } from "react-icons/hi2";
 import { inputValuesValidation } from "../../../../../public/global_functions/validations";
 import { getAdminInfo } from "../../../../../public/global_functions/popular";
 
-export default function UpdateAndDeleteGalleryImages() {
+export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
@@ -59,6 +59,7 @@ export default function UpdateAndDeleteGalleryImages() {
                     }
                 })
                 .catch(async (err) => {
+                    console.log(err);
                     if (err?.response?.data?.msg === "Unauthorized Error") {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
@@ -73,7 +74,7 @@ export default function UpdateAndDeleteGalleryImages() {
 
     const getAllGalleryImages = async () => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/products/${productIdAsProperty}/all-gallery-images`, {
+            return (await axios.get(`${process.env.BASE_API_URL}/products/all-gallery-images/${productIdAsProperty}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
                 }
@@ -199,11 +200,11 @@ export default function UpdateAndDeleteGalleryImages() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {allGalleryImages.map((image, imageIndex) => (
+                                {allGalleryImages.map((imagePath, imageIndex) => (
                                     <tr key={imageIndex}>
                                         <td className="gallery-image-cell">
                                             <img
-                                                src={`${process.env.BASE_API_URL}/${image}`}
+                                                src={`${process.env.BASE_API_URL}/${imagePath}`}
                                                 alt="Gallery Image !!"
                                                 width="100"
                                                 height="100"

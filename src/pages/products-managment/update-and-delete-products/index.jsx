@@ -385,20 +385,22 @@ export default function UpdateAndDeleteProducts() {
         }
     }
 
-    const deleteProduct = async (productId) => {
+    const deleteProduct = async (productIndex) => {
         try {
             setWaitMsg("Please Waiting Deleting ...");
-            const res = await axios.delete(`${process.env.BASE_API_URL}/products/${productId}`, {
+            setSelectedProductIndex(productIndex);
+            const res = await axios.delete(`${process.env.BASE_API_URL}/products/${allProductsInsideThePage[productIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
             });
             const result = res.data;
-            setWaitMsg(false);
+            setWaitMsg("");
             if (!result.error) {
-                setSuccessMsg(result.msg);
+                setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
+                    setSelectedProductIndex(-1);
                     setIsFilteringProductsStatus(true);
                     const result = await getProductsCount(getFilteringString(filters));
                     if (result.data > 0) {
@@ -411,6 +413,8 @@ export default function UpdateAndDeleteProducts() {
                     setIsFilteringProductsStatus(false);
                     clearTimeout(successTimeout);
                 }, 1500);
+            } else {
+                setSelectedProductIndex(-1);
             }
         }
         catch (err) {

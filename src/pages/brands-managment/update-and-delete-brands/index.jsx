@@ -146,6 +146,8 @@ export default function UpdateAndDeleteBrands() {
     }
 
     const changeBrandData = (brandIndex, fieldName, newValue) => {
+        setUpdatingBrandImageIndex(-1);
+        setUpdatingBrandIndex(-1);
         let brandsDataTemp = allBrandsInsideThePage;
         brandsDataTemp[brandIndex][fieldName] = newValue;
         setAllBrandsInsideThePage(brandsDataTemp);
@@ -185,8 +187,8 @@ export default function UpdateAndDeleteBrands() {
                     setSuccessChangeBrandImageMsg("Change Image Successfull !!");
                     let successTimeout = setTimeout(async () => {
                         setSuccessChangeBrandImageMsg("");
-                        setUpdatingBrandImageIndex(-1)
-                        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(1, pageSize)).data);
+                        setUpdatingBrandImageIndex(-1);
+                        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(currentPage, pageSize, getFilteringString(filters))).data);
                         clearTimeout(successTimeout);
                     }, 1500);
                 }

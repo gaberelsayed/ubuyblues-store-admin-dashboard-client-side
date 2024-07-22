@@ -177,10 +177,11 @@ export default function UpdateAndDeleteCategories() {
         }
     }
 
-    const deleteCategory = async (categoryId) => {
+    const deleteCategory = async (categoryIndex) => {
         try {
             setWaitMsg("Please Waiting Updating ...");
-            const res = await axios.delete(`${process.env.BASE_API_URL}/categories/${categoryId}`, {
+            setSelectedCategoryIndex(categoryIndex);
+            const res = await axios.delete(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
@@ -191,6 +192,7 @@ export default function UpdateAndDeleteCategories() {
                 setSuccessMsg("Updating Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
+                    setSelectedCategoryIndex(-1);
                     setIsGetCategories(true);
                     setCurrentPage(1);
                     const result = await getCategoriesCount();
@@ -267,7 +269,7 @@ export default function UpdateAndDeleteCategories() {
                                                 <hr />
                                                 <button
                                                     className="btn btn-danger global-button"
-                                                    onClick={() => deleteCategory(category._id)}
+                                                    onClick={() => deleteCategory(categoryIndex)}
                                                 >Delete</button>
                                             </>}
                                             {waitMsg && selectedCategoryIndex === categoryIndex && <button

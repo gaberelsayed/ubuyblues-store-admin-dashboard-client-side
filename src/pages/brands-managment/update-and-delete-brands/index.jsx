@@ -391,6 +391,7 @@ export default function UpdateAndDeleteBrands() {
                                             </>}
                                             {waitMsg && selectedBrandIndex === brandIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
+                                                disabled
                                             >{waitMsg}</button>}
                                             {successMsg && selectedBrandIndex === brandIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"

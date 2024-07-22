@@ -116,7 +116,7 @@ export default function UpdateAndDeleteCategories() {
     }
 
     const changeCategoryName = (categoryIndex, newValue) => {
-        setSelectedCategoryIndex(categoryIndex);
+        setSelectedCategoryIndex(-1);
         let categoriesTemp = allCategoriesInsideThePage;
         categoriesTemp[categoryIndex].name = newValue;
         setAllCategoriesInsideThePage(categoriesTemp);

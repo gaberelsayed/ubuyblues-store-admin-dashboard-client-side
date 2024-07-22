@@ -10,7 +10,7 @@ import { HiOutlineBellAlert } from "react-icons/hi2";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { getAdminInfo } from "../../../../public/global_functions/popular";
 
-export default function AddNewBrand() {
+export default function AddNewProductGalleryImage() {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
@@ -18,9 +18,7 @@ export default function AddNewBrand() {
 
     const [adminInfo, setAdminInfo] = useState({});
 
-    const [brandImage, setBrandImage] = useState("");
-
-    const [brandTitle, setBrandTitle] = useState("");
+    const [newGalleryImageFiles, setNewGalleryImageFiles] = useState([]);
 
     const [waitMsg, setWaitMsg] = useState(false);
 
@@ -67,29 +65,17 @@ export default function AddNewBrand() {
         } else router.replace("/login");
     }, []);
 
-    const addNewBrand = async (e, brandTitle) => {
+    const addNewGalleryImages = async (e) => {
         try {
             e.preventDefault();
             setFormValidationErrors({});
             const errorsObject = inputValuesValidation([
                 {
-                    name: "brandImage",
-                    value: brandImage,
+                    name: "newGalleryImageFiles",
+                    value: newProductGalleryImageFiles,
                     rules: {
-                        isRequired: {
-                            msg: "Sorry, This Field Can't Be Empty !!",
-                        },
-                        isImage: {
+                        isImages: {
                             msg: "Sorry, Invalid Image Type, Please Upload JPG Or PNG Or Webp Image File !!",
-                        },
-                    },
-                },
-                {
-                    name: "brandTitle",
-                    value: brandTitle,
-                    rules: {
-                        isRequired: {
-                            msg: "Sorry, This Field Can't Be Empty !!",
                         },
                     },
                 },
@@ -97,11 +83,11 @@ export default function AddNewBrand() {
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 let formData = new FormData();
-                formData.append("brandImg", brandImage);
-                formData.append("title", brandTitle);
-                formData.append("storeId", adminInfo.storeId);
-                setWaitMsg("Please WaitingTo Add New Brand ...");
-                const res = await axios.post(`${process.env.BASE_API_URL}/brands/add-new-brand`, formData, {
+                for (let galleryImageFile of newGalleryImageFiles) {
+                    formData.append("galleryImage", galleryImageFile);
+                }
+                setWaitMsg("Waiting Add New Image To Product Gallery ...");
+                const res = await axios.post(`${process.env.BASE_API_URL}/products/adding-new-images-to-product-gallery/${productId}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
@@ -112,13 +98,12 @@ export default function AddNewBrand() {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
-                        setBrandImage("");
-                        setBrandTitle("");
+                        setNewGalleryImageFiles([]);
                         fileElementRef.current.value = "";
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
-                    setWaitMsg("");
+                    setWaitMsg(false);
                     setErrorMsg(result.msg);
                     let errorTimeout = setTimeout(() => {
                         setErrorMsg("");
@@ -143,44 +128,32 @@ export default function AddNewBrand() {
     }
 
     return (
-        <div className="add-new-brand admin-dashboard">
+        <div className="add-new-gallery-images admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Add New Brand</title>
+                <title>Ubuyblues Store Admin Dashboard - Add New Product Gallery Images</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-4">
                     <h1 className="fw-bold w-fit pb-2 mb-3">
                         <PiHandWavingThin className="me-2" />
-                        Hi, Mr { adminInfo.firstName + " " + adminInfo.lastName } In Your Add New Brand Page
+                        Hi, Mr { adminInfo.firstName + " " + adminInfo.lastName } In Your Add New Product Gallery Images Page
                     </h1>
-                    <form className="add-new-brand-form admin-dashbboard-form" onSubmit={(e) => addNewBrand(e, brandTitle)}>
-                        <h6 className="mb-3 fw-bold">Please Select Brand Image</h6>
-                        <section className="brand-image mb-4">
+                    <form className="add-new-gallery-images-form admin-dashbboard-form" onSubmit={addNewGalleryImages}>
+                        <h6 className="mb-3 fw-bold">Please Select Gallery Images</h6>
+                        <section className="gallery-image mb-4">
                             <input
                                 type="file"
-                                className={`form-control p-2 border-2 brand-image-field ${formValidationErrors["brandImage"] ? "border-danger mb-3" : "mb-4"}`}
-                                onChange={(e) => setBrandImage(e.target.files[0])}
+                                className={`form-control p-2 border-2 gallery-image-field ${formValidationErrors["newGalleryImageFiles"] ? "border-danger mb-3" : "mb-4"}`}
+                                onChange={(e) => setNewGalleryImageFiles(e.target.files)}
+                                multiple
                                 ref={fileElementRef}
                                 value={fileElementRef.current?.value}
                                 accept=".png, .jpg, .webp"
                             />
-                            {formValidationErrors["brandImage"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                            {formValidationErrors["newGalleryImageFiles"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                <span>{formValidationErrors["brandImage"]}</span>
-                            </p>}
-                        </section>
-                        <section className="brand-title mb-4">
-                            <input
-                                type="text"
-                                className={`form-control p-2 border-2 brand-title-field ${formValidationErrors["brandTitle"] ? "border-danger mb-3" : "mb-4"}`}
-                                placeholder="Please Enter Brand Title"
-                                onChange={(e) => setBrandTitle(e.target.value)}
-                                value={brandTitle}
-                            />
-                            {formValidationErrors["brandTitle"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
-                                <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                <span>{formValidationErrors["brandTitle"]}</span>
+                                <span>{formValidationErrors["newGalleryImageFiles"]}</span>
                             </p>}
                         </section>
                         {!waitMsg && !successMsg && !errorMsg && <button

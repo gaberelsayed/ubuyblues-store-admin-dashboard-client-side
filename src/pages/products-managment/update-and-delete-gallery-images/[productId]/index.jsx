@@ -152,7 +152,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
     const deleteImageFromGallery = async (imageIndex) => {
         try {
             setWaitMsg("Please Waiting Deleting ...");
-            setSelectedBrandIndex(imageIndex);
+            selectedGalleryImageIndex(imageIndex);
             const res = await axios.delete(`${process.env.BASE_API_URL}/brands/${allGalleryImages[imageIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -164,8 +164,8 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                 setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
-                    setSelectedBrandIndex(-1);
-                    setAllGalleryImages(allGalleryImages.filter((brand) => brand._id !== allGalleryImages[imageIndex]._id));
+                    selectedGalleryImageIndex(-1);
+                    setAllGalleryImages(allGalleryImages.filter((image) => image._id !== allGalleryImages[imageIndex]._id));
                     clearTimeout(successTimeout);
                 }, 1500);
             }
@@ -180,7 +180,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
-                setSelectedBrandIndex(-1);
+                selectedGalleryImageIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }

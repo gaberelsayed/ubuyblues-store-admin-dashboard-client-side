@@ -88,9 +88,9 @@ export default function AddNewProductGalleryImage({ productIdAsProperty }) {
                 setWaitMsg("Waiting Add New Image To Product Gallery ...");
                 let formData = new FormData();
                 for (let galleryImageFile of newGalleryImageFiles) {
-                    formData.append("galleryImage", galleryImageFile);
+                    formData.append("productGalleryImage", galleryImageFile);
                 }
-                const res = await axios.post(`${process.env.BASE_API_URL}/products/adding-new-images-to-product-gallery/${productIdAsProperty}`, formData, {
+                const res = await axios.post(`${process.env.BASE_API_URL}/products/add-new-images-to-product-gallery/${productIdAsProperty}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
@@ -116,7 +116,6 @@ export default function AddNewProductGalleryImage({ productIdAsProperty }) {
             }
         }
         catch (err) {
-            console.log(err)
             if (err?.response?.data?.msg === "Unauthorized Error") {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");

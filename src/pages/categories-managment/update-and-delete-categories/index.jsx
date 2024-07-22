@@ -19,13 +19,13 @@ export default function UpdateAndDeleteCategories() {
 
     const [adminInfo, setAdminInfo] = useState({});
 
-    const [isWaitGetCategoriesStatus, setIsWaitGetCategoriesStatus] = useState(false);
+    const [isGetCategories, setIsGetCategories] = useState(false);
 
     const [allCategoriesInsideThePage, setAllCategoriesInsideThePage] = useState([]);
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState(false);
 
-    const [updatingCategoryIndex, setUpdatingCategoryIndex] = useState(-1);
+    const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(-1);
 
     const [errorMsg, setErrorMsg] = useState(false);
 
@@ -93,26 +93,26 @@ export default function UpdateAndDeleteCategories() {
     }
 
     const getPreviousPage = async () => {
-        setIsWaitGetCategoriesStatus(true);
+        setIsGetCategories(true);
         const newCurrentPage = currentPage - 1;
         setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
         setCurrentPage(newCurrentPage);
-        setIsWaitGetCategoriesStatus(false);
+        setIsGetCategories(false);
     }
 
     const getNextPage = async () => {
-        setIsWaitGetCategoriesStatus(true);
+        setIsGetCategories(true);
         const newCurrentPage = currentPage + 1;
         setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
         setCurrentPage(newCurrentPage);
-        setIsWaitGetCategoriesStatus(false);
+        setIsGetCategories(false);
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsWaitGetCategoriesStatus(true);
+        setIsGetCategories(true);
         setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(pageNumber, pageSize)).data);
         setCurrentPage(pageNumber);
-        setIsWaitGetCategoriesStatus(false);
+        setIsGetCategories(false);
     }
 
     const changeCategoryName = (categoryIndex, newValue) => {
@@ -136,7 +136,7 @@ export default function UpdateAndDeleteCategories() {
                 },
             ]);
             setFormValidationErrors(errorsObject);
-            setUpdatingCategoryIndex(categoryIndex);
+            setSelectedCategoryIndex(categoryIndex);
             if (Object.keys(errorsObject).length == 0) {
                 const res = await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
                     newCategoryName: allCategoriesInsideThePage[categoryIndex].name,
@@ -146,15 +146,15 @@ export default function UpdateAndDeleteCategories() {
                     }
                 });
                 const result = res.data;
-                setIsWaitStatus(false);
+                setWaitMsg("Please Waiting Updating ...");
                 if (!result.error) {
-                    setSuccessMsg(result.msg);
+                    setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
                         clearTimeout(successTimeout);
                     }, 1500);
                 }
-                setUpdatingCategoryIndex(-1);
+                setSelectedCategoryIndex(-1);
             }
         }
         catch (err) {
@@ -163,8 +163,8 @@ export default function UpdateAndDeleteCategories() {
                 await router.push("/login");
                 return;
             }
-            setUpdatingCategoryIndex(-1);
-            setIsWaitStatus(false);
+            setSelectedCategoryIndex(-1);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
@@ -175,29 +175,29 @@ export default function UpdateAndDeleteCategories() {
 
     const deleteCategory = async (categoryId) => {
         try {
-            setIsWaitStatus(true);
+            setWaitMsg("Please Waiting Updating ...");
             const res = await axios.delete(`${process.env.BASE_API_URL}/categories/${categoryId}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
             });
             const result = res.data;
-            setIsWaitStatus(false);
+            setWaitMsg("");
             if (!result.error) {
-                setSuccessMsg(result.msg);
+                setSuccessMsg("Updating Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
-                    setIsWaitGetCategoriesStatus(true);
+                    setIsGetCategories(true);
                     setCurrentPage(1);
                     const result = await getCategoriesCount();
                     if (result.data > 0) {
-                        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize)).data);
+                        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(filters))).data);
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
                     } else {
                         setAllCategoriesInsideThePage([]);
                         setTotalPagesCount(0);
                     }
-                    setIsWaitGetCategoriesStatus(false);
+                    setIsGetCategories(false);
                     clearTimeout(successTimeout);
                 }, 1500);
             }
@@ -208,7 +208,7 @@ export default function UpdateAndDeleteCategories() {
                 await router.push("/login");
                 return;
             }
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
@@ -229,7 +229,7 @@ export default function UpdateAndDeleteCategories() {
                         <PiHandWavingThin className="me-2" />
                         Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Categories Page
                     </h1>
-                    {allCategoriesInsideThePage.length > 0 && !isWaitGetCategoriesStatus && <section className="categories-box w-100">
+                    {allCategoriesInsideThePage.length > 0 && !isGetCategories && <section className="categories-box w-100">
                         <table className="products-table mb-4 managment-table bg-white w-100">
                             <thead>
                                 <tr>
@@ -244,18 +244,18 @@ export default function UpdateAndDeleteCategories() {
                                             <section className="category-name mb-4">
                                                 <input
                                                     type="text"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["categoryName"] && categoryIndex === updatingCategoryIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["categoryName"] && categoryIndex === selectedCategoryIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     defaultValue={category.name}
                                                     onChange={(e) => changeCategoryName(categoryIndex, e.target.value.trim())}
                                                 ></input>
-                                                {formValidationErrors["categoryName"] && categoryIndex === updatingCategoryIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["categoryName"] && categoryIndex === selectedCategoryIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["categoryName"]}</span>
                                                 </p>}
                                             </section>
                                         </td>
                                         <td className="update-cell">
-                                            {updatingCategoryIndex !== categoryIndex && <>
+                                            {selectedCategoryIndex !== categoryIndex && <>
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
                                                     onClick={() => updateCategory(categoryIndex)}
@@ -266,14 +266,15 @@ export default function UpdateAndDeleteCategories() {
                                                     onClick={() => deleteCategory(category._id)}
                                                 >Delete</button>
                                             </>}
-                                            {isWaitStatus && updatingCategoryIndex === categoryIndex && <button
+                                            {waitMsg && selectedCategoryIndex === categoryIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
-                                            >Please Waiting</button>}
-                                            {successMsg && updatingCategoryIndex === categoryIndex && <button
+                                                disabled
+                                            >{waitMsg}</button>}
+                                            {successMsg && selectedCategoryIndex === categoryIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && updatingCategoryIndex === categoryIndex && <button
+                                            {errorMsg && selectedCategoryIndex === categoryIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}
@@ -283,11 +284,11 @@ export default function UpdateAndDeleteCategories() {
                             </tbody>
                         </table>
                     </section>}
-                    {allCategoriesInsideThePage.length === 0 && !isWaitGetCategoriesStatus && <p className="alert alert-danger w-100">Sorry, Can't Find Any Categories !!</p>}
-                    {isWaitGetCategoriesStatus && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
+                    {allCategoriesInsideThePage.length === 0 && !isGetCategories && <p className="alert alert-danger w-100">Sorry, Can't Find Any Categories !!</p>}
+                    {isGetCategories && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
                         <span className="loader-table-data"></span>
                     </div>}
-                    {totalPagesCount > 1 && !isWaitGetCategoriesStatus &&
+                    {totalPagesCount > 1 && !isGetCategories &&
                         <PaginationBar
                             totalPagesCount={totalPagesCount}
                             currentPage={currentPage}

@@ -38,33 +38,15 @@ export default function UpdateAndDeleteProducts() {
 
     const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
 
-    const [updatingProductGalleryImageIndex, setUpdatingProductGalleryImageIndex] = useState(-1);
-
     const [isWaitChangeProductImage, setIsWaitChangeProductImage] = useState(false);
-
-    const [isWaitChangeProductGalleryImage, setIsWaitChangeProductGalleryImage] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState("");
 
     const [errorChangeProductImageMsg, setErrorChangeProductImageMsg] = useState("");
 
-    const [errorChangeProductGalleryImageMsg, setErrorChangeProductGalleryImageMsg] = useState("");
-
-    const [errorDeleteProductGalleryImageMsg, setErrorDeleteProductGalleryImageMsg] = useState("");
-
     const [successMsg, setSuccessMsg] = useState("");
 
     const [successChangeProductImageMsg, setSuccessChangeProductImageMsg] = useState("");
-
-    const [successChangeProductGalleryImageMsg, setSuccessChangeProductGalleryImageMsg] = useState("");
-
-    const [successDeleteProductGalleryImageMsg, setSuccessDeleteProductGalleryImageMsg] = useState("");
-
-    const [productIndex, setProductIndex] = useState(-1);
-
-    const [isDeleteProductGalleryImage, setIsDeleteProductGalleryImage] = useState(false);
-
-    const [newProductGalleryImageFiles, setNewProductGalleryImageFiles] = useState([]);
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -536,148 +518,6 @@ export default function UpdateAndDeleteProducts() {
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
-                {/* {productIndex > -1 && <div className="overlay">
-                    <div className="gallery-images-box d-flex flex-column align-items-center justify-content-center p-4">
-                        <GrFormClose className="close-overlay-icon" onClick={() => setProductIndex(-1)} />
-                        <h3 className="fw-bold border-bottom border-2 border-dark pb-2 mb-4">Product Gallery Images</h3>
-                        {allProductsInsideThePage[productIndex].galleryImagesPaths.length > 0 ? <div className="gallery-images-table-box w-100 p-3">
-                            <table className="gallery-images-table managment-table w-100">
-                                <thead>
-                                    <tr>
-                                        <th>Image</th>
-                                        <th>Process</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {allProductsInsideThePage[productIndex].galleryImagesPaths.map((galleryImagePath, index) => (
-                                        <tr key={index}>
-                                            <td>
-                                                <img
-                                                    src={`${process.env.BASE_API_URL}/${galleryImagePath}`}
-                                                    className="gallery-image d-block mx-auto"
-                                                />
-                                            </td>
-                                            <td>
-                                                {
-                                                    !isWaitChangeProductGalleryImage &&
-                                                    !errorChangeProductGalleryImageMsg &&
-                                                    !successChangeProductGalleryImageMsg &&
-                                                    !isDeleteProductGalleryImage &&
-                                                    !errorDeleteProductGalleryImageMsg &&
-                                                    !successDeleteProductGalleryImageMsg &&
-                                                    <button className="btn btn-danger w-50 global-button" onClick={() => deleteImageFromProductImagesGallery(productIndex, index)}>Delete</button>
-                                                }
-                                                {isDeleteProductGalleryImage && <button
-                                                    className="btn btn-info d-block mb-3 mx-auto global-button"
-                                                >Please Waiting</button>}
-                                                {successDeleteProductGalleryImageMsg && <button
-                                                    className="btn btn-success d-block mx-auto global-button"
-                                                    disabled
-                                                >{successDeleteProductGalleryImageMsg}</button>}
-                                                {errorDeleteProductGalleryImageMsg && <button
-                                                    className="btn btn-danger d-block mx-auto global-button"
-                                                    disabled
-                                                >{errorDeleteProductGalleryImageMsg}</button>}
-                                                <hr />
-                                                <section className="product-gallery-image mb-4">
-                                                    <input
-                                                        type="file"
-                                                        className={`form-control d-block mx-auto p-2 border-2 product-gallery-image-field ${formValidationErrors["galleryImage"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                        onChange={(e) => changeProductGalleryImage(index, e.target.files[0])}
-                                                        accept=".png, .jpg, .webp"
-                                                    />
-                                                    {formValidationErrors["galleryImage"] && index === updatingProductGalleryImageIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
-                                                        <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                                        <span>{formValidationErrors["galleryImage"]}</span>
-                                                    </p>}
-                                                </section>
-                                                {
-                                                    !isWaitChangeProductGalleryImage &&
-                                                    !errorChangeProductGalleryImageMsg &&
-                                                    !successChangeProductGalleryImageMsg &&
-                                                    !isDeleteProductGalleryImage &&
-                                                    !errorDeleteProductGalleryImageMsg &&
-                                                    !successDeleteProductGalleryImageMsg &&
-                                                    <button
-                                                        className="btn btn-success d-block mx-auto w-50 global-button"
-                                                        onClick={() => updateProductGalleryImage(index)}
-                                                    >
-                                                        Change
-                                                    </button>
-                                                }
-                                                {isWaitChangeProductGalleryImage && <button
-                                                    className="btn btn-info d-block mb-3 mx-auto global-button"
-                                                >Please Waiting</button>}
-                                                {successChangeProductGalleryImageMsg && <button
-                                                    className="btn btn-success d-block mx-auto global-button"
-                                                    disabled
-                                                >{successChangeProductGalleryImageMsg}</button>}
-                                                {errorChangeProductGalleryImageMsg && <button
-                                                    className="btn btn-danger d-block mx-auto global-button"
-                                                    disabled
-                                                >{errorChangeProductGalleryImageMsg}</button>}
-                                            </td>
-                                        </tr>
-                                    ))
-                                    }
-                                </tbody>
-                            </table>
-                        </div> : <p className="alert alert-danger w-100 border border-2 border-dark">Sorry, There Is No Gallery Images For This Product !!</p>}
-                        {allProductsInsideThePage.length === 0 && !isFilteringProductsStatus && <p className="alert alert-danger w-100">Sorry, Can't Find Any Products !!</p>}
-                        <div className="add-new-product-images-for-gallery w-100">
-                            <h3 className="fw-bold border-bottom border-2 border-dark pb-2 mb-4 mx-auto">Add New Images For Product Gallery Images</h3>
-                            <section className="product-gallery-images mb-4">
-                                <input
-                                    type="file"
-                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["newGalleryImages"] ? "border-danger mb-3" : "mb-4"}`}
-                                    multiple
-                                    onChange={(e) => setNewProductGalleryImageFiles(e.target.files)}
-                                    accept=".png, .jpg, .webp"
-                                />
-                                {formValidationErrors["newGalleryImages"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
-                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                    <span>{formValidationErrors["newGalleryImages"]}</span>
-                                </p>}
-                            </section>
-                            {
-                                newProductGalleryImageFiles.length === 0 &&
-                                !isAddingNewImagesToProductGallery &&
-                                !successNewImagesToProductGallery &&
-                                !errorNewImagesToProductGallery &&
-                                <button
-                                    className="btn btn-success d-block mx-auto w-50 global-button"
-                                    disabled
-                                >
-                                    Add New Images
-                                </button>
-                            }
-                            {
-                                newProductGalleryImageFiles.length > 0 &&
-                                !isAddingNewImagesToProductGallery &&
-                                !successNewImagesToProductGallery &&
-                                !errorNewImagesToProductGallery &&
-                                <button
-                                    className="btn btn-success d-block mx-auto w-50 global-button"
-                                    onClick={() => addingNewImagesToProductGallery(newProductGalleryImageFiles)}
-                                >
-                                    Add New Images
-                                </button>
-                            }
-                            {isAddingNewImagesToProductGallery && <button
-                                className="btn btn-info d-block mb-3 mx-auto global-button"
-                            >Please Waiting</button>}
-                            {successNewImagesToProductGallery && <button
-                                className="btn btn-success d-block mx-auto global-button"
-                                disabled
-                            >{successNewImagesToProductGallery}</button>}
-                            {errorNewImagesToProductGallery && <button
-                                className="btn btn-danger d-block mx-auto global-button"
-                                disabled
-                            >{errorNewImagesToProductGallery}</button>}
-                        </div>
-                    </div>
-                </div>} */}
-                {/* End Overlay */}
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-4">
                     <h1 className="fw-bold w-fit pb-2 mb-4">
                         <PiHandWavingThin className="me-2" />

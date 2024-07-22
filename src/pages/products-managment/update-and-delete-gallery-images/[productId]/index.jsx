@@ -19,8 +19,6 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
 
     const [adminInfo, setAdminInfo] = useState({});
 
-    const [isGetGalleryImages, setIsGetGalleryImages] = useState(false);
-
     const [allGalleryImages, setAllGalleryImages] = useState([]);
 
     const [selectedGalleryImageIndex, setSelectedGalleryImageIndex] = useState(-1);
@@ -105,7 +103,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
             setSelectedGalleryImageIndex(imageIndex);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setIsChangeBrandImage(true);
+                setWaitMsg("Please Waiting Updating ...");
                 let formData = new FormData();
                 formData.append("brandImage", allGalleryImages[imageIndex].image);
                 const res = await axios.put(`${process.env.BASE_API_URL}/brands/change-brand-image/${allGalleryImages[imageIndex]._id}`, formData, {
@@ -115,7 +113,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                 });
                 const result = res.data;
                 if (!result.error) {
-                    setIsChangeBrandImage(false);
+                    setWaitMsg("");
                     setSuccessChangeBrandImageMsg("Change Image Successfull !!");
                     let successTimeout = setTimeout(async () => {
                         setSuccessChangeBrandImageMsg("");
@@ -180,23 +178,24 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
     }
 
     return (
-        <div className="update-and-delete-brands admin-dashboard">
+        <div className="update-and-delete-product-gallery-images admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Update / Delete Brands</title>
+                <title>Ubuyblues Store Admin Dashboard - Update / Delete Product Gallery Images</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-5">
                     <h1 className="fw-bold w-fit pb-2 mb-4">
                         <PiHandWavingThin className="me-2" />
-                        Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Brands Page
+                        Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Product Gallery Images Page
                     </h1>
-                    {allGalleryImages.length > 0 && !isGetGalleryImages && <section className="gallery-images-box admin-dashbboard-data-box w-100">
+                    {allGalleryImages.length > 0 && <section className="gallery-images-box admin-dashbboard-data-box w-100">
                         <table className="gallery-images-table mb-4 managment-table bg-white admin-dashbboard-data-table">
                             <thead>
                                 <tr>
                                     <th>Image</th>
-                                    <th>Processes</th>
+                                    <th>Change Image</th>
+                                    <th>Delete Image</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -211,40 +210,60 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                                                 className="d-block mx-auto mb-4"
                                             />
                                         </td>
-                                        <td className="update-cell">
-                                            {/* {selectedBrandIndex !== imageIndex && <>
-                                                <button
-                                                    className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                    onClick={() => updateBrandInfo(imageIndex)}
-                                                >Update</button>
-                                                <hr />
-                                                <button
-                                                    className="btn btn-danger global-button"
-                                                    onClick={() => deleteImageFromGallery(imageIndex)}
-                                                >Delete</button>
-                                            </>}
-                                            {waitMsg && selectedBrandIndex === imageIndex && <button
+                                        <td className="update-gallery-image-cell">
+                                            <section className="gallery-image mb-4">
+                                                <input
+                                                    type="file"
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && brandIndex === selectedBrandImageIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeGalleryImage(imageIndex, "image", e.target.files[0])}
+                                                    accept=".png, .jpg, .webp"
+                                                />
+                                                {formValidationErrors["image"] && brandIndex === selectedBrandImageIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                                    <span>{formValidationErrors["image"]}</span>
+                                                </p>}
+                                            </section>
+                                            {selectedGalleryImageIndex !== imageIndex && <button
+                                                className="btn btn-success d-block mb-3 mx-auto global-button"
+                                                onClick={() => updateBrandInfo(imageIndex)}
+                                            >Change Image</button>}
+                                            {waitMsg && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
-                                            {successMsg && selectedBrandIndex === imageIndex && <button
+                                            {successMsg && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && selectedBrandIndex === imageIndex && <button
+                                            {errorMsg && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
-                                            >{errorMsg}</button>} */}
+                                            >{errorMsg}</button>}
+                                        </td>
+                                        <td className="delete-gallery-image-cell">
+                                            {selectedGalleryImageIndex !== imageIndex && <button
+                                                className="btn btn-danger global-button"
+                                                onClick={() => deleteImageFromGallery(imageIndex)}
+                                            >Delete</button>}
+                                            {waitMsg && selectedGalleryImageIndex === imageIndex && <button
+                                                className="btn btn-info d-block mb-3 mx-auto global-button"
+                                                disabled
+                                            >{waitMsg}</button>}
+                                            {successMsg && selectedGalleryImageIndex === imageIndex && <button
+                                                className="btn btn-success d-block mx-auto global-button"
+                                                disabled
+                                            >{successMsg}</button>}
+                                            {errorMsg && selectedGalleryImageIndex === imageIndex && <button
+                                                className="btn btn-danger d-block mx-auto global-button"
+                                                disabled
+                                            >{errorMsg}</button>}
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </section>}
-                    {allGalleryImages.length === 0 && !isGetGalleryImages && <p className="alert alert-danger w-100">Sorry, Can't Find Any Brands !!</p>}
-                    {isGetGalleryImages && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                        <span className="loader-table-data"></span>
-                    </div>}
+                    {allGalleryImages.length === 0 && <p className="alert alert-danger w-100">Sorry, Can't Find Any Gallery Images For This Product !!</p>}
                 </div>
             </>}
             {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}

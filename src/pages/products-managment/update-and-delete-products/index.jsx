@@ -36,9 +36,11 @@ export default function UpdateAndDeleteProducts() {
 
     const [waitMsg, setWaitMsg] = useState(false);
 
+    const [selectedProducImageIndex, setSelectedProducImageIndex] = useState(-1);
+
     const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
 
-    const [isWaitChangeProductImage, setIsWaitChangeProductImage] = useState(false);
+    const [waitChangeProductImageMsg, setWaitChangeProductImageMsg] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -202,9 +204,9 @@ export default function UpdateAndDeleteProducts() {
                 },
             ]);
             setFormValidationErrors(errorsObject);
-            setSelectedProductIndex(productIndex);
+            setSelectedProducImageIndex(productIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setIsWaitChangeProductImage(true);
+                setWaitChangeProductImageMsg("Please Waiting Change Image ...");
                 let formData = new FormData();
                 formData.append("productImage", allProductsInsideThePage[productIndex].image);
                 const res = await axios.put(`${process.env.BASE_API_URL}/products/update-product-image/${allProductsInsideThePage[productIndex]._id}`, formData, {
@@ -213,16 +215,17 @@ export default function UpdateAndDeleteProducts() {
                     }
                 });
                 const result = res.data;
+                setWaitChangeProductImageMsg("");
                 if (!result.error) {
-                    setIsWaitChangeProductImage(false);
-                    setSuccessChangeProductImageMsg(result.msg);
+                    setSuccessChangeProductImageMsg("Change Image Successfull !!");
                     let successTimeout = setTimeout(async () => {
                         setSuccessChangeProductImageMsg("");
-                        setCurrentPage(1);
-                        setAllProductsInsideThePage((await getAllProductsInsideThePage(1, pageSize)).data);
-                        setSelectedProductIndex(-1);
+                        setAllProductsInsideThePage((await getAllProductsInsideThePage(currentPage, pageSize, getFilteringString(filters))).data.products);
+                        setSelectedProducImageIndex(-1);
                         clearTimeout(successTimeout);
                     }, 1500);
+                } else {
+                    setSelectedProducImageIndex(-1);
                 }
             }
         }
@@ -232,11 +235,11 @@ export default function UpdateAndDeleteProducts() {
                 await router.replace("/login");
                 return;
             }
-            setSelectedProductIndex(-1);
-            setIsWaitChangeProductImage(false);
+            setWaitChangeProductImageMsg("");
             setErrorChangeProductImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorChangeProductImageMsg("");
+                setSelectedProducImageIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -414,103 +417,6 @@ export default function UpdateAndDeleteProducts() {
         }
     }
 
-    // const deleteImageFromProductImagesGallery = async (productIndex, productGalleryImageIndex) => {
-    //     try {
-    //         setIsDeleteProductGalleryImage(true);
-    //         const res = await axios.delete(`${process.env.BASE_API_URL}/products/gallery-images/${allProductsInsideThePage[productIndex]._id}?galleryImagePath=${allProductsInsideThePage[productIndex].galleryImagesPaths[productGalleryImageIndex]}`, {
-    //             headers: {
-    //                 Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
-    //             }
-    //         });
-    //         const result = res.data;
-    //         if (!result.error) {
-    //             setIsDeleteProductGalleryImage(false);
-    //             setSuccessDeleteProductGalleryImageMsg(result.msg);
-    //             let successTimeout = setTimeout(async () => {
-    //                 setSuccessDeleteProductGalleryImageMsg("");
-    //                 const newProductGalleryImagePaths = allProductsInsideThePage[productIndex].galleryImagesPaths.filter((path) => path !== allProductsInsideThePage[productIndex].galleryImagesPaths[productGalleryImageIndex]);
-    //                 allProductsInsideThePage[productIndex].galleryImagesPaths = newProductGalleryImagePaths;
-    //                 clearTimeout(successTimeout);
-    //             }, 1500);
-    //         }
-    //     }
-    //     catch (err) {
-    //         if (err?.response?.data?.msg === "Unauthorized Error") {
-    //             localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-    //             await router.replace("/login");
-    //             return;
-    //         }
-    //         setIsDeleteProductGalleryImage(false);
-    //         setErrorDeleteProductGalleryImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-    //         let errorTimeout = setTimeout(() => {
-    //             setErrorDeleteProductGalleryImageMsg("");
-    //             clearTimeout(errorTimeout);
-    //         }, 1500);
-    //     }
-    // }
-
-    // const changeProductGalleryImage = (productGalleryImageIndex, newValue) => {
-    //     let productsGalleryImagesTemp = newProductGalleryImageFiles;
-    //     productsGalleryImagesTemp[productGalleryImageIndex] = newValue;
-    //     setNewProductGalleryImageFiles(productsGalleryImagesTemp);
-    // }
-
-    // const updateProductGalleryImage = async (productGalleryImageIndex) => {
-    //     try {
-    //         setFormValidationErrors({});
-    //         const errorsObject = inputValuesValidation([
-    //             {
-    //                 name: "galleryImage",
-    //                 value: newProductGalleryImageFiles[productGalleryImageIndex],
-    //                 rules: {
-    //                     isRequired: {
-    //                         msg: "Sorry, This Field Can't Be Empty !!",
-    //                     },
-    //                     isImage: {
-    //                         msg: "Sorry, Invalid Image Type, Please Upload JPG Or PNG Or Webp Image File !!",
-    //                     },
-    //                 },
-    //             },
-    //         ]);
-    //         setFormValidationErrors(errorsObject);
-    //         setUpdatingProductGalleryImageIndex(productGalleryImageIndex);
-    //         if (Object.keys(errorsObject).length == 0) {
-    //             setIsWaitChangeProductGalleryImage(true);
-    //             let formData = new FormData();
-    //             formData.append("productGalleryImage", newProductGalleryImageFiles[productGalleryImageIndex]);
-    //             const res = await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${allProductsInsideThePage[productIndex]._id}?oldGalleryImagePath=${allProductsInsideThePage[productIndex].galleryImagesPaths[productGalleryImageIndex]}`, formData, {
-    //                 headers: {
-    //                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
-    //                 }
-    //             });
-    //             const result = res.data;
-    //             if (!result.error) {
-    //                 setIsWaitChangeProductGalleryImage(false);
-    //                 setSuccessChangeProductGalleryImageMsg(result.msg);
-    //                 let successTimeout = setTimeout(async () => {
-    //                     setSuccessChangeProductGalleryImageMsg("");
-    //                     setUpdatingProductGalleryImageIndex(-1);
-    //                     clearTimeout(successTimeout);
-    //                 }, 1500);
-    //             }
-    //         }
-    //     }
-    //     catch (err) {
-    //         if (err?.response?.data?.msg === "Unauthorized Error") {
-    //             localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-    //             await router.replace("/login");
-    //             return;
-    //         }
-    //         setIsWaitChangeProductGalleryImage(false);
-    //         setUpdatingProductGalleryImageIndex(-1);
-    //         setErrorChangeProductGalleryImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-    //         let errorTimeout = setTimeout(() => {
-    //             setErrorChangeProductGalleryImageMsg("");
-    //             clearTimeout(errorTimeout);
-    //         }, 1500);
-    //     }
-    // }
-
     return (
         <div className="update-and-delete-product admin-dashboard">
             <Head>
@@ -568,7 +474,7 @@ export default function UpdateAndDeleteProducts() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {allProductsInsideThePage.map((product, index) => (
+                                {allProductsInsideThePage.map((product, productIndex) => (
                                     <tr key={product._id}>
                                         <td className="product-name-cell">
                                             <section className="product-name mb-4">
@@ -576,10 +482,10 @@ export default function UpdateAndDeleteProducts() {
                                                     type="text"
                                                     placeholder="Enter New Product Name"
                                                     defaultValue={product.name}
-                                                    className={`form-control d-block mx-auto p-2 border-2 product-name-field ${formValidationErrors["name"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeProductData(index, "name", e.target.value.trim())}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-name-field ${formValidationErrors["name"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeProductData(productIndex, "name", e.target.value.trim())}
                                                 ></input>
-                                                {formValidationErrors["name"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["name"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["name"]}</span>
                                                 </p>}
@@ -591,10 +497,10 @@ export default function UpdateAndDeleteProducts() {
                                                     type="number"
                                                     placeholder="Enter New Product Price"
                                                     defaultValue={product.price}
-                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-field ${formValidationErrors["price"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeProductData(index, "price", e.target.valueAsNumber)}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-field ${formValidationErrors["price"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeProductData(productIndex, "price", e.target.valueAsNumber)}
                                                 ></input>
-                                                {formValidationErrors["price"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["price"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["price"]}</span>
                                                 </p>}
@@ -605,10 +511,10 @@ export default function UpdateAndDeleteProducts() {
                                                 <textarea
                                                     placeholder="Enter New Product Description"
                                                     defaultValue={product.description}
-                                                    className={`form-control d-block mx-auto p-2 border-2 product-description-field ${formValidationErrors["description"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeProductData(index, "description", e.target.value.trim())}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-description-field ${formValidationErrors["description"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeProductData(productIndex, "description", e.target.value.trim())}
                                                 ></textarea>
-                                                {formValidationErrors["description"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["description"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["description"]}</span>
                                                 </p>}
@@ -624,7 +530,7 @@ export default function UpdateAndDeleteProducts() {
                                             <hr />
                                             <select
                                                 className="product-category-select form-select mb-4"
-                                                onChange={(e) => changeProductData(index, "category", e.target.value)}
+                                                onChange={(e) => changeProductData(productIndex, "category", e.target.value)}
                                             >
                                                 <option defaultValue="" hidden>Please Select Your Category</option>
                                                 {allCategories.map((category) => (
@@ -638,10 +544,10 @@ export default function UpdateAndDeleteProducts() {
                                                     type="number"
                                                     placeholder="Enter New Discount Price"
                                                     defaultValue={product.discount}
-                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-discount ${formValidationErrors["discount"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeProductData(index, "discount", e.target.valueAsNumber)}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-discount ${formValidationErrors["discount"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeProductData(productIndex, "discount", e.target.valueAsNumber)}
                                                 ></input>
-                                                {formValidationErrors["discount"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["discount"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["discount"]}</span>
                                                 </p>}
@@ -652,14 +558,14 @@ export default function UpdateAndDeleteProducts() {
                                                     <input
                                                         type="datetime-local"
                                                         className="form-control mb-4 border border-dark"
-                                                        onChange={(e) => changeProductData(index, "startDiscountPeriod", e.target.value)}
+                                                        onChange={(e) => changeProductData(productIndex, "startDiscountPeriod", e.target.value)}
                                                         defaultValue={product.startDiscountPeriod ? getTimeAndDateByLocalTime(product.startDiscountPeriod) : null}
                                                     />
                                                     <h6 className="fw-bold">End Period</h6>
                                                     <input
                                                         type="datetime-local"
                                                         className="form-control mb-4 border border-dark"
-                                                        onChange={(e) => changeProductData(index, "endDiscountPeriod", e.target.value)}
+                                                        onChange={(e) => changeProductData(productIndex, "endDiscountPeriod", e.target.value)}
                                                         defaultValue={product.endDiscountPeriod ? getTimeAndDateByLocalTime(product.endDiscountPeriod) : null}
                                                     />
                                                     <section className="product-price-discount-in-offer-period mb-4">
@@ -667,10 +573,10 @@ export default function UpdateAndDeleteProducts() {
                                                             type="number"
                                                             placeholder="Enter New Discount Price"
                                                             defaultValue={product.discountInOfferPeriod}
-                                                            className={`form-control d-block mx-auto p-2 border-2 product-price-discount-in-offer-period-field ${formValidationErrors["discount"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-2"}`}
-                                                            onChange={(e) => changeProductData(index, "discountInOfferPeriod", e.target.valueAsNumber)}
+                                                            className={`form-control d-block mx-auto p-2 border-2 product-price-discount-in-offer-period-field ${formValidationErrors["discount"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-2"}`}
+                                                            onChange={(e) => changeProductData(productIndex, "discountInOfferPeriod", e.target.valueAsNumber)}
                                                         ></input>
-                                                        {formValidationErrors["discountInOfferPeriod"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                        {formValidationErrors["discountInOfferPeriod"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                             <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                             <span>{formValidationErrors["discountInOfferPeriod"]}</span>
                                                         </p>}
@@ -680,10 +586,10 @@ export default function UpdateAndDeleteProducts() {
                                                             type="text"
                                                             placeholder="Enter New Offer Description"
                                                             defaultValue={product.offerDescription}
-                                                            className={`form-control d-block mx-auto p-2 border-2 offer-description-field ${formValidationErrors["name"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-2"}`}
-                                                            onChange={(e) => changeProductData(index, "offerDescription", e.target.value.trim())}
+                                                            className={`form-control d-block mx-auto p-2 border-2 offer-description-field ${formValidationErrors["name"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-2"}`}
+                                                            onChange={(e) => changeProductData(productIndex, "offerDescription", e.target.value.trim())}
                                                         ></input>
-                                                        {formValidationErrors["offerDescription"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                        {formValidationErrors["offerDescription"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                             <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                             <span>{formValidationErrors["offerDescription"]}</span>
                                                         </p>}
@@ -702,35 +608,35 @@ export default function UpdateAndDeleteProducts() {
                                             <section className="product-image mb-4">
                                                 <input
                                                     type="file"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeProductData(index, "image", e.target.files[0])}
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && productIndex === selectedProducImageIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeProductData(productIndex, "image", e.target.files[0])}
                                                     accept=".png, .jpg, .webp"
                                                 />
-                                                {formValidationErrors["image"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["image"] && productIndex === selectedProducImageIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["image"]}</span>
                                                 </p>}
                                             </section>
-                                            {!isWaitChangeProductImage && !errorChangeProductImageMsg && !successChangeProductImageMsg &&
+                                            {(selectedProducImageIndex !== productIndex && selectedProductIndex !== productIndex) &&
                                                 <button
                                                     className="btn btn-success d-block mb-3 w-50 mx-auto global-button"
-                                                    onClick={() => updateProductImage(index)}
+                                                    onClick={() => updateProductImage(productIndex)}
                                                 >Change</button>
                                             }
-                                            {isWaitChangeProductImage && <button
+                                            {waitChangeProductImageMsg && selectedProducImageIndex === productIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
-                                            >Please Waiting</button>}
-                                            {successChangeProductImageMsg && <button
+                                            >{waitChangeProductImageMsg}</button>}
+                                            {successChangeProductImageMsg && selectedProducImageIndex === productIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successChangeProductImageMsg}</button>}
-                                            {errorChangeProductImageMsg && <button
+                                            {errorChangeProductImageMsg && selectedProducImageIndex === productIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorChangeProductImageMsg}</button>}
                                         </td>
                                         <td className="update-cell">
-                                            {selectedProductIndex !== index && <>
+                                            {selectedProductIndex !== productIndex && <>
                                                 <Link href={`/products-managment/update-and-delete-gallery-images/${product._id}`}
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
                                                 >Show Gallery</Link>
@@ -740,23 +646,23 @@ export default function UpdateAndDeleteProducts() {
                                                 <hr />
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                    onClick={() => updateProductData(index)}
+                                                    onClick={() => updateProductData(productIndex)}
                                                 >Update</button>
                                                 <hr />
                                                 <button
                                                     className="btn btn-danger global-button"
-                                                    onClick={() => deleteProduct(index)}
+                                                    onClick={() => deleteProduct(productIndex)}
                                                 >Delete</button>
                                             </>}
-                                            {waitMsg && selectedProductIndex === index && <button
+                                            {waitMsg && selectedProductIndex === productIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
-                                            {successMsg && selectedProductIndex === index && <button
+                                            {successMsg && selectedProductIndex === productIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && selectedProductIndex === index && <button
+                                            {errorMsg && selectedProductIndex === productIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}

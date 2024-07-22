@@ -29,7 +29,7 @@ export default function UpdateAndDeleteBrands() {
 
     const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
 
-    const [isChangeBrandImage, setIsChangeBrandImage] = useState(false);
+    const [waitChangeBrandImageMsg, setWaitChangeBrandImageMsg] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -171,7 +171,7 @@ export default function UpdateAndDeleteBrands() {
             setSelectedBrandImageIndex(brandIndex);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setIsChangeBrandImage(true);
+                setWaitChangeBrandImageMsg("Please Waiting Change Image ...");
                 let formData = new FormData();
                 formData.append("brandImage", allBrandsInsideThePage[brandIndex].image);
                 const res = await axios.put(`${process.env.BASE_API_URL}/brands/change-brand-image/${allBrandsInsideThePage[brandIndex]._id}`, formData, {
@@ -181,7 +181,7 @@ export default function UpdateAndDeleteBrands() {
                 });
                 const result = res.data;
                 if (!result.error) {
-                    setIsChangeBrandImage(false);
+                    setWaitChangeBrandImageMsg("");
                     setSuccessChangeBrandImageMsg("Change Image Successfull !!");
                     let successTimeout = setTimeout(async () => {
                         setSuccessChangeBrandImageMsg("");
@@ -199,7 +199,7 @@ export default function UpdateAndDeleteBrands() {
                 return;
             }
             setSelectedBrandImageIndex(-1);
-            setIsChangeBrandImage(false);
+            setWaitChangeBrandImageMsg(false);
             setErrorChangeBrandImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorChangeBrandImageMsg("");
@@ -365,9 +365,9 @@ export default function UpdateAndDeleteBrands() {
                                                     onClick={() => changeBrandImage(brandIndex)}
                                                 >Change</button>
                                             }
-                                            {isChangeBrandImage && selectedBrandImageIndex === brandIndex && <button
+                                            {waitChangeBrandImageMsg && selectedBrandImageIndex === brandIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
-                                            >Please Waiting</button>}
+                                            >{waitChangeBrandImageMsg}</button>}
                                             {successChangeBrandImageMsg && selectedBrandImageIndex === brandIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled

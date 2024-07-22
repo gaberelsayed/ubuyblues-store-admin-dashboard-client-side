@@ -542,7 +542,7 @@ export default function StoresManagment() {
                                                     >
                                                         Deleting ...
                                                     </button>}
-                                                    {isSuccessStatus && <button
+                                                    {isSuccessStatus && storeIndex === selectedStoreIndex && <button
                                                         className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                         disabled
                                                     >

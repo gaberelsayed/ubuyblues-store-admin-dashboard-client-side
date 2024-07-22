@@ -24,13 +24,11 @@ export default function UpdateAndDeleteAdmins() {
 
     const [selectedAdminIndex, setSelectedAdminIndex] = useState(-1);
 
-    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
-    const [isDeletingStatus, setIsDeletingStatus] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
 
-    const [successMsg, setSuccessMsg] = useState(false);
-
-    const [errorMsg, setErrorMsg] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -234,7 +232,7 @@ export default function UpdateAndDeleteAdmins() {
             setFormValidationErrors(errorsObject);
             setSelectedAdminIndex(adminIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setIsUpdatingStatus(true);
+                setWaitMsg("Please Waiting Updating ...");
                 const res = await axios.put(`${process.env.BASE_API_URL}/admins/update-admin-info/${allAdminsInsideThePage[adminIndex]._id}`, {
                     firstName: allAdminsInsideThePage[adminIndex].firstName,
                     lastName: allAdminsInsideThePage[adminIndex].lastName,
@@ -246,7 +244,7 @@ export default function UpdateAndDeleteAdmins() {
                 });
                 const result = res.data;
                 if (!result.error) {
-                    setIsUpdatingStatus(false);
+                    setWaitMsg("");
                     setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
@@ -264,10 +262,10 @@ export default function UpdateAndDeleteAdmins() {
                 await router.replace("/login");
                 return;
             }
-            setIsUpdatingStatus(false);
-            setErrorMsg(true);
+            setWaitMsg("");
+            setErrorMsg("");
             let errorTimeout = setTimeout(() => {
-                setErrorMsg(false);
+                setErrorMsg("");
                 setSelectedAdminIndex(-1);
                 clearTimeout(errorTimeout);
             }, 3000);
@@ -276,7 +274,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const deleteAdmin = async (adminIndex) => {
         try {
-            setIsDeletingStatus(true);
+            setWaitMsg("Please Waiting Deleting ...");
             setSelectedAdminIndex(adminIndex);
             const res = await axios.delete(`${process.env.BASE_API_URL}/admins/delete-admin/${allAdminsInsideThePage[adminIndex]._id}`, {
                 headers: {
@@ -284,7 +282,7 @@ export default function UpdateAndDeleteAdmins() {
                 }
             });
             let result = res.data;
-            setIsDeletingStatus(false);
+            setWaitMsg(false);
             if (!result.error) {
                 setSuccessMsg("Updating Successfull !!");
                 let successTimeout = setTimeout(async () => {
@@ -310,10 +308,10 @@ export default function UpdateAndDeleteAdmins() {
                 await router.replace("/login");
                 return;
             }
-            setIsDeletingStatus(false);
-            setErrorMsg(true);
+            setWaitMsg("");
+            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
-                setErrorMsg(false);
+                setErrorMsg("");
                 setSelectedAdminIndex(-1);
                 clearTimeout(errorTimeout);
             }, 3000);
@@ -456,18 +454,6 @@ export default function UpdateAndDeleteAdmins() {
                                                         Update
                                                     </button>
                                                 }
-                                                {isUpdatingStatus && adminIndex === selectedAdminIndex && <button
-                                                    className="btn btn-info d-block mx-auto mb-3 global-button"
-                                                    disabled
-                                                >
-                                                    Updating ...
-                                                </button>}
-                                                {successMsg && adminIndex === selectedAdminIndex && <button
-                                                    className="btn btn-success d-block mx-auto mb-3 global-button"
-                                                    disabled
-                                                >
-                                                    Success
-                                                </button>}
                                                 {
                                                     adminIndex !== selectedAdminIndex &&
                                                     !admin.isMerchant &&
@@ -478,14 +464,14 @@ export default function UpdateAndDeleteAdmins() {
                                                         Delete
                                                     </button>
                                                 }
-                                                {isDeletingStatus && adminIndex === selectedAdminIndex && <button
+                                                {waitMsg && adminIndex === selectedAdminIndex && <button
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
-                                                    Deleting ...
+                                                    {waitMsg}
                                                 </button>}
                                                 {successMsg && adminIndex === selectedAdminIndex && <button
-                                                    className="btn btn-danger d-block mx-auto mb-3 global-button"
+                                                    className="btn btn-success d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
                                                     {successMsg}

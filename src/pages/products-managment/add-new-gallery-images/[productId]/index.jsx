@@ -7,10 +7,10 @@ import LoaderPage from "@/components/LoaderPage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { useRouter } from "next/router";
 import { HiOutlineBellAlert } from "react-icons/hi2";
-import { inputValuesValidation } from "../../../../public/global_functions/validations";
-import { getAdminInfo } from "../../../../public/global_functions/popular";
+import { inputValuesValidation } from "../../../../../public/global_functions/validations";
+import { getAdminInfo } from "../../../../../public/global_functions/popular";
 
-export default function AddNewProductGalleryImage() {
+export default function AddNewProductGalleryImage({ productIdAsProperty }) {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
@@ -72,8 +72,11 @@ export default function AddNewProductGalleryImage() {
             const errorsObject = inputValuesValidation([
                 {
                     name: "newGalleryImageFiles",
-                    value: newProductGalleryImageFiles,
+                    value: newGalleryImageFiles,
                     rules: {
+                        isRequired: {
+                            msg: "Sorry, This Field Can't Be Empty !!",
+                        },
                         isImages: {
                             msg: "Sorry, Invalid Image Type, Please Upload JPG Or PNG Or Webp Image File !!",
                         },
@@ -82,12 +85,12 @@ export default function AddNewProductGalleryImage() {
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
+                setWaitMsg("Waiting Add New Image To Product Gallery ...");
                 let formData = new FormData();
                 for (let galleryImageFile of newGalleryImageFiles) {
                     formData.append("galleryImage", galleryImageFile);
                 }
-                setWaitMsg("Waiting Add New Image To Product Gallery ...");
-                const res = await axios.post(`${process.env.BASE_API_URL}/products/adding-new-images-to-product-gallery/${productId}`, formData, {
+                const res = await axios.post(`${process.env.BASE_API_URL}/products/adding-new-images-to-product-gallery/${productIdAsProperty}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
@@ -103,7 +106,7 @@ export default function AddNewProductGalleryImage() {
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
-                    setWaitMsg(false);
+                    setWaitMsg("");
                     setErrorMsg(result.msg);
                     let errorTimeout = setTimeout(() => {
                         setErrorMsg("");
@@ -113,6 +116,7 @@ export default function AddNewProductGalleryImage() {
             }
         }
         catch (err) {
+            console.log(err)
             if (err?.response?.data?.msg === "Unauthorized Error") {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
@@ -190,4 +194,22 @@ export default function AddNewProductGalleryImage() {
             {isErrorMsgOnLoadingThePage && <ErrorOnLoadingThePage />}
         </div>
     );
+}
+
+export async function getServerSideProps({ params }) {
+    const { productId } = params;
+    if (!productId) {
+        return {
+            redirect: {
+                permanent: false,
+                destination: "/products-managment/update-and-delete-products",
+            },
+        }
+    } else {
+        return {
+            props: {
+                productIdAsProperty: productId,
+            },
+        }
+    }
 }

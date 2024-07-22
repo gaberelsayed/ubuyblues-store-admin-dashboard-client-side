@@ -319,13 +319,13 @@ export default function OrderDetails({ orderIdAsProperty }) {
     );
 }
 
-export async function getServerSideProps(context) {
-    const orderId = context.query.orderId;
+export async function getServerSideProps({ params }) {
+    const { orderId } = params;
     if (!orderId) {
         return {
             redirect: {
                 permanent: false,
-                destination: "/404",
+                destination: "/orders-managment",
             },
         }
     } else {

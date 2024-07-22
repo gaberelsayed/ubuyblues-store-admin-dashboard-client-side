@@ -96,11 +96,11 @@ export default function AddNewBrand() {
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
+                setWaitMsg("Please WaitingTo Add New Brand ...");
                 let formData = new FormData();
                 formData.append("brandImg", brandImage);
                 formData.append("title", brandTitle);
                 formData.append("storeId", adminInfo.storeId);
-                setWaitMsg("Please WaitingTo Add New Brand ...");
                 const res = await axios.post(`${process.env.BASE_API_URL}/brands/add-new-brand`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),

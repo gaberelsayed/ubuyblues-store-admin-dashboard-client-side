@@ -18,6 +18,7 @@ import {
     getDateInUTCFormat,
     getAllCategories
 } from "../../../../public/global_functions/popular";
+import Link from "next/link";
 
 export default function UpdateAndDeleteProducts() {
 
@@ -790,7 +791,7 @@ export default function UpdateAndDeleteProducts() {
                                                     type="text"
                                                     placeholder="Enter New Product Name"
                                                     defaultValue={product.name}
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["name"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-name-field ${formValidationErrors["name"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeProductData(index, "name", e.target.value.trim())}
                                                 ></input>
                                                 {formValidationErrors["name"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
@@ -805,7 +806,7 @@ export default function UpdateAndDeleteProducts() {
                                                     type="number"
                                                     placeholder="Enter New Product Price"
                                                     defaultValue={product.price}
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["price"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-field ${formValidationErrors["price"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeProductData(index, "price", e.target.valueAsNumber)}
                                                 ></input>
                                                 {formValidationErrors["price"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
@@ -819,7 +820,7 @@ export default function UpdateAndDeleteProducts() {
                                                 <textarea
                                                     placeholder="Enter New Product Description"
                                                     defaultValue={product.description}
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["description"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-description-field ${formValidationErrors["description"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeProductData(index, "description", e.target.value.trim())}
                                                 ></textarea>
                                                 {formValidationErrors["description"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
@@ -852,7 +853,7 @@ export default function UpdateAndDeleteProducts() {
                                                     type="number"
                                                     placeholder="Enter New Discount Price"
                                                     defaultValue={product.discount}
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["discount"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-discount ${formValidationErrors["discount"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeProductData(index, "discount", e.target.valueAsNumber)}
                                                 ></input>
                                                 {formValidationErrors["discount"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
@@ -945,10 +946,9 @@ export default function UpdateAndDeleteProducts() {
                                         </td>
                                         <td className="update-cell">
                                             {!isWaitStatus && !errorMsg && !successMsg && <>
-                                                <button
+                                                <Link href={`/products-managment/add-new-gallery-images/${product._id}`}
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                    onClick={() => setProductIndex(index)}
-                                                >Show Gallery</button>
+                                                >Show Gallery</Link>
                                                 <hr />
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"

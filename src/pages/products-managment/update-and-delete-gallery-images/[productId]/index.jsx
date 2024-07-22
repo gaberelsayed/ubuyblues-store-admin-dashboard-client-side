@@ -8,8 +8,8 @@ import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { useRouter } from "next/router";
 import PaginationBar from "@/components/PaginationBar";
 import { HiOutlineBellAlert } from "react-icons/hi2";
-import { inputValuesValidation } from "../../../../public/global_functions/validations";
-import { getAdminInfo } from "../../../../public/global_functions/popular";
+import { inputValuesValidation } from "../../../../../public/global_functions/validations";
+import { getAdminInfo } from "../../../../../public/global_functions/popular";
 
 export default function UpdateAndDeleteGalleryImages() {
 
@@ -23,21 +23,13 @@ export default function UpdateAndDeleteGalleryImages() {
 
     const [allGalleryImages, setAllGalleryImages] = useState([]);
 
+    const [selectedGalleryImageIndex, setSelectedGalleryImageIndex] = useState(-1);
+
     const [waitMsg, setWaitMsg] = useState("");
-
-    const [selectedBrandImageIndex, setSelectedBrandImageIndex] = useState(-1);
-
-    const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
-
-    const [isChangeBrandImage, setIsChangeBrandImage] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState("");
 
-    const [errorChangeBrandImageMsg, setErrorChangeBrandImageMsg] = useState("");
-
     const [successMsg, setSuccessMsg] = useState("");
-
-    const [successChangeBrandImageMsg, setSuccessChangeBrandImageMsg] = useState("");
 
     const [formValidationErrors, setFormValidationErrors] = useState({});
 
@@ -97,7 +89,7 @@ export default function UpdateAndDeleteGalleryImages() {
             setFormValidationErrors({});
             const errorsObject = inputValuesValidation([
                 {
-                    name: "image",
+                    name: "galleryImage",
                     value: allGalleryImages[imageIndex].image,
                     rules: {
                         isRequired: {
@@ -109,7 +101,7 @@ export default function UpdateAndDeleteGalleryImages() {
                     },
                 },
             ]);
-            setSelectedBrandImageIndex(imageIndex);
+            setSelectedGalleryImageIndex(imageIndex);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 setIsChangeBrandImage(true);
@@ -126,7 +118,7 @@ export default function UpdateAndDeleteGalleryImages() {
                     setSuccessChangeBrandImageMsg("Change Image Successfull !!");
                     let successTimeout = setTimeout(async () => {
                         setSuccessChangeBrandImageMsg("");
-                        setSelectedBrandImageIndex(-1);
+                        setSelectedGalleryImageIndex(-1);
                         setAllGalleryImages((await getAllGalleryImages(currentPage, pageSize, getFilteringString(filters))).data);
                         clearTimeout(successTimeout);
                     }, 1500);
@@ -139,66 +131,11 @@ export default function UpdateAndDeleteGalleryImages() {
                 await router.replace("/login");
                 return;
             }
-            setSelectedBrandImageIndex(-1);
+            setSelectedGalleryImageIndex(-1);
             setIsChangeBrandImage(false);
             setErrorChangeBrandImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorChangeBrandImageMsg("");
-                clearTimeout(errorTimeout);
-            }, 1500);
-        }
-    }
-
-    const updateBrandInfo = async (imageIndex) => {
-        try {
-            setFormValidationErrors({});
-            const errorsObject = inputValuesValidation([
-                {
-                    name: "title",
-                    value: allGalleryImages[imageIndex].title,
-                    rules: {
-                        isRequired: {
-                            msg: "Sorry, This Field Can't Be Empty !!",
-                        },
-                    },
-                },
-            ]);
-            setFormValidationErrors(errorsObject);
-            setSelectedBrandIndex(imageIndex);
-            if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting Updating ...");
-                const res = await axios.put(`${process.env.BASE_API_URL}/brands/${allGalleryImages[imageIndex]._id}`, {
-                    newBrandTitle: allGalleryImages[imageIndex].title,
-                }, {
-                    headers: {
-                        Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
-                    }
-                });
-                const result = res.data;
-                setWaitMsg("");
-                if (!result.error) {
-                    setSuccessMsg("Updating Successfull !!");
-                    let successTimeout = setTimeout(() => {
-                        setSuccessMsg("");
-                        setSelectedBrandIndex(-1);
-                        clearTimeout(successTimeout);
-                    }, 1500);
-                } else {
-                    setSelectedBrandIndex(-1);
-                }
-            }
-        }
-        catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
-                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                await router.replace("/login");
-                return;
-            }
-            setWaitMsg("");
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                setSelectedBrandIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -253,73 +190,28 @@ export default function UpdateAndDeleteGalleryImages() {
                         <PiHandWavingThin className="me-2" />
                         Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Brands Page
                     </h1>
-                    {allGalleryImages.length > 0 && !isGetGalleryImages && <section className="brands-box admin-dashbboard-data-box w-100">
-                        <table className="brands-table mb-4 managment-table bg-white admin-dashbboard-data-table">
+                    {allGalleryImages.length > 0 && !isGetGalleryImages && <section className="gallery-images-box admin-dashbboard-data-box w-100">
+                        <table className="gallery-images-table mb-4 managment-table bg-white admin-dashbboard-data-table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
                                     <th>Image</th>
                                     <th>Processes</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {allGalleryImages.map((brand, imageIndex) => (
-                                    <tr key={brand._id}>
-                                        <td className="brand-title-cell">
-                                            <section className="brand-title mb-4">
-                                                <input
-                                                    type="text"
-                                                    placeholder="Enter New Brand Title"
-                                                    defaultValue={brand.title}
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["title"] && imageIndex === selectedBrandIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeBrandData(imageIndex, "title", e.target.value.trim())}
-                                                ></input>
-                                                {formValidationErrors["title"] && imageIndex === selectedBrandIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
-                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                                    <span>{formValidationErrors["title"]}</span>
-                                                </p>}
-                                            </section>
-                                        </td>
-                                        <td className="brand-image-cell">
+                                {allGalleryImages.map((image, imageIndex) => (
+                                    <tr key={imageIndex}>
+                                        <td className="gallery-image-cell">
                                             <img
-                                                src={`${process.env.BASE_API_URL}/${brand.imagePath}`}
-                                                alt={`${brand.title} Brand Image !!`}
+                                                src={`${process.env.BASE_API_URL}/${image}`}
+                                                alt="Gallery Image !!"
                                                 width="100"
                                                 height="100"
                                                 className="d-block mx-auto mb-4"
                                             />
-                                            <section className="brand-image mb-4">
-                                                <input
-                                                    type="file"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && imageIndex === selectedBrandImageIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeBrandData(imageIndex, "image", e.target.files[0])}
-                                                    accept=".png, .jpg, .webp"
-                                                />
-                                                {formValidationErrors["image"] && imageIndex === selectedBrandImageIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
-                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                                    <span>{formValidationErrors["image"]}</span>
-                                                </p>}
-                                            </section>
-                                            {(selectedBrandImageIndex !== imageIndex && selectedBrandIndex !== imageIndex) &&
-                                                <button
-                                                    className="btn btn-success d-block mb-3 w-50 mx-auto global-button"
-                                                    onClick={() => changeGalleryImage(imageIndex)}
-                                                >Change</button>
-                                            }
-                                            {isChangeBrandImage && selectedBrandImageIndex === imageIndex && <button
-                                                className="btn btn-info d-block mb-3 mx-auto global-button"
-                                            >Please Waiting</button>}
-                                            {successChangeBrandImageMsg && selectedBrandImageIndex === imageIndex && <button
-                                                className="btn btn-success d-block mx-auto global-button"
-                                                disabled
-                                            >{successChangeBrandImageMsg}</button>}
-                                            {errorChangeBrandImageMsg && selectedBrandImageIndex === imageIndex && <button
-                                                className="btn btn-danger d-block mx-auto global-button"
-                                                disabled
-                                            >{errorChangeBrandImageMsg}</button>}
                                         </td>
                                         <td className="update-cell">
-                                            {selectedBrandIndex !== imageIndex && <>
+                                            {/* {selectedBrandIndex !== imageIndex && <>
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
                                                     onClick={() => updateBrandInfo(imageIndex)}
@@ -341,7 +233,7 @@ export default function UpdateAndDeleteGalleryImages() {
                                             {errorMsg && selectedBrandIndex === imageIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
-                                            >{errorMsg}</button>}
+                                            >{errorMsg}</button>} */}
                                         </td>
                                     </tr>
                                 ))}
@@ -352,15 +244,6 @@ export default function UpdateAndDeleteGalleryImages() {
                     {isGetGalleryImages && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
                         <span className="loader-table-data"></span>
                     </div>}
-                    {totalPagesCount > 1 && !isGetGalleryImages &&
-                        <PaginationBar
-                            totalPagesCount={totalPagesCount}
-                            currentPage={currentPage}
-                            getPreviousPage={getPreviousPage}
-                            getNextPage={getNextPage}
-                            getSpecificPage={getSpecificPage}
-                        />
-                    }
                 </div>
             </>}
             {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}

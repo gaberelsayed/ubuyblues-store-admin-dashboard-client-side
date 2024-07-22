@@ -33,7 +33,7 @@ export default function UpdateAndDeleteBrands() {
 
     const [errorMsg, setErrorMsg] = useState("");
 
-    const [errorChangeBrandImageMsg, setErrorChangeBrandImageMsg] = useState(false);
+    const [errorChangeBrandImageMsg, setErrorChangeBrandImageMsg] = useState("");
 
     const [successMsg, setSuccessMsg] = useState("");
 
@@ -279,7 +279,7 @@ export default function UpdateAndDeleteBrands() {
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedBrandIndex(-1);
-                    setAllBrandsInsideThePage(allBrandsInsideThePage.filter((brand) => brand._id !== allBrandsInsideThePage[brandIndex]._id))
+                    setAllBrandsInsideThePage(allBrandsInsideThePage.filter((brand) => brand._id !== allBrandsInsideThePage[brandIndex]._id));
                     clearTimeout(successTimeout);
                 }, 1500);
             }

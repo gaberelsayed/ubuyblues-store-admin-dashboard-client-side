@@ -34,9 +34,9 @@ export default function UpdateAndDeleteProducts() {
 
     const [allCategories, setAllCategories] = useState([]);
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState(false);
 
-    const [updatingProductIndex, setUpdatingProductIndex] = useState(-1);
+    const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
 
     const [updatingProductGalleryImageIndex, setUpdatingProductGalleryImageIndex] = useState(-1);
 
@@ -65,12 +65,6 @@ export default function UpdateAndDeleteProducts() {
     const [isDeleteProductGalleryImage, setIsDeleteProductGalleryImage] = useState(false);
 
     const [newProductGalleryImageFiles, setNewProductGalleryImageFiles] = useState([]);
-
-    const [isAddingNewImagesToProductGallery, setIsAddingNewImagesToProductGallery] = useState(false);
-
-    const [errorNewImagesToProductGallery, setErrorNewImagesToProductGallery] = useState(false);
-
-    const [successNewImagesToProductGallery, setSuccessNewImagesToProductGallery] = useState(false);
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -192,6 +186,7 @@ export default function UpdateAndDeleteProducts() {
     }
 
     const changeProductData = (productIndex, fieldName, newValue) => {
+        setSelectedProductIndex(-1);
         let tempNewValue = newValue;
         if (fieldName === "startDiscountPeriod" || fieldName === "endDiscountPeriod") {
             tempNewValue = getDateInUTCFormat(newValue);
@@ -225,7 +220,7 @@ export default function UpdateAndDeleteProducts() {
                 },
             ]);
             setFormValidationErrors(errorsObject);
-            setUpdatingProductIndex(productIndex);
+            setSelectedProductIndex(productIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setIsWaitChangeProductImage(true);
                 let formData = new FormData();
@@ -243,7 +238,7 @@ export default function UpdateAndDeleteProducts() {
                         setSuccessChangeProductImageMsg("");
                         setCurrentPage(1);
                         setAllProductsInsideThePage((await getAllProductsInsideThePage(1, pageSize)).data);
-                        setUpdatingProductIndex(-1);
+                        setSelectedProductIndex(-1);
                         clearTimeout(successTimeout);
                     }, 1500);
                 }
@@ -255,7 +250,7 @@ export default function UpdateAndDeleteProducts() {
                 await router.replace("/login");
                 return;
             }
-            setUpdatingProductIndex(-1);
+            setSelectedProductIndex(-1);
             setIsWaitChangeProductImage(false);
             setErrorChangeProductImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
@@ -341,9 +336,9 @@ export default function UpdateAndDeleteProducts() {
                 },
             ]);
             setFormValidationErrors(errorsObject);
-            setUpdatingProductIndex(productIndex);
+            setSelectedProductIndex(productIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setIsWaitStatus(true);
+                setWaitMsg("Please Waiting Updating ...");
                 const res = await axios.put(`${process.env.BASE_API_URL}/products/${allProductsInsideThePage[productIndex]._id}`, {
                     name: allProductsInsideThePage[productIndex].name,
                     price: allProductsInsideThePage[productIndex].price,
@@ -361,15 +356,17 @@ export default function UpdateAndDeleteProducts() {
                     }
                 });
                 const result = res.data;
-                setIsWaitStatus(false);
+                setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
+                        setSelectedProductIndex(-1);
                         clearTimeout(successTimeout);
                     }, 1500);
+                } else {
+                    setSelectedProductIndex(-1);
                 }
-                setUpdatingProductIndex(-1);
             }
         }
         catch (err) {
@@ -378,11 +375,11 @@ export default function UpdateAndDeleteProducts() {
                 await router.replace("/login");
                 return;
             }
-            setUpdatingProductIndex(-1);
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
+                setSelectedProductIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -390,23 +387,22 @@ export default function UpdateAndDeleteProducts() {
 
     const deleteProduct = async (productId) => {
         try {
-            setIsWaitStatus(true);
+            setWaitMsg("Please Waiting Deleting ...");
             const res = await axios.delete(`${process.env.BASE_API_URL}/products/${productId}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
             });
             const result = res.data;
-            setIsWaitStatus(false);
+            setWaitMsg(false);
             if (!result.error) {
                 setSuccessMsg(result.msg);
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setIsFilteringProductsStatus(true);
-                    setCurrentPage(1);
-                    const result = await getProductsCount();
+                    const result = await getProductsCount(getFilteringString(filters));
                     if (result.data > 0) {
-                        setAllProductsInsideThePage((await getAllProductsInsideThePage(1, pageSize)).data);
+                        setAllProductsInsideThePage((await getAllProductsInsideThePage(currentPage, pageSize, getFilteringString(filters))).data);
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
                     } else {
                         setAllProductsInsideThePage([]);
@@ -423,7 +419,7 @@ export default function UpdateAndDeleteProducts() {
                 await router.replace("/login");
                 return;
             }
-            setIsWaitStatus(false);
+            setWaitMsg(false);
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
@@ -529,61 +525,6 @@ export default function UpdateAndDeleteProducts() {
         }
     }
 
-    const addingNewImagesToProductGallery = async (newProductGalleryImageFiles) => {
-        try {
-            console.log(newProductGalleryImageFiles)
-            setFormValidationErrors({});
-            const errorsObject = inputValuesValidation([
-                {
-                    name: "newGalleryImages",
-                    value: newProductGalleryImageFiles,
-                    rules: {
-                        isImages: {
-                            msg: "Sorry, Invalid Image Type, Please Upload JPG Or PNG Or Webp Image File !!",
-                        },
-                    },
-                },
-            ]);
-            setFormValidationErrors(errorsObject);
-            if (Object.keys(errorsObject).length == 0) {
-                setIsAddingNewImagesToProductGallery(true);
-                let formData = new FormData();
-                for (let productGalleryImageFile of newProductGalleryImageFiles) {
-                    formData.append("productGalleryImage", productGalleryImageFile);
-                }
-                const res = await axios.post(`${process.env.BASE_API_URL}/products/adding-new-images-to-product-gallery/${allProductsInsideThePage[productIndex]._id}`, formData, {
-                    headers: {
-                        Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
-                    }
-                });
-                const result = res.data;
-                setIsAddingNewImagesToProductGallery(false);
-                if (!result.error) {
-                    setIsAddingNewImagesToProductGallery(false);
-                    setSuccessNewImagesToProductGallery(result.msg);
-                    let successTimeout = setTimeout(async () => {
-                        setSuccessNewImagesToProductGallery("");
-                        allProductsInsideThePage[productIndex].galleryImagesPaths = allProductsInsideThePage[productIndex].galleryImagesPaths.concat(result.data.newGalleryImagePaths);
-                        clearTimeout(successTimeout);
-                    }, 1500);
-                }
-            }
-        }
-        catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
-                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                await router.replace("/login");
-                return;
-            }
-            setIsAddingNewImagesToProductGallery(false);
-            setErrorNewImagesToProductGallery("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorNewImagesToProductGallery("");
-                clearTimeout(errorTimeout);
-            }, 1500);
-        }
-    }
-
     return (
         <div className="update-and-delete-product admin-dashboard">
             <Head>
@@ -591,7 +532,7 @@ export default function UpdateAndDeleteProducts() {
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
-                {productIndex > -1 && <div className="overlay">
+                {/* {productIndex > -1 && <div className="overlay">
                     <div className="gallery-images-box d-flex flex-column align-items-center justify-content-center p-4">
                         <GrFormClose className="close-overlay-icon" onClick={() => setProductIndex(-1)} />
                         <h3 className="fw-bold border-bottom border-2 border-dark pb-2 mb-4">Product Gallery Images</h3>
@@ -637,7 +578,7 @@ export default function UpdateAndDeleteProducts() {
                                                 <section className="product-gallery-image mb-4">
                                                     <input
                                                         type="file"
-                                                        className={`form-control d-block mx-auto p-2 border-2 product-gallery-image-field ${formValidationErrors["galleryImage"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                        className={`form-control d-block mx-auto p-2 border-2 product-gallery-image-field ${formValidationErrors["galleryImage"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                         onChange={(e) => changeProductGalleryImage(index, e.target.files[0])}
                                                         accept=".png, .jpg, .webp"
                                                     />
@@ -731,7 +672,7 @@ export default function UpdateAndDeleteProducts() {
                             >{errorNewImagesToProductGallery}</button>}
                         </div>
                     </div>
-                </div>}
+                </div>} */}
                 {/* End Overlay */}
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-4">
                     <h1 className="fw-bold w-fit pb-2 mb-4">
@@ -791,10 +732,10 @@ export default function UpdateAndDeleteProducts() {
                                                     type="text"
                                                     placeholder="Enter New Product Name"
                                                     defaultValue={product.name}
-                                                    className={`form-control d-block mx-auto p-2 border-2 product-name-field ${formValidationErrors["name"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-name-field ${formValidationErrors["name"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeProductData(index, "name", e.target.value.trim())}
                                                 ></input>
-                                                {formValidationErrors["name"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["name"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["name"]}</span>
                                                 </p>}
@@ -806,10 +747,10 @@ export default function UpdateAndDeleteProducts() {
                                                     type="number"
                                                     placeholder="Enter New Product Price"
                                                     defaultValue={product.price}
-                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-field ${formValidationErrors["price"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-field ${formValidationErrors["price"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeProductData(index, "price", e.target.valueAsNumber)}
                                                 ></input>
-                                                {formValidationErrors["price"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["price"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["price"]}</span>
                                                 </p>}
@@ -820,10 +761,10 @@ export default function UpdateAndDeleteProducts() {
                                                 <textarea
                                                     placeholder="Enter New Product Description"
                                                     defaultValue={product.description}
-                                                    className={`form-control d-block mx-auto p-2 border-2 product-description-field ${formValidationErrors["description"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-description-field ${formValidationErrors["description"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeProductData(index, "description", e.target.value.trim())}
                                                 ></textarea>
-                                                {formValidationErrors["description"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["description"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["description"]}</span>
                                                 </p>}
@@ -853,10 +794,10 @@ export default function UpdateAndDeleteProducts() {
                                                     type="number"
                                                     placeholder="Enter New Discount Price"
                                                     defaultValue={product.discount}
-                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-discount ${formValidationErrors["discount"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-discount ${formValidationErrors["discount"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeProductData(index, "discount", e.target.valueAsNumber)}
                                                 ></input>
-                                                {formValidationErrors["discount"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["discount"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["discount"]}</span>
                                                 </p>}
@@ -882,10 +823,10 @@ export default function UpdateAndDeleteProducts() {
                                                             type="number"
                                                             placeholder="Enter New Discount Price"
                                                             defaultValue={product.discountInOfferPeriod}
-                                                            className={`form-control d-block mx-auto p-2 border-2 product-price-discount-in-offer-period-field ${formValidationErrors["discount"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-2"}`}
+                                                            className={`form-control d-block mx-auto p-2 border-2 product-price-discount-in-offer-period-field ${formValidationErrors["discount"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-2"}`}
                                                             onChange={(e) => changeProductData(index, "discountInOfferPeriod", e.target.valueAsNumber)}
                                                         ></input>
-                                                        {formValidationErrors["discountInOfferPeriod"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                        {formValidationErrors["discountInOfferPeriod"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                             <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                             <span>{formValidationErrors["discountInOfferPeriod"]}</span>
                                                         </p>}
@@ -895,10 +836,10 @@ export default function UpdateAndDeleteProducts() {
                                                             type="text"
                                                             placeholder="Enter New Offer Description"
                                                             defaultValue={product.offerDescription}
-                                                            className={`form-control d-block mx-auto p-2 border-2 offer-description-field ${formValidationErrors["name"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-2"}`}
+                                                            className={`form-control d-block mx-auto p-2 border-2 offer-description-field ${formValidationErrors["name"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-2"}`}
                                                             onChange={(e) => changeProductData(index, "offerDescription", e.target.value.trim())}
                                                         ></input>
-                                                        {formValidationErrors["offerDescription"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                        {formValidationErrors["offerDescription"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                             <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                             <span>{formValidationErrors["offerDescription"]}</span>
                                                         </p>}
@@ -917,11 +858,11 @@ export default function UpdateAndDeleteProducts() {
                                             <section className="product-image mb-4">
                                                 <input
                                                     type="file"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && index === updatingProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && index === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     onChange={(e) => changeProductData(index, "image", e.target.files[0])}
                                                     accept=".png, .jpg, .webp"
                                                 />
-                                                {formValidationErrors["image"] && index === updatingProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["image"] && index === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["image"]}</span>
                                                 </p>}
@@ -945,10 +886,13 @@ export default function UpdateAndDeleteProducts() {
                                             >{errorChangeProductImageMsg}</button>}
                                         </td>
                                         <td className="update-cell">
-                                            {!isWaitStatus && !errorMsg && !successMsg && <>
+                                            {!waitMsg && !errorMsg && !successMsg && <>
                                                 <Link href={`/products-managment/add-new-gallery-images/${product._id}`}
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
                                                 >Show Gallery</Link>
+                                                <Link href={`/products-managment/add-new-gallery-images/${product._id}`}
+                                                    className="btn btn-success d-block mb-3 mx-auto global-button"
+                                                >Add New Image To Gallery</Link>
                                                 <hr />
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
@@ -960,9 +904,9 @@ export default function UpdateAndDeleteProducts() {
                                                     onClick={() => deleteProduct(product._id)}
                                                 >Delete</button>
                                             </>}
-                                            {isWaitStatus && <button
+                                            {waitMsg && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
-                                            >Please Waiting</button>}
+                                            >{waitMsg}</button>}
                                             {successMsg && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled

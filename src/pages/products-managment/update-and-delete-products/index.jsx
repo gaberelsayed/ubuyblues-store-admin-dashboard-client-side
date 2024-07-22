@@ -910,6 +910,7 @@ export default function UpdateAndDeleteProducts() {
                                             </>}
                                             {waitMsg && selectedProductIndex === index && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
+                                                disabled
                                             >{waitMsg}</button>}
                                             {successMsg && selectedProductIndex === index && <button
                                                 className="btn btn-success d-block mx-auto global-button"

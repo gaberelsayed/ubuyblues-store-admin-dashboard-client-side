@@ -35,8 +35,6 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
 
     const router = useRouter();
 
-    const pageSize = 10;
-
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
         if (adminToken) {
@@ -86,6 +84,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
     }
 
     const changeGalleryImage = (imageIndex, newValue) => {
+        setSelectedGalleryImageIndex(-1);
         let productsGalleryImagesTemp = newProductGalleryImageFiles;
         productsGalleryImagesTemp[imageIndex] = newValue;
         setNewProductGalleryImageFiles(productsGalleryImagesTemp);
@@ -114,7 +113,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                 setWaitMsg("Please Waiting Updating ...");
                 let formData = new FormData();
                 formData.append("productGalleryImage", newProductGalleryImageFiles[imageIndex]);
-                const res = await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${productIdAsProperty}/${allGalleryImages[imageIndex]}`, formData, {
+                const res = await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${productIdAsProperty}?oldGalleryImagePath=${allGalleryImages[imageIndex]}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
@@ -140,7 +139,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                 return;
             }
             setWaitMsg("");
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+            setErrorMsg("Sorry, Someting Went Wrong When Updating, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
                 setSelectedGalleryImageIndex(-1);
@@ -177,7 +176,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                 return;
             }
             setWaitMsg("");
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+            setErrorMsg("Sorry, Someting Went Wrong When Deleting, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
                 selectedGalleryImageIndex(-1);
@@ -236,33 +235,33 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                                                 className="btn btn-success d-block mb-3 mx-auto global-button"
                                                 onClick={() => updateGalleryImage(imageIndex)}
                                             >Change Image</button>}
-                                            {waitMsg && selectedGalleryImageIndex === imageIndex && <button
+                                            {waitMsg === "Please Waiting Updating ..." && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
-                                            {successMsg && selectedGalleryImageIndex === imageIndex && <button
+                                            {successMsg === "Change Image Successfull !!" && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && selectedGalleryImageIndex === imageIndex && <button
+                                            {errorMsg === "Sorry, Someting Went Wrong When Updating, Please Repeate The Process !!" && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}
                                         </td>
                                         <td className="delete-gallery-image-cell">
-                                            {selectedGalleryImageIndex !== imageIndex && <button
+                                            {(selectedGalleryImageIndex !== imageIndex || formValidationErrors["galleryImage"]) && <button
                                                 className="btn btn-danger global-button"
                                                 onClick={() => deleteImageFromGallery(imageIndex)}
                                             >Delete</button>}
-                                            {waitMsg && selectedGalleryImageIndex === imageIndex && <button
+                                            {waitMsg === "Please Waiting Deleting ..." && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
-                                            {successMsg && selectedGalleryImageIndex === imageIndex && <button
+                                            {successMsg === "Deleting Successfull !!" && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && selectedGalleryImageIndex === imageIndex && <button
+                                            {errorMsg === "Sorry, Someting Went Wrong When Deleting, Please Repeate The Process !!" && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}

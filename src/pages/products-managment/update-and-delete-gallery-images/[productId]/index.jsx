@@ -21,6 +21,8 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
 
     const [allGalleryImages, setAllGalleryImages] = useState([]);
 
+    const [newProductGalleryImageFiles, setNewProductGalleryImageFiles] = useState([]);
+
     const [selectedGalleryImageIndex, setSelectedGalleryImageIndex] = useState(-1);
 
     const [waitMsg, setWaitMsg] = useState("");
@@ -83,44 +85,51 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
         }
     }
 
-    const changeGalleryImage = async (imageIndex) => {
+    const changeGalleryImage = (imageIndex, newValue) => {
+        let productsGalleryImagesTemp = newProductGalleryImageFiles;
+        productsGalleryImagesTemp[imageIndex] = newValue;
+        setNewProductGalleryImageFiles(productsGalleryImagesTemp);
+    }
+
+    const updateGalleryImage = async (imageIndex) => {
         try {
             setFormValidationErrors({});
             const errorsObject = inputValuesValidation([
                 {
                     name: "galleryImage",
-                    value: allGalleryImages[imageIndex].image,
+                    value: newProductGalleryImageFiles[imageIndex],
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
                         },
                         isImage: {
-                            msg: "Sorry, Invalid Image Type, Please Upload JPG Or PNG Image File !!",
+                            msg: "Sorry, Invalid Image Type, Please Upload JPG Or PNG Or Webp Image File !!",
                         },
                     },
                 },
             ]);
-            setSelectedGalleryImageIndex(imageIndex);
             setFormValidationErrors(errorsObject);
+            setSelectedGalleryImageIndex(imageIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting Updating ...");
                 let formData = new FormData();
-                formData.append("brandImage", allGalleryImages[imageIndex].image);
-                const res = await axios.put(`${process.env.BASE_API_URL}/brands/change-brand-image/${allGalleryImages[imageIndex]._id}`, formData, {
+                formData.append("productGalleryImage", newProductGalleryImageFiles[imageIndex]);
+                const res = await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${productIdAsProperty}/${allGalleryImages[imageIndex]}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
                 });
                 const result = res.data;
+                setWaitMsg("");
                 if (!result.error) {
-                    setWaitMsg("");
-                    setSuccessChangeBrandImageMsg("Change Image Successfull !!");
+                    setSuccessMsg("Change Image Successfull !!");
                     let successTimeout = setTimeout(async () => {
-                        setSuccessChangeBrandImageMsg("");
+                        setSuccessMsg("");
                         setSelectedGalleryImageIndex(-1);
-                        setAllGalleryImages((await getAllGalleryImages(currentPage, pageSize, getFilteringString(filters))).data);
                         clearTimeout(successTimeout);
                     }, 1500);
+                } else {
+                    setSelectedGalleryImageIndex(-1);
                 }
             }
         }
@@ -130,11 +139,11 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                 await router.replace("/login");
                 return;
             }
-            setSelectedGalleryImageIndex(-1);
-            setIsChangeBrandImage(false);
-            setErrorChangeBrandImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+            setWaitMsg("");
+            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
-                setErrorChangeBrandImageMsg("");
+                setErrorMsg("");
+                setSelectedGalleryImageIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -214,18 +223,18 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                                             <section className="gallery-image mb-4">
                                                 <input
                                                     type="file"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["image"] && brandIndex === selectedBrandImageIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeGalleryImage(imageIndex, "image", e.target.files[0])}
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["galleryImage"] && imageIndex === selectedGalleryImageIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeGalleryImage(imageIndex, e.target.files[0])}
                                                     accept=".png, .jpg, .webp"
                                                 />
-                                                {formValidationErrors["image"] && brandIndex === selectedBrandImageIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["galleryImage"] && imageIndex === selectedGalleryImageIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                                    <span>{formValidationErrors["image"]}</span>
+                                                    <span>{formValidationErrors["galleryImage"]}</span>
                                                 </p>}
                                             </section>
                                             {selectedGalleryImageIndex !== imageIndex && <button
                                                 className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                onClick={() => updateBrandInfo(imageIndex)}
+                                                onClick={() => updateGalleryImage(imageIndex)}
                                             >Change Image</button>}
                                             {waitMsg && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"

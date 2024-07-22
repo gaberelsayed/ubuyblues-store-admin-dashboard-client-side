@@ -358,7 +358,7 @@ export default function UpdateAndDeleteProducts() {
                 const result = res.data;
                 setWaitMsg("");
                 if (!result.error) {
-                    setSuccessMsg(result.msg);
+                    setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
                         setSelectedProductIndex(-1);
@@ -428,102 +428,102 @@ export default function UpdateAndDeleteProducts() {
         }
     }
 
-    const deleteImageFromProductImagesGallery = async (productIndex, productGalleryImageIndex) => {
-        try {
-            setIsDeleteProductGalleryImage(true);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/products/gallery-images/${allProductsInsideThePage[productIndex]._id}?galleryImagePath=${allProductsInsideThePage[productIndex].galleryImagesPaths[productGalleryImageIndex]}`, {
-                headers: {
-                    Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
-                }
-            });
-            const result = res.data;
-            if (!result.error) {
-                setIsDeleteProductGalleryImage(false);
-                setSuccessDeleteProductGalleryImageMsg(result.msg);
-                let successTimeout = setTimeout(async () => {
-                    setSuccessDeleteProductGalleryImageMsg("");
-                    const newProductGalleryImagePaths = allProductsInsideThePage[productIndex].galleryImagesPaths.filter((path) => path !== allProductsInsideThePage[productIndex].galleryImagesPaths[productGalleryImageIndex]);
-                    allProductsInsideThePage[productIndex].galleryImagesPaths = newProductGalleryImagePaths;
-                    clearTimeout(successTimeout);
-                }, 1500);
-            }
-        }
-        catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
-                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                await router.replace("/login");
-                return;
-            }
-            setIsDeleteProductGalleryImage(false);
-            setErrorDeleteProductGalleryImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorDeleteProductGalleryImageMsg("");
-                clearTimeout(errorTimeout);
-            }, 1500);
-        }
-    }
+    // const deleteImageFromProductImagesGallery = async (productIndex, productGalleryImageIndex) => {
+    //     try {
+    //         setIsDeleteProductGalleryImage(true);
+    //         const res = await axios.delete(`${process.env.BASE_API_URL}/products/gallery-images/${allProductsInsideThePage[productIndex]._id}?galleryImagePath=${allProductsInsideThePage[productIndex].galleryImagesPaths[productGalleryImageIndex]}`, {
+    //             headers: {
+    //                 Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
+    //             }
+    //         });
+    //         const result = res.data;
+    //         if (!result.error) {
+    //             setIsDeleteProductGalleryImage(false);
+    //             setSuccessDeleteProductGalleryImageMsg(result.msg);
+    //             let successTimeout = setTimeout(async () => {
+    //                 setSuccessDeleteProductGalleryImageMsg("");
+    //                 const newProductGalleryImagePaths = allProductsInsideThePage[productIndex].galleryImagesPaths.filter((path) => path !== allProductsInsideThePage[productIndex].galleryImagesPaths[productGalleryImageIndex]);
+    //                 allProductsInsideThePage[productIndex].galleryImagesPaths = newProductGalleryImagePaths;
+    //                 clearTimeout(successTimeout);
+    //             }, 1500);
+    //         }
+    //     }
+    //     catch (err) {
+    //         if (err?.response?.data?.msg === "Unauthorized Error") {
+    //             localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+    //             await router.replace("/login");
+    //             return;
+    //         }
+    //         setIsDeleteProductGalleryImage(false);
+    //         setErrorDeleteProductGalleryImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+    //         let errorTimeout = setTimeout(() => {
+    //             setErrorDeleteProductGalleryImageMsg("");
+    //             clearTimeout(errorTimeout);
+    //         }, 1500);
+    //     }
+    // }
 
-    const changeProductGalleryImage = (productGalleryImageIndex, newValue) => {
-        let productsGalleryImagesTemp = newProductGalleryImageFiles;
-        productsGalleryImagesTemp[productGalleryImageIndex] = newValue;
-        setNewProductGalleryImageFiles(productsGalleryImagesTemp);
-    }
+    // const changeProductGalleryImage = (productGalleryImageIndex, newValue) => {
+    //     let productsGalleryImagesTemp = newProductGalleryImageFiles;
+    //     productsGalleryImagesTemp[productGalleryImageIndex] = newValue;
+    //     setNewProductGalleryImageFiles(productsGalleryImagesTemp);
+    // }
 
-    const updateProductGalleryImage = async (productGalleryImageIndex) => {
-        try {
-            setFormValidationErrors({});
-            const errorsObject = inputValuesValidation([
-                {
-                    name: "galleryImage",
-                    value: newProductGalleryImageFiles[productGalleryImageIndex],
-                    rules: {
-                        isRequired: {
-                            msg: "Sorry, This Field Can't Be Empty !!",
-                        },
-                        isImage: {
-                            msg: "Sorry, Invalid Image Type, Please Upload JPG Or PNG Or Webp Image File !!",
-                        },
-                    },
-                },
-            ]);
-            setFormValidationErrors(errorsObject);
-            setUpdatingProductGalleryImageIndex(productGalleryImageIndex);
-            if (Object.keys(errorsObject).length == 0) {
-                setIsWaitChangeProductGalleryImage(true);
-                let formData = new FormData();
-                formData.append("productGalleryImage", newProductGalleryImageFiles[productGalleryImageIndex]);
-                const res = await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${allProductsInsideThePage[productIndex]._id}?oldGalleryImagePath=${allProductsInsideThePage[productIndex].galleryImagesPaths[productGalleryImageIndex]}`, formData, {
-                    headers: {
-                        Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
-                    }
-                });
-                const result = res.data;
-                if (!result.error) {
-                    setIsWaitChangeProductGalleryImage(false);
-                    setSuccessChangeProductGalleryImageMsg(result.msg);
-                    let successTimeout = setTimeout(async () => {
-                        setSuccessChangeProductGalleryImageMsg("");
-                        setUpdatingProductGalleryImageIndex(-1);
-                        clearTimeout(successTimeout);
-                    }, 1500);
-                }
-            }
-        }
-        catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
-                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                await router.replace("/login");
-                return;
-            }
-            setIsWaitChangeProductGalleryImage(false);
-            setUpdatingProductGalleryImageIndex(-1);
-            setErrorChangeProductGalleryImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorChangeProductGalleryImageMsg("");
-                clearTimeout(errorTimeout);
-            }, 1500);
-        }
-    }
+    // const updateProductGalleryImage = async (productGalleryImageIndex) => {
+    //     try {
+    //         setFormValidationErrors({});
+    //         const errorsObject = inputValuesValidation([
+    //             {
+    //                 name: "galleryImage",
+    //                 value: newProductGalleryImageFiles[productGalleryImageIndex],
+    //                 rules: {
+    //                     isRequired: {
+    //                         msg: "Sorry, This Field Can't Be Empty !!",
+    //                     },
+    //                     isImage: {
+    //                         msg: "Sorry, Invalid Image Type, Please Upload JPG Or PNG Or Webp Image File !!",
+    //                     },
+    //                 },
+    //             },
+    //         ]);
+    //         setFormValidationErrors(errorsObject);
+    //         setUpdatingProductGalleryImageIndex(productGalleryImageIndex);
+    //         if (Object.keys(errorsObject).length == 0) {
+    //             setIsWaitChangeProductGalleryImage(true);
+    //             let formData = new FormData();
+    //             formData.append("productGalleryImage", newProductGalleryImageFiles[productGalleryImageIndex]);
+    //             const res = await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${allProductsInsideThePage[productIndex]._id}?oldGalleryImagePath=${allProductsInsideThePage[productIndex].galleryImagesPaths[productGalleryImageIndex]}`, formData, {
+    //                 headers: {
+    //                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
+    //                 }
+    //             });
+    //             const result = res.data;
+    //             if (!result.error) {
+    //                 setIsWaitChangeProductGalleryImage(false);
+    //                 setSuccessChangeProductGalleryImageMsg(result.msg);
+    //                 let successTimeout = setTimeout(async () => {
+    //                     setSuccessChangeProductGalleryImageMsg("");
+    //                     setUpdatingProductGalleryImageIndex(-1);
+    //                     clearTimeout(successTimeout);
+    //                 }, 1500);
+    //             }
+    //         }
+    //     }
+    //     catch (err) {
+    //         if (err?.response?.data?.msg === "Unauthorized Error") {
+    //             localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+    //             await router.replace("/login");
+    //             return;
+    //         }
+    //         setIsWaitChangeProductGalleryImage(false);
+    //         setUpdatingProductGalleryImageIndex(-1);
+    //         setErrorChangeProductGalleryImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+    //         let errorTimeout = setTimeout(() => {
+    //             setErrorChangeProductGalleryImageMsg("");
+    //             clearTimeout(errorTimeout);
+    //         }, 1500);
+    //     }
+    // }
 
     return (
         <div className="update-and-delete-product admin-dashboard">
@@ -886,7 +886,7 @@ export default function UpdateAndDeleteProducts() {
                                             >{errorChangeProductImageMsg}</button>}
                                         </td>
                                         <td className="update-cell">
-                                            {!waitMsg && !errorMsg && !successMsg && <>
+                                            {selectedProductIndex !== index && <>
                                                 <Link href={`/products-managment/add-new-gallery-images/${product._id}`}
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
                                                 >Show Gallery</Link>
@@ -901,17 +901,17 @@ export default function UpdateAndDeleteProducts() {
                                                 <hr />
                                                 <button
                                                     className="btn btn-danger global-button"
-                                                    onClick={() => deleteProduct(product._id)}
+                                                    onClick={() => deleteProduct(index)}
                                                 >Delete</button>
                                             </>}
-                                            {waitMsg && <button
+                                            {waitMsg && selectedProductIndex === index && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                             >{waitMsg}</button>}
-                                            {successMsg && <button
+                                            {successMsg && selectedProductIndex === index && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && <button
+                                            {errorMsg && selectedProductIndex === index && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}

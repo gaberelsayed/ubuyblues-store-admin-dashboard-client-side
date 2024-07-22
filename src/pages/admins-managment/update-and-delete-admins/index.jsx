@@ -247,9 +247,9 @@ export default function UpdateAndDeleteAdmins() {
                 const result = res.data;
                 if (!result.error) {
                     setIsUpdatingStatus(false);
-                    setSuccessMsg(true);
+                    setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
-                        setSuccessMsg(false);
+                        setSuccessMsg("");
                         setSelectedAdminIndex(-1);
                         clearTimeout(successTimeout);
                     }, 3000);
@@ -286,9 +286,9 @@ export default function UpdateAndDeleteAdmins() {
             let result = res.data;
             setIsDeletingStatus(false);
             if (!result.error) {
-                setSuccessMsg(true);
+                setSuccessMsg("Updating Successfull !!");
                 let successTimeout = setTimeout(async () => {
-                    setSuccessMsg(false);
+                    setSuccessMsg("");
                     setSelectedAdminIndex(-1);
                     setIsFilteringStoresStatus(true);
                     result = await getAdminsCount();
@@ -488,13 +488,13 @@ export default function UpdateAndDeleteAdmins() {
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
-                                                    Deleting Successful
+                                                    {successMsg}
                                                 </button>}
                                                 {errorMsg && adminIndex === selectedAdminIndex && <button
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
-                                                    Sorry, Someting Went Wrong, Please Repeate The Process !!
+                                                    {errorMsg}
                                                 </button>}
                                             </td>
                                         </tr>

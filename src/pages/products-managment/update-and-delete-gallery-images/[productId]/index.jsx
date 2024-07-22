@@ -125,6 +125,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                     let successTimeout = setTimeout(async () => {
                         setSuccessMsg("");
                         setSelectedGalleryImageIndex(-1);
+                        allGalleryImages[imageIndex] = result.data;
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
@@ -151,8 +152,8 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
     const deleteImageFromGallery = async (imageIndex) => {
         try {
             setWaitMsg("Please Waiting Deleting ...");
-            selectedGalleryImageIndex(imageIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/brands/${allGalleryImages[imageIndex]._id}`, {
+            setSelectedGalleryImageIndex(imageIndex);
+            const res = await axios.delete(`${process.env.BASE_API_URL}/products/gallery-images/${productIdAsProperty}?galleryImagePath=${allGalleryImages[imageIndex]}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
@@ -163,8 +164,8 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                 setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
-                    selectedGalleryImageIndex(-1);
-                    setAllGalleryImages(allGalleryImages.filter((image) => image._id !== allGalleryImages[imageIndex]._id));
+                    setSelectedGalleryImageIndex(-1);
+                    setAllGalleryImages(allGalleryImages.filter((image) => image !== allGalleryImages[imageIndex]));
                     clearTimeout(successTimeout);
                 }, 1500);
             }
@@ -179,7 +180,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
             setErrorMsg("Sorry, Someting Went Wrong When Deleting, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
-                selectedGalleryImageIndex(-1);
+                setSelectedGalleryImageIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }

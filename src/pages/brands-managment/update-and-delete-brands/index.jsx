@@ -19,11 +19,11 @@ export default function UpdateAndDeleteBrands() {
 
     const [adminInfo, setAdminInfo] = useState({});
 
-    const [isWaitGetBrandsStatus, setIsWaitGetBrandsStatus] = useState(false);
+    const [isGetBrands, setIsGetBrands] = useState(false);
 
     const [allBrandsInsideThePage, setAllBrandsInsideThePage] = useState([]);
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [updatingBrandImageIndex, setUpdatingBrandImageIndex] = useState(-1);
 
@@ -31,7 +31,7 @@ export default function UpdateAndDeleteBrands() {
 
     const [deletingBrandIndex, setDeletingBrandIndex] = useState(-1);
 
-    const [isWaitChangeBrandImage, setIsWaitChangeBrandImage] = useState(false);
+    const [isChangeBrandImage, setIsChangeBrandImage] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -123,26 +123,26 @@ export default function UpdateAndDeleteBrands() {
     }
 
     const getPreviousPage = async () => {
-        setIsWaitGetBrandsStatus(true);
+        setIsGetBrands(true);
         const newCurrentPage = currentPage - 1;
         setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
-        setIsWaitGetBrandsStatus(false);
+        setIsGetBrands(false);
     }
 
     const getNextPage = async () => {
-        setIsWaitGetBrandsStatus(true);
+        setIsGetBrands(true);
         const newCurrentPage = currentPage + 1;
         setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
-        setIsWaitGetBrandsStatus(false);
+        setIsGetBrands(false);
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsWaitGetBrandsStatus(true)
+        setIsGetBrands(true)
         setAllBrandsInsideThePage((await getAllBrandsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
         setCurrentPage(pageNumber);
-        setIsWaitGetBrandsStatus(false);
+        setIsGetBrands(false);
     }
 
     const changeBrandData = (brandIndex, fieldName, newValue) => {
@@ -173,7 +173,7 @@ export default function UpdateAndDeleteBrands() {
             setUpdatingBrandImageIndex(brandIndex);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setIsWaitChangeBrandImage(true);
+                setIsChangeBrandImage(true);
                 let formData = new FormData();
                 formData.append("brandImage", allBrandsInsideThePage[brandIndex].image);
                 const res = await axios.put(`${process.env.BASE_API_URL}/brands/change-brand-image/${allBrandsInsideThePage[brandIndex]._id}`, formData, {
@@ -183,7 +183,7 @@ export default function UpdateAndDeleteBrands() {
                 });
                 const result = res.data;
                 if (!result.error) {
-                    setIsWaitChangeBrandImage(false);
+                    setIsChangeBrandImage(false);
                     setSuccessChangeBrandImageMsg("Change Image Successfull !!");
                     let successTimeout = setTimeout(async () => {
                         setSuccessChangeBrandImageMsg("");
@@ -201,7 +201,7 @@ export default function UpdateAndDeleteBrands() {
                 return;
             }
             setUpdatingBrandImageIndex(-1);
-            setIsWaitChangeBrandImage(false);
+            setIsChangeBrandImage(false);
             setErrorChangeBrandImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorChangeBrandImageMsg("");
@@ -227,7 +227,7 @@ export default function UpdateAndDeleteBrands() {
             setFormValidationErrors(errorsObject);
             setUpdatingBrandIndex(brandIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setIsWaitStatus(true);
+                setWaitMsg("Please Waiting Updating ...");
                 const res = await axios.put(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
                     newBrandTitle: allBrandsInsideThePage[brandIndex].title,
                 }, {
@@ -236,7 +236,7 @@ export default function UpdateAndDeleteBrands() {
                     }
                 });
                 const result = res.data;
-                setIsWaitStatus(false);
+                setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
@@ -255,11 +255,11 @@ export default function UpdateAndDeleteBrands() {
                 await router.replace("/login");
                 return;
             }
-            setUpdatingBrandIndex(-1);
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
+                setUpdatingBrandIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -267,15 +267,15 @@ export default function UpdateAndDeleteBrands() {
 
     const deleteBrand = async (brandIndex) => {
         try {
-            setIsWaitStatus(true);
+            setWaitMsg("Please Waiting Deleting ...");
+            setDeletingBrandIndex(brandIndex);
             const res = await axios.delete(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
             });
             const result = res.data;
-            setIsWaitStatus(false);
-            setDeletingBrandIndex(brandIndex);
+            setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
@@ -292,10 +292,11 @@ export default function UpdateAndDeleteBrands() {
                 await router.replace("/login");
                 return;
             }
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
+                setDeletingBrandIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -313,7 +314,7 @@ export default function UpdateAndDeleteBrands() {
                         <PiHandWavingThin className="me-2" />
                         Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Brands Page
                     </h1>
-                    {allBrandsInsideThePage.length > 0 && !isWaitGetBrandsStatus && <section className="brands-box admin-dashbboard-data-box w-100">
+                    {allBrandsInsideThePage.length > 0 && !isGetBrands && <section className="brands-box admin-dashbboard-data-box w-100">
                         <table className="brands-table mb-4 managment-table bg-white admin-dashbboard-data-table">
                             <thead>
                                 <tr>
@@ -366,7 +367,7 @@ export default function UpdateAndDeleteBrands() {
                                                     onClick={() => changeBrandImage(brandIndex)}
                                                 >Change</button>
                                             }
-                                            {isWaitChangeBrandImage && updatingBrandImageIndex === brandIndex && <button
+                                            {isChangeBrandImage && updatingBrandImageIndex === brandIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                             >Please Waiting</button>}
                                             {successChangeBrandImageMsg && updatingBrandImageIndex === brandIndex && <button
@@ -390,9 +391,9 @@ export default function UpdateAndDeleteBrands() {
                                                     onClick={() => deleteBrand(brandIndex)}
                                                 >Delete</button>
                                             </>}
-                                            {isWaitStatus && (updatingBrandIndex === brandIndex || deletingBrandIndex === brandIndex) && <button
+                                            {waitMsg && (updatingBrandIndex === brandIndex || deletingBrandIndex === brandIndex) && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
-                                            >Please Waiting</button>}
+                                            >{waitMsg}</button>}
                                             {successMsg && (updatingBrandIndex === brandIndex || deletingBrandIndex === brandIndex) && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
@@ -407,11 +408,11 @@ export default function UpdateAndDeleteBrands() {
                             </tbody>
                         </table>
                     </section>}
-                    {allBrandsInsideThePage.length === 0 && !isWaitGetBrandsStatus && <p className="alert alert-danger w-100">Sorry, Can't Find Any Brands !!</p>}
-                    {isWaitGetBrandsStatus && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
+                    {allBrandsInsideThePage.length === 0 && !isGetBrands && <p className="alert alert-danger w-100">Sorry, Can't Find Any Brands !!</p>}
+                    {isGetBrands && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
                         <span className="loader-table-data"></span>
                     </div>}
-                    {totalPagesCount > 1 && !isWaitGetBrandsStatus &&
+                    {totalPagesCount > 1 && !isGetBrands &&
                         <PaginationBar
                             totalPagesCount={totalPagesCount}
                             currentPage={currentPage}

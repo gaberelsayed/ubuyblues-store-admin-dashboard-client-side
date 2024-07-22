@@ -28,9 +28,9 @@ export default function UpdateAndDeleteAdmins() {
 
     const [isDeletingStatus, setIsDeletingStatus] = useState(false);
 
-    const [isSuccessStatus, setIsSuccessStatus] = useState(false);
+    const [successMsg, setSuccessMsg] = useState(false);
 
-    const [isErrorStatus, setIsErrorStatus] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(false);
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -178,9 +178,9 @@ export default function UpdateAndDeleteAdmins() {
                 return;
             }
             setIsFilteringStoresStatus(false);
-            setIsErrorStatus(true);
+            setErrorMsg(true);
             let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
+                setErrorMsg(false);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -247,9 +247,9 @@ export default function UpdateAndDeleteAdmins() {
                 const result = res.data;
                 if (!result.error) {
                     setIsUpdatingStatus(false);
-                    setIsSuccessStatus(true);
+                    setSuccessMsg(true);
                     let successTimeout = setTimeout(() => {
-                        setIsSuccessStatus(false);
+                        setSuccessMsg(false);
                         setSelectedAdminIndex(-1);
                         clearTimeout(successTimeout);
                     }, 3000);
@@ -265,9 +265,9 @@ export default function UpdateAndDeleteAdmins() {
                 return;
             }
             setIsUpdatingStatus(false);
-            setIsErrorStatus(true);
+            setErrorMsg(true);
             let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
+                setErrorMsg(false);
                 setSelectedAdminIndex(-1);
                 clearTimeout(errorTimeout);
             }, 3000);
@@ -286,9 +286,9 @@ export default function UpdateAndDeleteAdmins() {
             let result = res.data;
             setIsDeletingStatus(false);
             if (!result.error) {
-                setIsSuccessStatus(true);
+                setSuccessMsg(true);
                 let successTimeout = setTimeout(async () => {
-                    setIsSuccessStatus(false);
+                    setSuccessMsg(false);
                     setSelectedAdminIndex(-1);
                     setIsFilteringStoresStatus(true);
                     result = await getAdminsCount();
@@ -311,9 +311,9 @@ export default function UpdateAndDeleteAdmins() {
                 return;
             }
             setIsDeletingStatus(false);
-            setIsErrorStatus(true);
+            setErrorMsg(true);
             let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
+                setErrorMsg(false);
                 setSelectedAdminIndex(-1);
                 clearTimeout(errorTimeout);
             }, 3000);
@@ -462,7 +462,7 @@ export default function UpdateAndDeleteAdmins() {
                                                 >
                                                     Updating ...
                                                 </button>}
-                                                {isSuccessStatus && adminIndex === selectedAdminIndex && <button
+                                                {successMsg && adminIndex === selectedAdminIndex && <button
                                                     className="btn btn-success d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
@@ -484,13 +484,13 @@ export default function UpdateAndDeleteAdmins() {
                                                 >
                                                     Deleting ...
                                                 </button>}
-                                                {isSuccessStatus && adminIndex === selectedAdminIndex && <button
+                                                {successMsg && adminIndex === selectedAdminIndex && <button
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
                                                     Deleting Successful
                                                 </button>}
-                                                {isErrorStatus && adminIndex === selectedAdminIndex && <button
+                                                {errorMsg && adminIndex === selectedAdminIndex && <button
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >

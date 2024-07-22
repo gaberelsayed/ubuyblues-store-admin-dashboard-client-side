@@ -189,7 +189,7 @@ export default function OrdersManagment() {
             const errorsObject = inputValuesValidation([
                 {
                     name: "totalAmount",
-                    value: allOrdersInsideThePage[orderIndex].order_amount,
+                    value: allOrdersInsideThePage[orderIndex].orderAmount,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -206,7 +206,7 @@ export default function OrdersManagment() {
             if (Object.keys(errorsObject).length == 0) {
                 setIsUpdatingStatus(true);
                 const res = await axios.post(`${process.env.BASE_API_URL}/orders/update-order/${allOrdersInsideThePage[orderIndex]._id}`, {
-                    order_amount: allOrdersInsideThePage[orderIndex].order_amount,
+                    orderAmount: allOrdersInsideThePage[orderIndex].orderAmount,
                     status: allOrdersInsideThePage[orderIndex].status,
                 }, {
                     headers: {
@@ -222,6 +222,8 @@ export default function OrdersManagment() {
                         setSelectedOrderIndex(-1);
                         clearTimeout(successTimeout);
                     }, 3000);
+                } else {
+                    setSelectedOrderIndex(-1);
                 }
             }
         }
@@ -260,7 +262,7 @@ export default function OrdersManagment() {
                     const filteringString = getFilteringString(filters);
                     const result = await getOrdersCount(filteringString);
                     if (result.data > 0) {
-                        setAllOrdersInsideThePage((await getAllOrdersInsideThePage(1, pageSize, filteringString)).data);
+                        setAllOrdersInsideThePage((await getAllOrdersInsideThePage(currentPage, pageSize, filteringString)).data);
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
                         setIsFilteringOrdersStatus(false);
                     } else {
@@ -409,7 +411,7 @@ export default function OrdersManagment() {
                                                         defaultValue={order.orderAmount}
                                                         className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["totalAmount"] && orderIndex === selectedOrderIndex ? "border-danger mb-3" : "mb-4"}`}
                                                         placeholder="Pleae Enter Order Amount"
-                                                        onChange={(e) => changeOrderData(orderIndex, "order_amount", e.target.valueAsNumber ? e.target.valueAsNumber : "")}
+                                                        onChange={(e) => changeOrderData(orderIndex, "orderAmount", e.target.valueAsNumber ? e.target.valueAsNumber : "")}
                                                     />
                                                     {formValidationErrors["totalAmount"] && orderIndex === selectedOrderIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                         <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
@@ -419,7 +421,7 @@ export default function OrdersManagment() {
                                             </td>
                                             <td>{getDateFormated(order.addedDate)}</td>
                                             <td>
-                                                {!isUpdatingStatus && !isDeletingStatus && !isSuccessStatus && !isErrorStatus && !order.isDeleted && <button
+                                                {!order.isDeleted && orderIndex !== selectedOrderIndex && <button
                                                     className="btn btn-info d-block mx-auto mb-3 global-button"
                                                     onClick={() => updateOrderData(orderIndex)}
                                                 >

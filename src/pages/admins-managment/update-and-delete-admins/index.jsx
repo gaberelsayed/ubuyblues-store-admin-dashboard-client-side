@@ -465,7 +465,7 @@ export default function UpdateAndDeleteAdmins() {
                                                     </button>
                                                 }
                                                 {waitMsg && adminIndex === selectedAdminIndex && <button
-                                                    className="btn btn-danger d-block mx-auto mb-3 global-button"
+                                                    className="btn btn-info d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
                                                     {waitMsg}

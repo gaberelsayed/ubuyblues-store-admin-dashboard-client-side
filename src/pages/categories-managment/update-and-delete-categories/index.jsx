@@ -152,10 +152,12 @@ export default function UpdateAndDeleteCategories() {
                     setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
+                        setSelectedCategoryIndex(-1);
                         clearTimeout(successTimeout);
                     }, 1500);
+                } else {
+                    setSelectedCategoryIndex(-1);
                 }
-                setSelectedCategoryIndex(-1);
             }
         }
         catch (err) {

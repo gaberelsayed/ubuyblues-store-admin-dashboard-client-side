@@ -197,7 +197,7 @@ export default function UpdateAndDeleteCategories() {
                     setCurrentPage(1);
                     const result = await getCategoriesCount();
                     if (result.data > 0) {
-                        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(filters))).data);
+                        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(currentPage, pageSize, getFiltersAsQuery(filters))).data);
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
                     } else {
                         setAllCategoriesInsideThePage([]);

@@ -37,6 +37,7 @@ export default function UpdateAndDeleteAdmins() {
     const [totalPagesCount, setTotalPagesCount] = useState(0);
 
     const [filters, setFilters] = useState({
+        storeId: "",
         adminId: "",
         firstName: "",
         lastName: "",
@@ -47,7 +48,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const router = useRouter();
 
-    const pageSize = 5;
+    const pageSize = 10;
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
@@ -65,9 +66,11 @@ export default function UpdateAndDeleteAdmins() {
                                 await router.replace("/login");
                             } else {
                                 setAdminInfo(adminDetails);
+                                const tempFilters = { ...filters, storeId: adminDetails.storeId };
+                                setFilters(tempFilters);
                                 result = await getAdminsCount();
                                 if (result.data > 0) {
-                                    setAllAdminsInsideThePage((await getAllAdminsInsideThePage(1, pageSize)).data);
+                                    setAllAdminsInsideThePage((await getAllAdminsInsideThePage(1, pageSize, getFilteringString(tempFilters))).data);
                                     setTotalPagesCount(Math.ceil(result.data / pageSize));
                                 }
                                 setIsLoadingPage(false);
@@ -143,6 +146,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const getFilteringString = (filters) => {
         let filteringString = "";
+        if (filters.storeId) filteringString += `storeId=${filters.storeId}&`;
         if (filters.adminId) filteringString += `_id=${filters.adminId}&`;
         if (filters.firstName) filteringString += `firstName=${filters.firstName}&`;
         if (filters.lastName) filteringString += `lastName=${filters.lastName}&`;
@@ -289,7 +293,7 @@ export default function UpdateAndDeleteAdmins() {
                     setIsFilteringStoresStatus(true);
                     result = await getAdminsCount();
                     if (result.data > 0) {
-                        setAllAdminsInsideThePage((await getAllAdminsInsideThePage(1, pageSize)).data);
+                        setAllAdminsInsideThePage((await getAllAdminsInsideThePage(currentPage, pageSize)).data);
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
                     }
                     setCurrentPage(1);

@@ -24,9 +24,9 @@ export default function UpdateAndDeleteCategories() {
 
     const [allImageAds, setAllImageAds] = useState([]);
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [selectedAdIndex, setSelectedAdIndex] = useState(-1);
 
-    const [updatingAdIndex, setUpdatingAdIndex] = useState(-1);
+    const [waitMsg, setWaitMsg] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState(false);
 
@@ -99,8 +99,9 @@ export default function UpdateAndDeleteCategories() {
                 },
             ]);
             setFormValidationErrors(errorsObject);
-            setUpdatingAdIndex(adIndex);
+            setSelectedAdIndex(adIndex);
             if (Object.keys(errorsObject).length == 0) {
+                setWaitMsg("Please Waiting Updating ...");
                 const res = await axios.put(`${process.env.BASE_API_URL}/ads/${allAds[adIndex]._id}`, {
                     newCategoryName: allAds[adIndex].name,
                 }, {
@@ -109,15 +110,16 @@ export default function UpdateAndDeleteCategories() {
                     }
                 });
                 const result = res.data;
-                setIsWaitStatus(false);
                 if (!result.error) {
-                    setSuccessMsg(result.msg);
+                    setSuccessMsg("Change Image Successfull !!");
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
+                        setSelectedAdIndex(-1);
                         clearTimeout(successTimeout);
                     }, 1500);
+                } else {
+                    setSelectedAdIndex(-1);
                 }
-                setUpdatingAdIndex(-1);
             }
         }
         catch (err) {
@@ -126,43 +128,36 @@ export default function UpdateAndDeleteCategories() {
                 await router.push("/login");
                 return;
             }
-            setUpdatingAdIndex(-1);
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
+                setSelectedAdIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
     }
 
-    const deleteAd = async (adId) => {
+    const deleteAd = async (adIndex) => {
         try {
-            setIsWaitStatus(true);
+            setWaitMsg("Please Waiting Deleting ...");
+            setSelectedAdIndex(adIndex);
             const res = await axios.delete(`${process.env.BASE_API_URL}/ads/${adId}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
             });
             const result = res.data;
-            setIsWaitStatus(false);
+            setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg(result.msg);
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
-                    setIsWaitGetCategoriesStatus(true);
-                    setCurrentPage(1);
-                    const result = await getCategoriesCount();
-                    if (result.data > 0) {
-                        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize)).data);
-                        setTotalPagesCount(Math.ceil(result.data / pageSize));
-                    } else {
-                        setAllCategoriesInsideThePage([]);
-                        setTotalPagesCount(0);
-                    }
-                    setIsWaitGetCategoriesStatus(false);
+                    setSelectedAdIndex(-1);
                     clearTimeout(successTimeout);
                 }, 1500);
+            } else {
+                setSelectedAdIndex(-1);
             }
         }
         catch (err) {
@@ -171,10 +166,11 @@ export default function UpdateAndDeleteCategories() {
                 await router.push("/login");
                 return;
             }
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
+                setSelectedAdIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -219,37 +215,37 @@ export default function UpdateAndDeleteCategories() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {allTextAds.map((ad, index) => (
+                                {allTextAds.map((ad, adIndex) => (
                                     <tr key={ad._id}>
                                         <td className="ad-content-cell">
                                             <section className="ad-content mb-4">
                                                 <input
                                                     type="text"
-                                                    className={`form-control d-block mx-auto p-2 border-2 ad-content-field ${formValidationErrors["adContent"] && index === updatingAdIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    className={`form-control d-block mx-auto p-2 border-2 ad-content-field ${formValidationErrors["adContent"] && adIndex === selectedAdIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     defaultValue={ad.content}
-                                                    onChange={(e) => changeAdContent(index, e.target.value.trim())}
+                                                    onChange={(e) => changeAdContent(adIndex, e.target.value.trim())}
                                                 ></input>
-                                                {formValidationErrors["adContent"] && index === updatingAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["adContent"] && adIndex === selectedAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["adContent"]}</span>
                                                 </p>}
                                             </section>
                                         </td>
                                         <td className="update-cell">
-                                            {!isWaitStatus && !errorMsg && !successMsg && <>
+                                            {selectedAdIndex !== adIndex && <>
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                    onClick={() => updateAd(index)}
+                                                    onClick={() => updateAd(adIndex)}
                                                 >Update</button>
                                                 <hr />
                                                 <button
                                                     className="btn btn-danger global-button"
-                                                    onClick={() => deleteAd(category._id)}
+                                                    onClick={() => deleteAd(adIndex)}
                                                 >Delete</button>
                                             </>}
-                                            {isWaitStatus && <button
+                                            {waitMsg && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
-                                            >Please Waiting</button>}
+                                            >{waitMsg}</button>}
                                             {successMsg && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
@@ -273,7 +269,7 @@ export default function UpdateAndDeleteCategories() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {allImageAds.map((ad, index) => (
+                                {allImageAds.map((ad, adIndex) => (
                                     <tr key={ad._id}>
                                         <td className="ad-image-cell">
                                             <img
@@ -286,36 +282,60 @@ export default function UpdateAndDeleteCategories() {
                                             <section className="ad-image mb-4">
                                                 <input
                                                     type="file"
-                                                    className={`form-control d-block mx-auto p-2 border-2 ad-image-field ${formValidationErrors["adImage"] && index === updatingAdIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeAdImage(index, "adImage", e.target.files[0])}
+                                                    className={`form-control d-block mx-auto p-2 border-2 ad-image-field ${formValidationErrors["adImage"] && adIndex === selectedAdIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeAdImage(adIndex, "adImage", e.target.files[0])}
                                                     accept=".png, .jpg, .webp"
                                                 />
-                                                {formValidationErrors["adImage"] && index === updatingAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["adImage"] && adIndex === selectedAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["adImage"]}</span>
                                                 </p>}
                                             </section>
                                         </td>
-                                        <td className="update-cell">
-                                            {!isWaitStatus && !errorMsg && !successMsg && <>
-                                                <button
-                                                    className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                    onClick={() => updateAd(index)}
-                                                >Update</button>
-                                                <hr />
-                                                <button
-                                                    className="btn btn-danger global-button"
-                                                    onClick={() => deleteAd(category._id)}
-                                                >Delete</button>
-                                            </>}
-                                            {isWaitStatus && <button
+                                        <td className="update-ad-image-cell">
+                                            <section className="gallery-image mb-4">
+                                                <input
+                                                    type="file"
+                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["galleryImage"] && imageIndex === selectedAdIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeGalleryImage(imageIndex, e.target.files[0])}
+                                                    accept=".png, .jpg, .webp"
+                                                />
+                                                {formValidationErrors["galleryImage"] && imageIndex === selectedAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                                    <span>{formValidationErrors["galleryImage"]}</span>
+                                                </p>}
+                                            </section>
+                                            {selectedAdIndex !== imageIndex && <button
+                                                className="btn btn-success d-block mb-3 mx-auto global-button"
+                                                onClick={() => updateGalleryImage(imageIndex)}
+                                            >Change Image</button>}
+                                            {waitMsg === "Please Waiting Updating ..." && selectedAdIndex === imageIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
-                                            >Please Waiting</button>}
-                                            {successMsg && <button
+                                                disabled
+                                            >{waitMsg}</button>}
+                                            {successMsg === "Change Image Successfull !!" && selectedAdIndex === imageIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && <button
+                                            {errorMsg === "Sorry, Someting Went Wrong When Updating, Please Repeate The Process !!" && selectedAdIndex === imageIndex && <button
+                                                className="btn btn-danger d-block mx-auto global-button"
+                                                disabled
+                                            >{errorMsg}</button>}
+                                        </td>
+                                        <td className="delete-gallery-image-cell">
+                                            {(selectedAdIndex !== imageIndex || formValidationErrors["galleryImage"]) && <button
+                                                className="btn btn-danger global-button"
+                                                onClick={() => deleteImageFromGallery(imageIndex)}
+                                            >Delete</button>}
+                                            {waitMsg === "Please Waiting Deleting ..." && selectedAdIndex === imageIndex && <button
+                                                className="btn btn-info d-block mb-3 mx-auto global-button"
+                                                disabled
+                                            >{waitMsg}</button>}
+                                            {successMsg === "Deleting Successfull !!" && selectedAdIndex === imageIndex && <button
+                                                className="btn btn-success d-block mx-auto global-button"
+                                                disabled
+                                            >{successMsg}</button>}
+                                            {errorMsg === "Sorry, Someting Went Wrong When Deleting, Please Repeate The Process !!" && selectedAdIndex === imageIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}

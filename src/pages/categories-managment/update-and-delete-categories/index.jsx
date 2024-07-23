@@ -179,7 +179,7 @@ export default function UpdateAndDeleteCategories() {
 
     const deleteCategory = async (categoryIndex) => {
         try {
-            setWaitMsg("Please Waiting Updating ...");
+            setWaitMsg("Please Waiting Deleting ...");
             setSelectedCategoryIndex(categoryIndex);
             const res = await axios.delete(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
                 headers: {
@@ -189,12 +189,11 @@ export default function UpdateAndDeleteCategories() {
             const result = res.data;
             setWaitMsg("");
             if (!result.error) {
-                setSuccessMsg("Updating Successfull !!");
+                setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedCategoryIndex(-1);
                     setIsGetCategories(true);
-                    setCurrentPage(1);
                     const result = await getCategoriesCount();
                     if (result.data > 0) {
                         setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(currentPage, pageSize, getFiltersAsQuery(filters))).data);
@@ -206,6 +205,8 @@ export default function UpdateAndDeleteCategories() {
                     setIsGetCategories(false);
                     clearTimeout(successTimeout);
                 }, 1500);
+            } else {
+                setSelectedCategoryIndex(-1);
             }
         }
         catch (err) {
@@ -218,6 +219,7 @@ export default function UpdateAndDeleteCategories() {
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
+                setSelectedCategoryIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }

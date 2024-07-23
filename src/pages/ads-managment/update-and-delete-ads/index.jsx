@@ -110,7 +110,7 @@ export default function UpdateAndDeleteCategories() {
             ] : [
                 {
                     name: "adImage",
-                    value: allImageAds[adIndex],
+                    value: newAdImageFiles[adIndex],
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -152,6 +152,9 @@ export default function UpdateAndDeleteCategories() {
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
                         setSelectedAdIndex(-1);
+                        if (advertisementType === "image") {
+                            allImageAds[adIndex].imagePath = result.data.newAdImagePath;
+                        }
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
@@ -187,7 +190,7 @@ export default function UpdateAndDeleteCategories() {
             const result = res.data;
             setWaitMsg("");
             if (!result.error) {
-                setSuccessMsg(result.msg);
+                setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedAdIndex(-1);

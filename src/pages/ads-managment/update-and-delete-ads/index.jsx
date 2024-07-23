@@ -81,6 +81,7 @@ export default function UpdateAndDeleteCategories() {
     }
 
     const changeAdContent = (adIndex, newValue) => {
+        setSelectedAdIndex(-1);
         let adsTemp = allTextAds;
         adsTemp[adIndex].content = newValue;
         setAllTextAds(adsTemp);
@@ -96,11 +97,10 @@ export default function UpdateAndDeleteCategories() {
     const updateAd = async (adIndex) => {
         try {
             setFormValidationErrors({});
-
             const errorsObject = inputValuesValidation(advertisementType === "text" ? [
                 {
                     name: "adContent",
-                    value: allAds[adIndex].content,
+                    value: allTextAds[adIndex].content,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -125,16 +125,30 @@ export default function UpdateAndDeleteCategories() {
             setSelectedAdIndex(adIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting Updating ...");
-                const res = await axios.put(`${process.env.BASE_API_URL}/ads/${allTextAds[adIndex]._id}`, {
-                    content: allTextAds[adIndex].content,
-                }, {
-                    headers: {
-                        Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
-                    }
-                });
-                const result = res.data;
+                let result;
+                if (advertisementType === "text") {
+                    const res = await axios.put(`${process.env.BASE_API_URL}/ads/update-ad-content/${allTextAds[adIndex]._id}`, {
+                        content: allTextAds[adIndex].content,
+                    }, {
+                        headers: {
+                            Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
+                        }
+                    });
+                    result = res.data;
+                }
+                else {
+                    let formData = new FormData();
+                    formData.append("adImage", newAdImageFiles[adIndex]);
+                    const res = await axios.put(`${process.env.BASE_API_URL}/ads/update-ad-image/${allImageAds[adIndex]._id}`, formData, {
+                        headers: {
+                            Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
+                        }
+                    });
+                    result = res.data;
+                }
+                setWaitMsg("");
                 if (!result.error) {
-                    setSuccessMsg("Change Image Successfull !!");
+                    setSuccessMsg(advertisementType === "text" ? "Updating Successfull !!" : "Change Image Successfull !!");
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
                         setSelectedAdIndex(-1);
@@ -165,7 +179,7 @@ export default function UpdateAndDeleteCategories() {
         try {
             setWaitMsg("Please Waiting Deleting ...");
             setSelectedAdIndex(adIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/ads/${adId}`, {
+            const res = await axios.delete(`${process.env.BASE_API_URL}/ads/${advertisementType === "text" ? allTextAds[adIndex]._id : allImageAds[adIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
@@ -177,6 +191,11 @@ export default function UpdateAndDeleteCategories() {
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedAdIndex(-1);
+                    if (advertisementType === "text") {
+                        setAllTextAds(allTextAds.filter((ad, index) => index !== adIndex));
+                    } else {
+                        setAllImageAds(allImageAds.filter((ad, index) => index !== adIndex));
+                    }
                     clearTimeout(successTimeout);
                 }, 1500);
             } else {
@@ -184,6 +203,7 @@ export default function UpdateAndDeleteCategories() {
             }
         }
         catch (err) {
+            console.log(err)
             if (err?.response?.data?.msg === "Unauthorized Error") {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.push("/login");
@@ -266,14 +286,15 @@ export default function UpdateAndDeleteCategories() {
                                                     onClick={() => deleteAd(adIndex)}
                                                 >Delete</button>
                                             </>}
-                                            {waitMsg && <button
+                                            {waitMsg && selectedAdIndex === adIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
+                                                disabled
                                             >{waitMsg}</button>}
-                                            {successMsg && <button
+                                            {successMsg && selectedAdIndex === adIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && <button
+                                            {errorMsg && selectedAdIndex === adIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}
@@ -319,7 +340,7 @@ export default function UpdateAndDeleteCategories() {
                                             </section>
                                             {selectedAdIndex !== adIndex && <button
                                                 className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                onClick={() => updateGalleryImage(adIndex)}
+                                                onClick={() => updateAd(adIndex)}
                                             >Change Image</button>}
                                             {waitMsg === "Please Waiting Updating ..." && selectedAdIndex === adIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
@@ -334,10 +355,10 @@ export default function UpdateAndDeleteCategories() {
                                                 disabled
                                             >{errorMsg}</button>}
                                         </td>
-                                        <td className="delete-gallery-image-cell">
-                                            {(selectedAdIndex !== adIndex || formValidationErrors["galleryImage"]) && <button
+                                        <td className="delete-ad-image-cell">
+                                            {(selectedAdIndex !== adIndex || formValidationErrors["adImage"]) && <button
                                                 className="btn btn-danger global-button"
-                                                onClick={() => deleteImageFromGallery(adIndex)}
+                                                onClick={() => deleteAd(adIndex)}
                                             >Delete</button>}
                                             {waitMsg === "Please Waiting Deleting ..." && selectedAdIndex === adIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"

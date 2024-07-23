@@ -265,7 +265,8 @@ export default function UpdateAndDeleteCategories() {
                             <thead>
                                 <tr>
                                     <th>Image</th>
-                                    <th>Process</th>
+                                    <th>Change Ad Image</th>
+                                    <th>Delete Ad</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -293,49 +294,49 @@ export default function UpdateAndDeleteCategories() {
                                             </section>
                                         </td>
                                         <td className="update-ad-image-cell">
-                                            <section className="gallery-image mb-4">
+                                            <section className="ad-image mb-4">
                                                 <input
                                                     type="file"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-image-field ${formValidationErrors["galleryImage"] && imageIndex === selectedAdIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeGalleryImage(imageIndex, e.target.files[0])}
+                                                    className={`form-control d-block mx-auto p-2 border-2 ad-image-field ${formValidationErrors["adImage"] && adIndex === selectedAdIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeGalleryImage(adIndex, e.target.files[0])}
                                                     accept=".png, .jpg, .webp"
                                                 />
-                                                {formValidationErrors["galleryImage"] && imageIndex === selectedAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["adImage"] && adIndex === selectedAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                                    <span>{formValidationErrors["galleryImage"]}</span>
+                                                    <span>{formValidationErrors["adImage"]}</span>
                                                 </p>}
                                             </section>
-                                            {selectedAdIndex !== imageIndex && <button
+                                            {selectedAdIndex !== adIndex && <button
                                                 className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                onClick={() => updateGalleryImage(imageIndex)}
+                                                onClick={() => updateGalleryImage(adIndex)}
                                             >Change Image</button>}
-                                            {waitMsg === "Please Waiting Updating ..." && selectedAdIndex === imageIndex && <button
+                                            {waitMsg === "Please Waiting Updating ..." && selectedAdIndex === adIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
-                                            {successMsg === "Change Image Successfull !!" && selectedAdIndex === imageIndex && <button
+                                            {successMsg === "Change Image Successfull !!" && selectedAdIndex === adIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg === "Sorry, Someting Went Wrong When Updating, Please Repeate The Process !!" && selectedAdIndex === imageIndex && <button
+                                            {errorMsg === "Sorry, Someting Went Wrong When Updating, Please Repeate The Process !!" && selectedAdIndex === adIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}
                                         </td>
                                         <td className="delete-gallery-image-cell">
-                                            {(selectedAdIndex !== imageIndex || formValidationErrors["galleryImage"]) && <button
+                                            {(selectedAdIndex !== adIndex || formValidationErrors["galleryImage"]) && <button
                                                 className="btn btn-danger global-button"
-                                                onClick={() => deleteImageFromGallery(imageIndex)}
+                                                onClick={() => deleteImageFromGallery(adIndex)}
                                             >Delete</button>}
-                                            {waitMsg === "Please Waiting Deleting ..." && selectedAdIndex === imageIndex && <button
+                                            {waitMsg === "Please Waiting Deleting ..." && selectedAdIndex === adIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
-                                            {successMsg === "Deleting Successfull !!" && selectedAdIndex === imageIndex && <button
+                                            {successMsg === "Deleting Successfull !!" && selectedAdIndex === adIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg === "Sorry, Someting Went Wrong When Deleting, Please Repeate The Process !!" && selectedAdIndex === imageIndex && <button
+                                            {errorMsg === "Sorry, Someting Went Wrong When Deleting, Please Repeate The Process !!" && selectedAdIndex === adIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}

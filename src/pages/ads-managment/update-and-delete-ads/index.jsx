@@ -7,7 +7,7 @@ import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { useRouter } from "next/router";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
-import { getAdminInfo, getCategoriesCount, getAllCategoriesInsideThePage } from "../../../../public/global_functions/popular";
+import { getAdminInfo } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 
 export default function UpdateAndDeleteCategories() {
@@ -23,6 +23,8 @@ export default function UpdateAndDeleteCategories() {
     const [allTextAds, setAllTextAds] = useState([]);
 
     const [allImageAds, setAllImageAds] = useState([]);
+
+    const [newAdImageFiles, setNewAdImageFiles] = useState([]);
 
     const [selectedAdIndex, setSelectedAdIndex] = useState(-1);
 
@@ -79,15 +81,23 @@ export default function UpdateAndDeleteCategories() {
     }
 
     const changeAdContent = (adIndex, newValue) => {
-        let adsTemp = allAds;
-        adsTemp[adIndex].name = newValue;
-        setAllAds(adsTemp);
+        let adsTemp = allTextAds;
+        adsTemp[adIndex].content = newValue;
+        setAllTextAds(adsTemp);
+    }
+
+    const changeAdImage = (imageIndex, newValue) => {
+        setSelectedAdIndex(-1);
+        let adImagesTemp = newAdImageFiles;
+        adImagesTemp[imageIndex] = newValue;
+        setNewAdImageFiles(adImagesTemp);
     }
 
     const updateAd = async (adIndex) => {
         try {
             setFormValidationErrors({});
-            const errorsObject = inputValuesValidation([
+
+            const errorsObject = inputValuesValidation(advertisementType === "text" ? [
                 {
                     name: "adContent",
                     value: allAds[adIndex].content,
@@ -97,13 +107,26 @@ export default function UpdateAndDeleteCategories() {
                         },
                     },
                 },
+            ] : [
+                {
+                    name: "adImage",
+                    value: allImageAds[adIndex],
+                    rules: {
+                        isRequired: {
+                            msg: "Sorry, This Field Can't Be Empty !!",
+                        },
+                        isImage: {
+                            msg: "Sorry, Invalid Image Type, Please Upload JPG Or PNG Or Webp Image File !!",
+                        },
+                    },
+                },
             ]);
             setFormValidationErrors(errorsObject);
             setSelectedAdIndex(adIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting Updating ...");
-                const res = await axios.put(`${process.env.BASE_API_URL}/ads/${allAds[adIndex]._id}`, {
-                    newCategoryName: allAds[adIndex].name,
+                const res = await axios.put(`${process.env.BASE_API_URL}/ads/${allTextAds[adIndex]._id}`, {
+                    content: allTextAds[adIndex].content,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -280,25 +303,13 @@ export default function UpdateAndDeleteCategories() {
                                                 height="100"
                                                 className="d-block mx-auto mb-4"
                                             />
-                                            <section className="ad-image mb-4">
-                                                <input
-                                                    type="file"
-                                                    className={`form-control d-block mx-auto p-2 border-2 ad-image-field ${formValidationErrors["adImage"] && adIndex === selectedAdIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeAdImage(adIndex, "adImage", e.target.files[0])}
-                                                    accept=".png, .jpg, .webp"
-                                                />
-                                                {formValidationErrors["adImage"] && adIndex === selectedAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
-                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                                    <span>{formValidationErrors["adImage"]}</span>
-                                                </p>}
-                                            </section>
                                         </td>
                                         <td className="update-ad-image-cell">
                                             <section className="ad-image mb-4">
                                                 <input
                                                     type="file"
                                                     className={`form-control d-block mx-auto p-2 border-2 ad-image-field ${formValidationErrors["adImage"] && adIndex === selectedAdIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeGalleryImage(adIndex, e.target.files[0])}
+                                                    onChange={(e) => changeAdImage(adIndex, e.target.files[0])}
                                                     accept=".png, .jpg, .webp"
                                                 />
                                                 {formValidationErrors["adImage"] && adIndex === selectedAdIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">

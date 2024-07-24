@@ -271,17 +271,21 @@ export default function UpdateAndDeleteProducts() {
                     },
                 },
                 {
-                    name: "description",
-                    value: allProductsInsideThePage[productIndex].description,
+                    name: "quantity",
+                    value: allProductsInsideThePage[productIndex].quantity,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
                         },
+                        minNumber: {
+                            value: 0,
+                            msg: "Sorry, Min Number Is: 0 !!",
+                        },
                     },
                 },
                 {
-                    name: "discount",
-                    value: allProductsInsideThePage[productIndex].discount,
+                    name: "description",
+                    value: allProductsInsideThePage[productIndex].description,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -330,6 +334,8 @@ export default function UpdateAndDeleteProducts() {
                 const res = await axios.put(`${process.env.BASE_API_URL}/products/${allProductsInsideThePage[productIndex]._id}`, {
                     name: allProductsInsideThePage[productIndex].name,
                     price: allProductsInsideThePage[productIndex].price,
+                    quantity: allProductsInsideThePage[productIndex].quantity,
+                    country: allProductsInsideThePage[productIndex].country,
                     description: allProductsInsideThePage[productIndex].description,
                     discount: allProductsInsideThePage[productIndex].discount,
                     category: allProductsInsideThePage[productIndex].category,

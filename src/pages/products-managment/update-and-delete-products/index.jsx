@@ -19,6 +19,7 @@ import {
     getAllCategories
 } from "../../../../public/global_functions/popular";
 import Link from "next/link";
+import { countries } from "countries-list";
 
 export default function UpdateAndDeleteProducts() {
 
@@ -64,6 +65,8 @@ export default function UpdateAndDeleteProducts() {
     const router = useRouter();
 
     const pageSize = 10;
+
+    const countryList = Object.keys(countries);
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
@@ -466,6 +469,8 @@ export default function UpdateAndDeleteProducts() {
                                 <tr>
                                     <th>Name</th>
                                     <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Country</th>
                                     <th>Description</th>
                                     <th>Category</th>
                                     <th>Discount</th>
@@ -506,6 +511,40 @@ export default function UpdateAndDeleteProducts() {
                                                 </p>}
                                             </section>
                                         </td>
+                                        <td className="product-country-cell">
+                                            <section className="product-country mb-4">
+                                                <h6 className="bg-info p-2 fw-bold">{countries[product.country].name}</h6>
+                                                <hr />
+                                                <select
+                                                    className={`country-select form-select p-2 border-2 product-country-field ${formValidationErrors["country"] ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeProductData(productIndex, "country", e.target.value)}
+                                                >
+                                                    <option defaultValue="" hidden>Please Select Country</option>
+                                                    {countryList.map((countryCode) => (
+                                                        <option value={countryCode} key={countryCode}>{countries[countryCode].name}</option>
+                                                    ))}
+                                                </select>
+                                                {formValidationErrors["country"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                                    <span>{formValidationErrors["country"]}</span>
+                                                </p>}
+                                            </section>
+                                        </td>
+                                        <td className="product-price-cell">
+                                            <section className="product-price mb-4">
+                                                <input
+                                                    type="number"
+                                                    placeholder="Enter New Product Price"
+                                                    defaultValue={product.price}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-field ${formValidationErrors["price"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeProductData(productIndex, "price", e.target.valueAsNumber)}
+                                                ></input>
+                                                {formValidationErrors["price"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                                    <span>{formValidationErrors["price"]}</span>
+                                                </p>}
+                                            </section>
+                                        </td>
                                         <td className="product-description-cell">
                                             <section className="product-description mb-4">
                                                 <textarea
@@ -521,12 +560,7 @@ export default function UpdateAndDeleteProducts() {
                                             </section>
                                         </td>
                                         <td className="product-category-cell">
-                                            <input
-                                                type="text"
-                                                disabled
-                                                defaultValue={product.category}
-                                                className="p-2 form-control mb-3"
-                                            ></input>
+                                            <h6 className="bg-info p-2 fw-bold">{product.category}</h6>
                                             <hr />
                                             <select
                                                 className="product-category-select form-select mb-4"

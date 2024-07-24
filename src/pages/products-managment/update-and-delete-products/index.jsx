@@ -511,6 +511,23 @@ export default function UpdateAndDeleteProducts() {
                                                 </p>}
                                             </section>
                                         </td>
+                                        <td className="product-quantity-cell">
+                                            <section className="product-quantity mb-4">
+                                                <h6 className="bg-info p-2 fw-bold">{product.quantity}</h6>
+                                                <hr />
+                                                <input
+                                                    type="number"
+                                                    placeholder="Enter New Product Quantity"
+                                                    defaultValue={product.quantity}
+                                                    className={`form-control d-block mx-auto p-2 border-2 product-quantity-field ${formValidationErrors["quantity"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    onChange={(e) => changeProductData(productIndex, "quantity", e.target.valueAsNumber)}
+                                                ></input>
+                                                {formValidationErrors["quantity"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                                    <span>{formValidationErrors["quantity"]}</span>
+                                                </p>}
+                                            </section>
+                                        </td>
                                         <td className="product-country-cell">
                                             <section className="product-country mb-4">
                                                 <h6 className="bg-info p-2 fw-bold">{countries[product.country].name}</h6>
@@ -527,21 +544,6 @@ export default function UpdateAndDeleteProducts() {
                                                 {formValidationErrors["country"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["country"]}</span>
-                                                </p>}
-                                            </section>
-                                        </td>
-                                        <td className="product-price-cell">
-                                            <section className="product-price mb-4">
-                                                <input
-                                                    type="number"
-                                                    placeholder="Enter New Product Price"
-                                                    defaultValue={product.price}
-                                                    className={`form-control d-block mx-auto p-2 border-2 product-price-field ${formValidationErrors["price"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeProductData(productIndex, "price", e.target.valueAsNumber)}
-                                                ></input>
-                                                {formValidationErrors["price"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
-                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                                    <span>{formValidationErrors["price"]}</span>
                                                 </p>}
                                             </section>
                                         </td>

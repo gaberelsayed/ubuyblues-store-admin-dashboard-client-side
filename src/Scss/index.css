@@ -468,6 +468,10 @@ textarea {
   width: 100%;
 }
 
+.admin-dashboard .page-content .admin-dashbboard-data-table.products-table {
+  width: 150%;
+}
+
 @media (max-width: 991px) {
   .admin-dashboard .page-content .admin-dashbboard-data-table {
     width: 300%;

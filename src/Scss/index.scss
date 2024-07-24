@@ -395,6 +395,9 @@ textarea{
         }
         .admin-dashbboard-data-table{
             width: 100%;
+            &.products-table{
+                width: 150%;
+            }
             @media (max-width: 991px) {
                 width: 300%;
             }

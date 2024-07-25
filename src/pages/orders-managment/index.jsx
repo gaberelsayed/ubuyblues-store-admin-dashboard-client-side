@@ -460,23 +460,17 @@ export default function OrdersManagment() {
                                                 >
                                                     {successMsg}
                                                 </button>}
-                                                {order.isDeleted && <button
-                                                    className="btn btn-danger d-block mx-auto mb-3 global-button"
-                                                    disabled
-                                                >
-                                                    Deleted
-                                                </button>}
-                                                {waitMsg && !order.isDeleted && orderIndex === selectedOrderIndex && <button
-                                                    className="btn btn-danger d-block mx-auto mb-3 global-button"
-                                                    disabled
-                                                >
-                                                    {waitMsg}
-                                                </button>}
                                                 {errorMsg && orderIndex === selectedOrderIndex && <button
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
                                                     {errorMsg}
+                                                </button>}
+                                                {order.isDeleted && <button
+                                                    className="btn btn-danger d-block mx-auto mb-3 global-button"
+                                                    disabled
+                                                >
+                                                    Deleted
                                                 </button>}
                                                 {selectedOrderIndex !== orderIndex && <>
                                                     <Link

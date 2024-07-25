@@ -25,13 +25,11 @@ export default function OrdersManagment() {
 
     const [selectedOrderIndex, setSelectedOrderIndex] = useState(-1);
 
-    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
-    const [isDeletingStatus, setIsDeletingStatus] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
 
-    const [isSuccessStatus, setIsSuccessStatus] = useState(false);
-
-    const [isErrorStatus, setIsErrorStatus] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -151,18 +149,33 @@ export default function OrdersManagment() {
 
     const filterOrders = async (filters) => {
         try {
-            setIsFilteringOrdersStatus(true);
-            setCurrentPage(1);
-            let filteringString = getFilteringString(filters);
-            const result = await getOrdersCount(filteringString);
-            if (result.data > 0) {
-                setAllOrdersInsideThePage((await getAllOrdersInsideThePage(1, pageSize, filteringString)).data);
-                setTotalPagesCount(Math.ceil(result.data / pageSize));
-                setIsFilteringOrdersStatus(false);
-            } else {
-                setAllOrdersInsideThePage([]);
-                setTotalPagesCount(0);
-                setIsFilteringOrdersStatus(false);
+            setFormValidationErrors({});
+            const errorsObject = inputValuesValidation([
+                {
+                    name: "orderNumber",
+                    value: filters.orderNumber,
+                    rules: {
+                        minNumber: {
+                            value: 1,
+                            msg: "Sorry, Min Number Is: 1 !!",
+                        },
+                    },
+                },
+            ]);
+            if (Object.keys(errorsObject).length == 0) {
+                setIsFilteringOrdersStatus(true);
+                setCurrentPage(1);
+                let filteringString = getFilteringString(filters);
+                const result = await getOrdersCount(filteringString);
+                if (result.data > 0) {
+                    setAllOrdersInsideThePage((await getAllOrdersInsideThePage(1, pageSize, filteringString)).data);
+                    setTotalPagesCount(Math.ceil(result.data / pageSize));
+                    setIsFilteringOrdersStatus(false);
+                } else {
+                    setAllOrdersInsideThePage([]);
+                    setTotalPagesCount(0);
+                    setIsFilteringOrdersStatus(false);
+                }
             }
         }
         catch (err) {
@@ -171,9 +184,9 @@ export default function OrdersManagment() {
                 return;
             }
             setIsFilteringOrdersStatus(false);
-            setIsErrorStatus(true);
+            setErrorMsg(true);
             let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
+                setErrorMsg(false);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -195,7 +208,7 @@ export default function OrdersManagment() {
                             msg: "Sorry, This Field Can't Be Empty !!",
                         },
                         minNumber: {
-                            value: 0,
+                            value: 1,
                             msg: "Sorry, Min Number Is: 1 !!",
                         },
                     },
@@ -204,7 +217,7 @@ export default function OrdersManagment() {
             setFormValidationErrors(errorsObject);
             setSelectedOrderIndex(orderIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setIsUpdatingStatus(true);
+                setWaitMsg("Please Waiting Updating ...");
                 const res = await axios.post(`${process.env.BASE_API_URL}/orders/update-order/${allOrdersInsideThePage[orderIndex]._id}`, {
                     orderAmount: allOrdersInsideThePage[orderIndex].orderAmount,
                     status: allOrdersInsideThePage[orderIndex].status,
@@ -214,11 +227,11 @@ export default function OrdersManagment() {
                     }
                 });
                 const result = res.data;
+                setWaitMsg("");
                 if (!result.error) {
-                    setIsUpdatingStatus(false);
-                    setIsSuccessStatus(true);
+                    setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
-                        setIsSuccessStatus(false);
+                        setSuccessMsg("");
                         setSelectedOrderIndex(-1);
                         clearTimeout(successTimeout);
                     }, 3000);
@@ -233,10 +246,10 @@ export default function OrdersManagment() {
                 await router.replace("/login");
                 return;
             }
-            setIsUpdatingStatus(false);
-            setIsErrorStatus(true);
+            setWaitMsg("");
+            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
+                setErrorMsg("");
                 setSelectedOrderIndex(-1);
                 clearTimeout(errorTimeout);
             }, 3000);
@@ -245,7 +258,7 @@ export default function OrdersManagment() {
 
     const deleteOrder = async (orderIndex) => {
         try {
-            setIsDeletingStatus(true);
+            setWaitMsg("Please Waiting Deleting ...");
             setSelectedOrderIndex(orderIndex);
             const res = await axios.delete(`${process.env.BASE_API_URL}/orders/delete-order/${allOrdersInsideThePage[orderIndex]._id}`, {
                 headers: {
@@ -253,11 +266,11 @@ export default function OrdersManagment() {
                 }
             });
             const result = res.data;
-            setIsDeletingStatus(false);
+            setWaitMsg("");
             if (!result.error) {
-                setIsSuccessStatus(true);
+                setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
-                    setIsSuccessStatus(false);
+                    setSuccessMsg("");
                     setSelectedOrderIndex(-1);
                     const filteringString = getFilteringString(filters);
                     const result = await getOrdersCount(filteringString);
@@ -280,10 +293,10 @@ export default function OrdersManagment() {
                 await router.replace("/login");
                 return;
             }
-            setIsDeletingStatus(false);
-            setIsErrorStatus(true);
+            setWaitMsg("");
+            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
+                setErrorMsg("");
                 setSelectedOrderIndex(-1);
                 clearTimeout(errorTimeout);
             }, 3000);
@@ -421,29 +434,31 @@ export default function OrdersManagment() {
                                             </td>
                                             <td>{getDateFormated(order.addedDate)}</td>
                                             <td>
-                                                {!order.isDeleted && orderIndex !== selectedOrderIndex && <button
-                                                    className="btn btn-info d-block mx-auto mb-3 global-button"
-                                                    onClick={() => updateOrderData(orderIndex)}
-                                                >
-                                                    Update
-                                                </button>}
-                                                {isUpdatingStatus && orderIndex === selectedOrderIndex && <button
+                                                {!order.isDeleted && orderIndex !== selectedOrderIndex && <>
+                                                    <button
+                                                        className="btn btn-info d-block mx-auto mb-3 global-button"
+                                                        onClick={() => updateOrderData(orderIndex)}
+                                                    >
+                                                        Update
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-danger d-block mx-auto mb-3 global-button"
+                                                        onClick={() => deleteOrder(orderIndex)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </>}
+                                                {waitMsg && orderIndex === selectedOrderIndex && <button
                                                     className="btn btn-info d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
-                                                    Updating ...
+                                                    {waitMsg}
                                                 </button>}
-                                                {isSuccessStatus && orderIndex === selectedOrderIndex && <button
+                                                {successMsg && orderIndex === selectedOrderIndex && <button
                                                     className="btn btn-success d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
-                                                    Success
-                                                </button>}
-                                                {!isUpdatingStatus && !isDeletingStatus && !isSuccessStatus && !isErrorStatus && !order.isDeleted && <button
-                                                    className="btn btn-danger d-block mx-auto mb-3 global-button"
-                                                    onClick={() => deleteOrder(orderIndex)}
-                                                >
-                                                    Delete
+                                                    {successMsg}
                                                 </button>}
                                                 {order.isDeleted && <button
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
@@ -451,19 +466,19 @@ export default function OrdersManagment() {
                                                 >
                                                     Deleted
                                                 </button>}
-                                                {isDeletingStatus && !order.isDeleted && orderIndex === selectedOrderIndex && <button
+                                                {waitMsg && !order.isDeleted && orderIndex === selectedOrderIndex && <button
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
-                                                    Deleting ...
+                                                    {waitMsg}
                                                 </button>}
-                                                {isErrorStatus && orderIndex === selectedOrderIndex && <button
+                                                {errorMsg && orderIndex === selectedOrderIndex && <button
                                                     className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
-                                                    Sorry, Someting Went Wrong, Please Repeate The Process !!
+                                                    {errorMsg}
                                                 </button>}
-                                                {!isUpdatingStatus && !isDeletingStatus && !isErrorStatus && !isSuccessStatus && <>
+                                                {selectedOrderIndex !== orderIndex && <>
                                                     <Link
                                                         href={`/orders-managment/${order._id}`}
                                                         className="btn btn-success d-block mx-auto mb-4 global-button"

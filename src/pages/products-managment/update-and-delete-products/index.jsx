@@ -417,7 +417,7 @@ export default function UpdateAndDeleteProducts() {
                 await router.replace("/login");
                 return;
             }
-            setWaitMsg(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");

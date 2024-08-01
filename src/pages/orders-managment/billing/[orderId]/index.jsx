@@ -5,7 +5,7 @@ import axios from "axios";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import { FaRegSmileWink } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { getAdminInfo } from "../../../../../public/global_functions/popular";
+import { getAdminInfo, getStoreDetails } from "../../../../../public/global_functions/popular";
 import { useRouter } from "next/router";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { getCurrencyNameByCountry, getUSDPriceAgainstCurrency } from "../../../../../public/global_functions/prices";
@@ -21,6 +21,10 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
     const [currencyNameByCountry, setCurrencyNameByCountry] = useState("");
 
     const [isGetOrderDetails, setIsGetOrderDetails] = useState(true);
+
+    const [adminInfo, setAdminInfo] = useState({});
+
+    const [storeDetails, setStoreDetails] = useState({});
 
     const [orderDetails, setOrderDetails] = useState({});
 
@@ -49,46 +53,49 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
     }, [countryAsProperty]);
 
     useEffect(() => {
-        if (orderIdAsProperty) {
-            const userLanguage = localStorage.getItem("asfour-store-language");
-            handleSelectUserLanguage(userLanguage === "ar" || userLanguage === "en" || userLanguage === "tr" || userLanguage === "de" ? userLanguage : "en");
-            const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
-            if (adminToken) {
-                getAdminInfo()
-                    .then(async (result) => {
-                        if (result.error) {
+        const userLanguage = localStorage.getItem("asfour-store-language");
+        handleSelectUserLanguage(userLanguage === "ar" || userLanguage === "en" || userLanguage === "tr" || userLanguage === "de" ? userLanguage : "en");
+    }, []);
+
+    useEffect(() => {
+        const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
+        if (adminToken) {
+            getAdminInfo()
+                .then(async (result) => {
+                    if (result.error) {
+                        localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                        await router.replace("/login");
+                    } else {
+                        const adminDetails = result.data;
+                        if (adminDetails.isBlocked) {
                             localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                             await router.replace("/login");
                         } else {
-                            const adminDetails = result.data;
-                            if (adminDetails.isBlocked) {
-                                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                                await router.replace("/login");
-                            } else {
-                                result = await getOrderDetails(orderIdAsProperty);
-                                if (!result.error) {
-                                    setOrderDetails(result.data);
-                                    setPricesDetailsSummary({
-                                        totalPriceBeforeDiscount: calcTotalOrderPriceBeforeDiscount(result.data.products),
-                                        totalDiscount: calcTotalOrderDiscount(result.data.products),
-                                    });
-                                }
-                                setIsGetOrderDetails(false);
+                            setAdminInfo(adminDetails);
+                            setStoreDetails((await getStoreDetails(adminDetails.storeId)).data);
+                            result = await getOrderDetails(orderIdAsProperty);
+                            if (!result.error) {
+                                setOrderDetails(result.data);
+                                setPricesDetailsSummary({
+                                    totalPriceBeforeDiscount: calcTotalOrderPriceBeforeDiscount(result.data.products),
+                                    totalDiscount: calcTotalOrderDiscount(result.data.products),
+                                });
                             }
+                            setIsGetOrderDetails(false);
                         }
-                    })
-                    .catch(async (err) => {
-                        if (err?.response?.data?.msg === "Unauthorized Error") {
-                            localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                            await router.replace("/login");
-                        }
-                        else {
-                            setIsLoadingPage(false);
-                            setIsErrorMsgOnLoadingThePage(true);
-                        }
-                    });
-            } else router.replace("/login");
-        }
+                    }
+                })
+                .catch(async (err) => {
+                    if (err?.response?.data?.msg === "Unauthorized Error") {
+                        localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                        await router.replace("/login");
+                    }
+                    else {
+                        setIsLoadingPage(false);
+                        setIsErrorMsgOnLoadingThePage(true);
+                    }
+                });
+        } else router.replace("/login");
     }, []);
 
     useEffect(() => {
@@ -134,9 +141,9 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
                 <title>Ubuyblues Store Admin Dashboard - Billing</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
-                <AdminPanelHeader />
+                <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content p-4 bg-white">
-                    <h1 className="welcome-msg text-center mb-5">{t("Your Order Billing From Ubuyblues Store")}</h1>
+                    <h1 className="welcome-msg text-center mb-5">{t("Your Order Billing From Store")}: {storeDetails.name}</h1>
                     {Object.keys(orderDetails).length > 0 ? <section className="order-total border border-3 border-dark p-4 ps-md-5 pe-md-5 text-center" id="order-total">
                         <h5 className="fw-bold mb-4 text-center">{t("Your Request")}</h5>
                         <div className="order-id-and-number border border-2 border-dark p-4 mb-5">
@@ -206,7 +213,7 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
                             <FaRegSmileWink className="thanks-icon" style={{ fontSize: "70px" }} />
                         </div>
                         <h4 className="mb-4">
-                            {t("Thanks For Purchase From Ubuyblues Store")}
+                            {t("Thanks For Purchase From Store")} {storeDetails.name}
                         </h4>
                     </section> : <p className="alert alert-danger">Sorry, This Order Is Not Found !!</p>}
                 </div>

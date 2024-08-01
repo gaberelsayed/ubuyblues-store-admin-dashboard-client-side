@@ -1,10 +1,6 @@
 {
-    "English": "İngilizce",
-    "Arabic": "Arapça",
-    "Turkey": "Türkiye",
-    "Germany": "Almanya",
     "Your Request": "Talebiniz",
-    "Your Order Billing From Ubuyblues Store": "Ubuyblues Mağazasından Sipariş Faturanız",
+    "Your Order Billing From Store": "Mağazadan Sipariş Faturalandırmanız",
     "Order Id": "Sipariş Kimliği",
     "Order Number": "Sipariş Numarası",
     "Order Details": "Sipariş Detayları",
@@ -12,9 +8,10 @@
     "Unit Price Before Discount": "İndirim Öncesi Birim Fiyat",
     "Unit Discount": "Birim İndirimi",
     "$": "Amerikan Doları",
+    "KWD": "Kuveyt Dinarı",
     "Sum": "Toplam",
     "Total Price Before Discount": "İndirim Öncesi Toplam Fiyat",
     "Total Discount": "Toplam İndirim",
     "Total Price After Discount": "İndirim Sonrası Toplam Fiyat",
-    "Thanks For Purchase From Ubuyblues Store": "Ubuyblues Mağazasından Satın Alım İçin Teşekkürler"
+    "Thanks For Purchase From Store": "Mağazadan Satın Alma İçin Teşekkürler"
 }

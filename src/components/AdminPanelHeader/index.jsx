@@ -5,14 +5,23 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import { useTranslation } from "react-i18next";
 
 export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = false }) {
 
     const router = useRouter();
 
+    const { i18n, t } = useTranslation();
+
     const adminLogout = async () => {
         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
         await router.replace("/login");
+    }
+
+    const handleChangeLanguage = (language) => {
+        i18n.changeLanguage(language);
+        document.body.lang = language;
+        localStorage.setItem("asfour-store-language", language);
     }
 
     const handleSelectCountry = async (country) => {
@@ -63,20 +72,31 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
     }
 
     return (
-        <header className="admin-panel-header">
+        <header className="admin-panel-header" dir="ltr">
             <Navbar expand="lg" className="bg-body-tertiary">
                 <Container fluid>
                     <Navbar.Brand href="/" as={Link}>Ubuyblues Dashboard</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                         <Nav>
-                            {router.pathname === "/orders-managment/billing/[orderId]" && <NavDropdown title="Countries" id="products-nav-dropdown">
-                                <NavDropdown.Item onClick={() => handleSelectCountry("kuwait")}>KW</NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item onClick={() => handleSelectCountry("germany")}>DE</NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item onClick={() => handleSelectCountry("turkey")}>TR</NavDropdown.Item>
-                            </NavDropdown>}
+                            {router.pathname === "/orders-managment/billing/[orderId]" && <>
+                                <NavDropdown title="Countries" id="countries-nav-dropdown">
+                                    <NavDropdown.Item onClick={() => handleSelectCountry("kuwait")}>KW</NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item onClick={() => handleSelectCountry("germany")}>DE</NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item onClick={() => handleSelectCountry("turkey")}>TR</NavDropdown.Item>
+                                </NavDropdown>
+                                <NavDropdown title={t("Languages")} id="languages-nav-dropdown">
+                                    <NavDropdown.Item onClick={() => handleChangeLanguage("ar")}>Arabic</NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item onClick={() => handleChangeLanguage("en")}>English</NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item onClick={() => handleChangeLanguage("tr")}>Turkish</NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Item onClick={() => handleChangeLanguage("de")}>German</NavDropdown.Item>
+                                </NavDropdown>
+                            </>}
                             {isWebsiteOwner && <>
                                 <NavDropdown title="Stores" id="stores-nav-dropdown">
                                     <NavDropdown.Item href="/stores-managment" as={Link}>All Stores</NavDropdown.Item>

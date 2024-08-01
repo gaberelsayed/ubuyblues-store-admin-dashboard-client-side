@@ -1,10 +1,6 @@
 {
-    "English": "Englisch",
-    "Arabic": "Arabisch",
-    "Turkey": "Türkisch",
-    "Germany": "Deutsch",
     "Your Request": "Ihre Anfrage",
-    "Your Order Billing From Ubuyblues Store": "Ihre Bestellabrechnung im Ubuyblues Store",
+    "Your Order Billing From Store": "Ihre Bestellung wird im Store abgerechnet",
     "Order Id": "Bestellkennung",
     "Order Number": "Bestellnummer",
     "Order Details": "Bestelldetails",
@@ -12,9 +8,10 @@
     "Unit Price Before Discount": "Stückpreis vor Rabatt",
     "Unit Discount": "Stückrabatt",
     "$": "US-Dollar",
+    "KWD": "Kuwaitischer Dinar",
     "Sum": "Summe",
     "Total Price Before Discount": "Gesamtpreis vor Rabatt",
     "Total Discount": "Gesamtrabatt",
     "Total Price After Discount": "Gesamtpreis nach Rabatt",
-    "Thanks For Purchase From Ubuyblues Store": "Vielen Dank für Ihren Einkauf im Ubuyblues Store"
+    "Thanks For Purchase From Store": "Vielen Dank für den Kauf im Geschäft"
 }

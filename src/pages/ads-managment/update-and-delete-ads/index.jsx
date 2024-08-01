@@ -28,11 +28,11 @@ export default function UpdateAndDeleteCategories() {
 
     const [selectedAdIndex, setSelectedAdIndex] = useState(-1);
 
-    const [waitMsg, setWaitMsg] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
-    const [errorMsg, setErrorMsg] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
-    const [successMsg, setSuccessMsg] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
 
     const [formValidationErrors, setFormValidationErrors] = useState({});
 
@@ -124,7 +124,7 @@ export default function UpdateAndDeleteCategories() {
             setFormValidationErrors(errorsObject);
             setSelectedAdIndex(adIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting Updating ...");
+                setWaitMsg("Please Wait Updating ...");
                 let result;
                 if (advertisementType === "text") {
                     const res = await axios.put(`${process.env.BASE_API_URL}/ads/update-ad-content/${allTextAds[adIndex]._id}`, {
@@ -180,7 +180,7 @@ export default function UpdateAndDeleteCategories() {
 
     const deleteAd = async (adIndex) => {
         try {
-            setWaitMsg("Please Waiting Deleting ...");
+            setWaitMsg("Please Wait Deleting ...");
             setSelectedAdIndex(adIndex);
             const res = await axios.delete(`${process.env.BASE_API_URL}/ads/${advertisementType === "text" ? allTextAds[adIndex]._id : allImageAds[adIndex]._id}`, {
                 headers: {

@@ -469,7 +469,7 @@ export default function UpdateAndDeleteProducts() {
                             Filtering ...
                         </button>}
                     </section>
-                    {allProductsInsideThePage.length > 0 && !isFilteringProductsStatus && <div className="products-box admin-dashbboard-data-box w-100">
+                    {allProductsInsideThePage.length > 0 && !isFilteringProductsStatus && <div className="products-box admin-dashbboard-data-box w-100 pe-4">
                         <table className="products-table mb-4 managment-table admin-dashbboard-data-table bg-white">
                             <thead>
                                 <tr>

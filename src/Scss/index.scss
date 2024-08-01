@@ -388,7 +388,8 @@ textarea{
             }
         }
         .admin-dashbboard-data-box{
-            overflow-x: auto;
+            overflow: auto;
+            height: calc(100vh - 250px);
             @media (max-width: 991px) {
                 margin-bottom: 30px;
             }

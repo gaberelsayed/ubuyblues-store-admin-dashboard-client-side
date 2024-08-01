@@ -23,21 +23,21 @@ export default function UpdateAndDeleteBrands() {
 
     const [allBrandsInsideThePage, setAllBrandsInsideThePage] = useState([]);
 
-    const [waitMsg, setWaitMsg] = useState("");
-
     const [selectedBrandImageIndex, setSelectedBrandImageIndex] = useState(-1);
 
     const [selectedBrandIndex, setSelectedBrandIndex] = useState(-1);
 
     const [waitChangeBrandImageMsg, setWaitChangeBrandImageMsg] = useState(false);
 
-    const [errorMsg, setErrorMsg] = useState("");
-
     const [errorChangeBrandImageMsg, setErrorChangeBrandImageMsg] = useState("");
 
+    const [successChangeBrandImageMsg, setSuccessChangeBrandImageMsg] = useState("");
+
+    const [waitMsg, setWaitMsg] = useState("");
+    
     const [successMsg, setSuccessMsg] = useState("");
 
-    const [successChangeBrandImageMsg, setSuccessChangeBrandImageMsg] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -198,11 +198,11 @@ export default function UpdateAndDeleteBrands() {
                 await router.replace("/login");
                 return;
             }
-            setSelectedBrandImageIndex(-1);
             setWaitChangeBrandImageMsg(false);
             setErrorChangeBrandImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorChangeBrandImageMsg("");
+                setSelectedBrandImageIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -367,6 +367,7 @@ export default function UpdateAndDeleteBrands() {
                                             }
                                             {waitChangeBrandImageMsg && selectedBrandImageIndex === brandIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
+                                                disabled
                                             >{waitChangeBrandImageMsg}</button>}
                                             {successChangeBrandImageMsg && selectedBrandImageIndex === brandIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"

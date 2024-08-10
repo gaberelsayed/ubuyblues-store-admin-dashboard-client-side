@@ -141,14 +141,13 @@ export default function UpdateAndDeleteCategories() {
             setSelectedCategoryIndex(categoryIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting Updating ...");
-                const res = await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
                     newCategoryName: allCategoriesInsideThePage[categoryIndex].name,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg("Updating Successfull !!");
@@ -158,7 +157,12 @@ export default function UpdateAndDeleteCategories() {
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
-                    setSelectedCategoryIndex(-1);
+                    setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorMsg("");
+                        setSelectedCategoryIndex(-1);
+                        clearTimeout(errorTimeout);
+                    }, 1500);
                 }
             }
         }
@@ -168,11 +172,11 @@ export default function UpdateAndDeleteCategories() {
                 await router.push("/login");
                 return;
             }
-            setSelectedCategoryIndex(-1);
             setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
+                setSelectedCategoryIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -182,12 +186,11 @@ export default function UpdateAndDeleteCategories() {
         try {
             setWaitMsg("Please Waiting Deleting ...");
             setSelectedCategoryIndex(categoryIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            const result = res.data;
+            })).data;
             setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg("Deleting Successfull !!");

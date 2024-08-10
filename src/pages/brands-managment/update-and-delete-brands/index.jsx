@@ -34,7 +34,7 @@ export default function UpdateAndDeleteBrands() {
     const [successChangeBrandImageMsg, setSuccessChangeBrandImageMsg] = useState("");
 
     const [waitMsg, setWaitMsg] = useState("");
-    
+
     const [successMsg, setSuccessMsg] = useState("");
 
     const [errorMsg, setErrorMsg] = useState("");
@@ -174,12 +174,11 @@ export default function UpdateAndDeleteBrands() {
                 setWaitChangeBrandImageMsg("Please Waiting Change Image ...");
                 let formData = new FormData();
                 formData.append("brandImage", allBrandsInsideThePage[brandIndex].image);
-                const res = await axios.put(`${process.env.BASE_API_URL}/brands/change-brand-image/${allBrandsInsideThePage[brandIndex]._id}`, formData, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/brands/change-brand-image/${allBrandsInsideThePage[brandIndex]._id}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 if (!result.error) {
                     setWaitChangeBrandImageMsg("");
                     setSuccessChangeBrandImageMsg("Change Image Successfull !!");
@@ -226,14 +225,13 @@ export default function UpdateAndDeleteBrands() {
             setSelectedBrandIndex(brandIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting Updating ...");
-                const res = await axios.put(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
                     newBrandTitle: allBrandsInsideThePage[brandIndex].title,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg("Updating Successfull !!");
@@ -243,7 +241,12 @@ export default function UpdateAndDeleteBrands() {
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
-                    setSelectedBrandIndex(-1);
+                    setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorMsg("");
+                        setSelectedBrandIndex(-1);
+                        clearTimeout(errorTimeout);
+                    }, 1500);
                 }
             }
         }
@@ -267,20 +270,26 @@ export default function UpdateAndDeleteBrands() {
         try {
             setWaitMsg("Please Waiting Deleting ...");
             setSelectedBrandIndex(brandIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            const result = res.data;
+            })).data;
             setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedBrandIndex(-1);
-                    setAllBrandsInsideThePage(allBrandsInsideThePage.filter((brand) => brand._id !== allBrandsInsideThePage[brandIndex]._id));
+                    setAllBrandsInsideThePage(allBrandsInsideThePage.filter((brand, index) => index !== brandIndex));
                     clearTimeout(successTimeout);
+                }, 1500);
+            } else {
+                setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedBrandIndex(-1);
+                    clearTimeout(errorTimeout);
                 }, 1500);
             }
         }

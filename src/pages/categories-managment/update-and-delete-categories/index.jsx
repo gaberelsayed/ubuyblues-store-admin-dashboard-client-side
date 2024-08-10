@@ -63,9 +63,10 @@ export default function UpdateAndDeleteCategories() {
                             setAdminInfo(adminDetails);
                             const tempFilters = { ...filters, storeId: adminDetails.storeId };
                             setFilters(tempFilters);
-                            result = await getCategoriesCount(getFiltersAsQuery(tempFilters));
+                            const filtersAsQuery = getFiltersAsQuery(tempFilters);
+                            result = await getCategoriesCount(filtersAsQuery);
                             if (result.data > 0) {
-                                setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(tempFilters))).data);
+                                setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize, filtersAsQuery)).data);
                                 setTotalPagesCount(Math.ceil(result.data / pageSize));
                             }
                             setIsLoadingPage(false);
@@ -193,20 +194,16 @@ export default function UpdateAndDeleteCategories() {
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedCategoryIndex(-1);
-                    setIsGetCategories(true);
-                    const result = await getCategoriesCount();
-                    if (result.data > 0) {
-                        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(currentPage, pageSize, getFiltersAsQuery(filters))).data);
-                        setTotalPagesCount(Math.ceil(result.data / pageSize));
-                    } else {
-                        setAllCategoriesInsideThePage([]);
-                        setTotalPagesCount(0);
-                    }
-                    setIsGetCategories(false);
+                    setAllCategoriesInsideThePage(allCategoriesInsideThePage.filter((category, index) => index !== categoryIndex));
                     clearTimeout(successTimeout);
                 }, 1500);
             } else {
-                setSelectedCategoryIndex(-1);
+                setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedCategoryIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
             }
         }
         catch (err) {

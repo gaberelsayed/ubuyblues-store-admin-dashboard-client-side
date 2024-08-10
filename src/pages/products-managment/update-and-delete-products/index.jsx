@@ -553,7 +553,7 @@ export default function UpdateAndDeleteProducts() {
                                                 </p>}
                                             </section>
                                         </td>
-                                        <td className="product-description-cell">
+                                        <td className="product-description-cell" width="400">
                                             <section className="product-description mb-4">
                                                 <textarea
                                                     placeholder="Enter New Product Description"

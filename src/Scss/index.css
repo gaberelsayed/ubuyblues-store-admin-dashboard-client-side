@@ -47,11 +47,6 @@ input:focus, textarea:focus, select:focus, .checkbox:focus {
   border-color: #00F;
 }
 
-textarea {
-  height: 120px;
-  resize: none;
-}
-
 .page {
   min-height: 100vh;
 }
@@ -188,7 +183,6 @@ textarea {
 }
 
 .managment-table textarea {
-  resize: none;
   height: 150px;
 }
 
@@ -343,16 +337,6 @@ textarea {
 
 .pagination-bar .navigate-to-specific-page-form .page-number-input {
   font-size: 14px;
-}
-
-.overlay {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  min-height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 2;
 }
 
 .data-box .data-table th, .data-box .data-table td {

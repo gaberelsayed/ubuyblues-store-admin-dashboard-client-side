@@ -43,11 +43,6 @@ input, textarea, select, .checkbox{
     }
 }
 
-textarea{
-    height: 120px;
-    resize: none;
-}
-
 .page{
     min-height: 100vh;
 }
@@ -127,7 +122,6 @@ textarea{
 .managment-table{
     background-color: #FFF;
     textarea{
-        resize: none;
         height: 150px;
     }
     h6{
@@ -283,16 +277,6 @@ textarea{
             font-size: 14px;
         }
     }
-}
-
-.overlay{
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    min-height: 100vh;
-    background: rgba($color: #000, $alpha: 0.7);
-    z-index: 2;
 }
 
 .data-box{

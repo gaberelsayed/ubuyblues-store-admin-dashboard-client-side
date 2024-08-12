@@ -36,7 +36,7 @@ export default function UsersManagment() {
     const [filters, setFilters] = useState({
         isVerified: true,
     });
-    
+
     const router = useRouter();
 
     const pageSize = 10;
@@ -98,7 +98,7 @@ export default function UsersManagment() {
             throw Error(err);
         }
     }
-    
+
     const getAllUsersInsideThePage = async (pageNumber, pageSize, filters) => {
         try {
             return (await axios.get(`${process.env.BASE_API_URL}/users/all-users-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`, {
@@ -208,10 +208,10 @@ export default function UsersManagment() {
                                             {user.email}
                                         </td>
                                         <td className="user-email-cell">
-                                            {user.firstName}
+                                            {user.firstName ? user.firstName : "---------"}
                                         </td>
                                         <td className="user-email-cell">
-                                            {user.lastName}
+                                            {user.lastName ? user.lastName : "---------"}
                                         </td>
                                         <td className="user-email-cell">
                                             {getDateFormated(user.dateOfCreation)}

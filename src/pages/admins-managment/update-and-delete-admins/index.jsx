@@ -20,7 +20,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const [allAdminsInsideThePage, setAllAdminsInsideThePage] = useState([]);
 
-    const [isFilteringAdminsStatus, setIsFilteringStoresStatus] = useState(false);
+    const [isFilteringAdminsStatus, setIsFilteringAdminsStatus] = useState(false);
 
     const [selectedAdminIndex, setSelectedAdminIndex] = useState(-1);
 
@@ -120,26 +120,26 @@ export default function UpdateAndDeleteAdmins() {
     }
 
     const getPreviousPage = async () => {
-        setIsFilteringStoresStatus(true);
+        setIsFilteringAdminsStatus(true);
         const newCurrentPage = currentPage - 1;
         setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
-        setIsFilteringStoresStatus(false);
+        setIsFilteringAdminsStatus(false);
     }
 
     const getNextPage = async () => {
-        setIsFilteringStoresStatus(true);
+        setIsFilteringAdminsStatus(true);
         const newCurrentPage = currentPage + 1;
         setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
-        setIsFilteringStoresStatus(false);
+        setIsFilteringAdminsStatus(false);
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsFilteringStoresStatus(true);
+        setIsFilteringAdminsStatus(true);
         setAllAdminsInsideThePage((await getAllAdminsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
         setCurrentPage(pageNumber);
-        setIsFilteringStoresStatus(false);
+        setIsFilteringAdminsStatus(false);
     }
 
     const getFilteringString = (filters) => {
@@ -155,18 +155,18 @@ export default function UpdateAndDeleteAdmins() {
 
     const filterAdmins = async (filters) => {
         try {
-            setIsFilteringStoresStatus(true);
+            setIsFilteringAdminsStatus(true);
             setCurrentPage(1);
             const filteringString = getFilteringString(filters);
             const result = await getAdminsCount(filteringString);
             if (result.data > 0) {
                 setAllAdminsInsideThePage((await getAllAdminsInsideThePage(1, pageSize, filteringString)).data);
                 setTotalPagesCount(Math.ceil(result.data / pageSize));
-                setIsFilteringStoresStatus(false);
+                setIsFilteringAdminsStatus(false);
             } else {
                 setAllAdminsInsideThePage([]);
                 setTotalPagesCount(0);
-                setIsFilteringStoresStatus(false);
+                setIsFilteringAdminsStatus(false);
             }
         }
         catch (err) {
@@ -175,10 +175,10 @@ export default function UpdateAndDeleteAdmins() {
                 await router.replace("/login");
                 return;
             }
-            setIsFilteringStoresStatus(false);
-            setErrorMsg(true);
+            setIsFilteringAdminsStatus(false);
+            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
-                setErrorMsg(false);
+                setErrorMsg("");
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -288,14 +288,14 @@ export default function UpdateAndDeleteAdmins() {
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedAdminIndex(-1);
-                    setIsFilteringStoresStatus(true);
+                    setIsFilteringAdminsStatus(true);
                     result = await getAdminsCount();
                     if (result.data > 0) {
                         setAllAdminsInsideThePage((await getAllAdminsInsideThePage(currentPage, pageSize)).data);
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
                     }
                     setCurrentPage(1);
-                    setIsFilteringStoresStatus(false);
+                    setIsFilteringAdminsStatus(false);
                     clearTimeout(successTimeout);
                 }, 3000);
             } else {

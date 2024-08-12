@@ -75,8 +75,7 @@ const getAllCategories = async (filters) => {
 
 const getStoresCount = async (filters) => {
     try {
-        const res = await axios.get(`${process.env.BASE_API_URL}/stores/stores-count?${filters ? filters : ""}`);
-        return res.data;
+        return (await axios.get(`${process.env.BASE_API_URL}/stores/stores-count?${filters ? filters : ""}`)).data;
     }
     catch (err) {
         throw Error(err);
@@ -85,8 +84,7 @@ const getStoresCount = async (filters) => {
 
 const getAllStoresInsideThePage = async (pageNumber, pageSize, filters) => {
     try {
-        const res = await axios.get(`${process.env.BASE_API_URL}/stores/all-stores-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`);
-        return res.data;
+        return (await axios.get(`${process.env.BASE_API_URL}/stores/all-stores-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`)).data;
     }
     catch (err) {
         throw Error(err);

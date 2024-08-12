@@ -238,7 +238,7 @@ export default function UpdateAndDeleteCategories() {
                         Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Categories Page
                     </h1>
                     {allCategoriesInsideThePage.length > 0 && !isGetCategories && <section className="categories-box w-100">
-                        <table className="products-table mb-4 managment-table bg-white w-100">
+                        <table className="users-table mb-4 managment-table bg-white w-100">
                             <thead>
                                 <tr>
                                     <th>Name</th>

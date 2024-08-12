@@ -98,6 +98,7 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
                                 </NavDropdown>
                             </>}
                             {isWebsiteOwner && <>
+                                <Nav.Link href="/users-managment" as={Link}>Users</Nav.Link> 
                                 <NavDropdown title="Stores" id="stores-nav-dropdown">
                                     <NavDropdown.Item href="/stores-managment" as={Link}>All Stores</NavDropdown.Item>
                                 </NavDropdown>

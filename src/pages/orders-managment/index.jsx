@@ -106,8 +106,7 @@ export default function OrdersManagment() {
 
     const getOrdersCount = async (filters) => {
         try {
-            const res = await axios.get(`${process.env.BASE_API_URL}/orders/orders-count?${filters ? filters : ""}`);
-            return res.data;
+            return (await axios.get(`${process.env.BASE_API_URL}/orders/orders-count?${filters ? filters : ""}`)).data;
         }
         catch (err) {
             throw Error(err);
@@ -116,8 +115,7 @@ export default function OrdersManagment() {
 
     const getAllOrdersInsideThePage = async (pageNumber, pageSize, filters) => {
         try {
-            const res = await axios.get(`${process.env.BASE_API_URL}/orders/all-orders-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`);
-            return res.data;
+            return (await axios.get(`${process.env.BASE_API_URL}/orders/all-orders-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`)).data;
         }
         catch (err) {
             throw Error(err);
@@ -218,15 +216,14 @@ export default function OrdersManagment() {
             setSelectedOrderIndex(orderIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting Updating ...");
-                const res = await axios.post(`${process.env.BASE_API_URL}/orders/update-order/${allOrdersInsideThePage[orderIndex]._id}`, {
+                const result = (await axios.post(`${process.env.BASE_API_URL}/orders/update-order/${allOrdersInsideThePage[orderIndex]._id}`, {
                     orderAmount: allOrdersInsideThePage[orderIndex].orderAmount,
                     status: allOrdersInsideThePage[orderIndex].status,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg("Updating Successfull !!");

@@ -211,7 +211,9 @@ export default function AddNewProduct() {
                 formData.append("discount", productData.discount);
                 formData.append("quantity", productData.quantity);
                 formData.append("productImage", productData.image);
-                formData.append("galleryImages", productData.galleryImages[0]);
+                for(let galleryImage of productData.galleryImages) {
+                    formData.append("galleryImages", galleryImage);
+                }
                 formData.append("storeId", adminInfo.storeId);
                 setIsWaitStatus(true);
                 const res = await axios.post(`${process.env.BASE_API_URL}/products/add-new-product`, formData, {

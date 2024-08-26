@@ -21,7 +21,7 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
     const handleChangeLanguage = (language) => {
         i18n.changeLanguage(language);
         document.body.lang = language;
-        localStorage.setItem("asfour-store-language", language);
+        localStorage.setItem("ubuyblues-store-admin-dashboard-language", language);
     }
 
     const handleSelectCountry = async (country) => {

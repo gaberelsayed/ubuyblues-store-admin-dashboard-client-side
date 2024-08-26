@@ -66,11 +66,9 @@ export default function OrdersManagment() {
                             await router.replace("/login");
                         } else {
                             setAdminInfo(adminDetails);
-                            const tempFilters = { ...filters, storeId: adminDetails.storeId };
-                            setFilters(tempFilters);
-                            result = await getOrdersCount(getFilteringString(tempFilters));
+                            result = await getOrdersCount(getFilteringString(filters));
                             if (result.data > 0) {
-                                setAllOrdersInsideThePage((await getAllOrdersInsideThePage(1, pageSize, getFilteringString(tempFilters))).data);
+                                setAllOrdersInsideThePage((await getAllOrdersInsideThePage(1, pageSize, getFilteringString(filters))).data);
                                 setTotalPagesCount(Math.ceil(result.data / pageSize));
                             }
                             setIsLoadingPage(false);
@@ -91,9 +89,8 @@ export default function OrdersManagment() {
     }, []);
 
     const getFilteringString = (filters) => {
-        let filteringString = "";
+        let filteringString = "destination=admin&";
         if (filters.orderNumber !== -1 && filters.orderNumber) filteringString += `orderNumber=${filters.orderNumber}&`;
-        if (filters.storeId) filteringString += `storeId=${filters.storeId}&`;
         if (filters.orderId) filteringString += `_id=${filters.orderId}&`;
         if (filters.status) filteringString += `status=${filters.status}&`;
         if (filters.customerName) filteringString += `customerName=${filters.customerName}&`;
@@ -106,7 +103,11 @@ export default function OrdersManagment() {
 
     const getOrdersCount = async (filters) => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/orders/orders-count?${filters ? filters : ""}`)).data;
+            return (await axios.get(`${process.env.BASE_API_URL}/orders/orders-count?${filters ? filters : ""}`, {
+                headers: {
+                    Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
+                }
+            })).data;
         }
         catch (err) {
             throw Error(err);
@@ -115,7 +116,11 @@ export default function OrdersManagment() {
 
     const getAllOrdersInsideThePage = async (pageNumber, pageSize, filters) => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/orders/all-orders-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`)).data;
+            return (await axios.get(`${process.env.BASE_API_URL}/orders/all-orders-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`, {
+                headers: {
+                    Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
+                }
+            })).data;
         }
         catch (err) {
             throw Error(err);

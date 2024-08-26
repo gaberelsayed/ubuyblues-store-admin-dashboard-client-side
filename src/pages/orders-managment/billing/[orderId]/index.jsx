@@ -53,7 +53,7 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
     }, [countryAsProperty]);
 
     useEffect(() => {
-        const userLanguage = localStorage.getItem("asfour-store-language");
+        const userLanguage = localStorage.getItem("ubuyblues-store-admin-dashboard-language");
         handleSelectUserLanguage(userLanguage === "ar" || userLanguage === "en" || userLanguage === "tr" || userLanguage === "de" ? userLanguage : "en");
     }, []);
 
@@ -106,8 +106,7 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
 
     const getOrderDetails = async () => {
         try {
-            const res = await axios.get(`${process.env.BASE_API_URL}/orders/order-details/${orderIdAsProperty}`);
-            return res.data;
+            return (await axios.get(`${process.env.BASE_API_URL}/orders/order-details/${orderIdAsProperty}`)).data;
         }
         catch (err) {
             throw Error(err);

@@ -342,6 +342,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                     <div className="col-md-6 bg-white border border-2 border-dark">
                                         <div className="creator-box text-start p-3">
                                             <h6 className="fw-bold m-0">Creator: {orderDetails.creator}</h6>
+                                            <h6 className="fw-bold m-0">Creator: {orderDetails.userId}</h6>
                                         </div>
                                     </div>
                                     <div className="col-md-6 bg-white border border-2 border-dark">

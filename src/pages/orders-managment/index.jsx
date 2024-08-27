@@ -408,19 +408,21 @@ export default function OrdersManagment() {
                                             <td>{order.checkoutStatus}</td>
                                             <td>
                                                 <h6 className="fw-bold">{order.status}</h6>
-                                                <hr />
-                                                <select
-                                                    className="select-order-status form-select"
-                                                    onChange={(e) => changeOrderData(orderIndex, "status", e.target.value)}
-                                                >
-                                                    <option value="" hidden>Pleae Enter Status</option>
-                                                    <option value="pending">Pending</option>
-                                                    <option value="shipping">Shipping</option>
-                                                    <option value="completed">Completed</option>
-                                                </select>
+                                                {order.checkoutStatus === "Checkout Successfull" && <>
+                                                    <hr />
+                                                    <select
+                                                        className="select-order-status form-select"
+                                                        onChange={(e) => changeOrderData(orderIndex, "status", e.target.value)}
+                                                    >
+                                                        <option value="" hidden>Pleae Enter Status</option>
+                                                        <option value="pending">Pending</option>
+                                                        <option value="shipping">Shipping</option>
+                                                        <option value="completed">Completed</option>
+                                                    </select>
+                                                </>}
                                             </td>
                                             <td>
-                                                <section className="order-total-amount mb-4">
+                                                {order.checkoutStatus === "Checkout Successfull" ? <section className="order-total-amount mb-4">
                                                     <input
                                                         type="number"
                                                         defaultValue={order.orderAmount}
@@ -432,17 +434,17 @@ export default function OrdersManagment() {
                                                         <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                         <span>{formValidationErrors["totalAmount"]}</span>
                                                     </p>}
-                                                </section>
+                                                </section> : order.orderAmount}
                                             </td>
                                             <td>{getDateFormated(order.addedDate)}</td>
                                             <td>
                                                 {!order.isDeleted && orderIndex !== selectedOrderIndex && <>
-                                                    <button
+                                                    {order.checkoutStatus === "Checkout Successfull" && <button
                                                         className="btn btn-info d-block mx-auto mb-3 global-button"
                                                         onClick={() => updateOrderData(orderIndex)}
                                                     >
                                                         Update
-                                                    </button>
+                                                    </button>}
                                                     <button
                                                         className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                         onClick={() => deleteOrder(orderIndex)}
@@ -479,10 +481,10 @@ export default function OrdersManagment() {
                                                         href={`/orders-managment/${order._id}`}
                                                         className="btn btn-success d-block mx-auto mb-4 global-button"
                                                     >Show Details</Link>
-                                                    <Link
+                                                    {order.checkoutStatus === "Checkout Successfull" && <Link
                                                         href={`/orders-managment/billing/${order._id}`}
                                                         className="btn btn-success d-block mx-auto mb-4 global-button"
-                                                    >Show Billing</Link>
+                                                    >Show Billing</Link>}
                                                 </>}
                                             </td>
                                         </tr>

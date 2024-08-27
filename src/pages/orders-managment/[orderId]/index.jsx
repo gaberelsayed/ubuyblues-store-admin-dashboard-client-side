@@ -67,8 +67,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
 
     const getOrderDetails = async (orderId) => {
         try {
-            const res = await axios.get(`${process.env.BASE_API_URL}/orders/order-details/${orderId}`);
-            return res.data;
+            return (await axios.get(`${process.env.BASE_API_URL}/orders/order-details/${orderId}`)).data;
         }
         catch (err) {
             throw Error(err);
@@ -127,12 +126,11 @@ export default function OrderDetails({ orderIdAsProperty }) {
         try {
             setIsDeletingStatus(true);
             setSelectedOrderProductIndex(orderProductIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/orders/products/delete-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/orders/products/delete-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            const result = res.data;
+            })).data;
             if (!result.error) {
                 setIsDeletingStatus(false);
                 setSuccessMsg("Deleting Success !!");
@@ -143,7 +141,12 @@ export default function OrderDetails({ orderIdAsProperty }) {
                     clearTimeout(successTimeout);
                 }, 1500);
             } else {
-                setSelectedOrderProductIndex(-1);
+                setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedOrderProductIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
             }
         }
         catch (err) {
@@ -174,7 +177,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                 {/* Start Content Section */}
                 <section className="page-content d-flex justify-content-center align-items-center flex-column text-center pt-4 pb-4 p-4">
                     <div className="container-fluid">
-                        <h1 className="welcome-msg mb-4 fw-bold pb-3 mx-auto">Hello To You In Orders Details Page</h1>
+                        <h1 className="welcome-msg fw-bold mx-auto mt-3 mb-3">Hello To You In Orders Details Page</h1>
                         {Object.keys(orderDetails).length > 0 ? <div className="order-details-box p-3 data-box admin-dashbboard-data-box">
                             <table className="order-data-table mb-5 managment-table admin-dashbboard-data-table">
                                 <thead>
@@ -198,7 +201,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                                     className="form-control quantity"
                                                     defaultValue={orderProduct.quantity}
                                                     onChange={(e) => changeOrderProductData(orderProductIndex, "quantity", e.target.valueAsNumber)}
-                                                    disabled={orderDetails.isDeleted}
+                                                    disabled={orderDetails.isDeleted || orderDetails.checkoutStatus !== "Checkout Successfull"}
                                                 />
                                             </td>
                                             <td>
@@ -207,7 +210,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                                     className="form-control name"
                                                     defaultValue={orderProduct.name}
                                                     onChange={(e) => changeOrderProductData(orderProductIndex, "name", e.target.value)}
-                                                    disabled={orderDetails.isDeleted}
+                                                    disabled={orderDetails.isDeleted || orderDetails.checkoutStatus !== "Checkout Successfull"}
                                                 />
                                             </td>
                                             <td>
@@ -216,7 +219,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                                     className="form-control unit-price"
                                                     defaultValue={orderProduct.unitPrice}
                                                     onChange={(e) => changeOrderProductData(orderProductIndex, "unitPrice", e.target.valueAsNumber)}
-                                                    disabled={orderDetails.isDeleted}
+                                                    disabled={orderDetails.isDeleted || orderDetails.checkoutStatus !== "Checkout Successfull"}
                                                 />
                                             </td>
                                             <td>
@@ -225,7 +228,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                                     className="form-control total-amount"
                                                     defaultValue={orderProduct.totalAmount}
                                                     onChange={(e) => changeOrderProductData(orderProductIndex, "totalAmount", e.target.valueAsNumber)}
-                                                    disabled={orderDetails.isDeleted}
+                                                    disabled={orderDetails.isDeleted || orderDetails.checkoutStatus !== "Checkout Successfull"}
                                                 />
                                             </td>
                                             <td>
@@ -237,7 +240,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                                 />
                                             </td>
                                             <td>
-                                                {!orderDetails.isDeleted ? <>
+                                                {!orderDetails.isDeleted && orderDetails.checkoutStatus === "Checkout Successfull" ? <>
                                                     {selectedOrderProductIndex !== orderProductIndex && <button
                                                         className="btn btn-info d-block mx-auto mb-3 global-button"
                                                         onClick={() => updateOrderProductData(orderProductIndex)}
@@ -277,38 +280,78 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                 </tbody>
                             </table>
                         </div> : <p className="alert alert-danger order-not-found-error">Sorry, This Order Is Not Found !!</p>}
-                        {Object.keys(orderDetails).length > 0 && <section className="customer-info">
+                        {Object.keys(orderDetails).length > 0 && <div className="rest-info">
+                            <section className="customer-addresses mb-5">
+                                <h4 className="fw-bold mb-4 border border-2 border-dark bg-white p-3">Addresses</h4>
                                 <div className="row">
                                     <div className="col-md-6 bg-white border border-2 border-dark">
                                         <div className="billing-address-box text-start p-3">
                                             <h6 className="fw-bold">Billing Address</h6>
                                             <hr />
-                                            <p className="city fw-bold info">City: {orderDetails.billingAddress.city}</p>
-                                            <p className="email fw-bold info">Email: {orderDetails.billingAddress.email}</p>
-                                            <p className="name fw-bold info">Name: {orderDetails.billingAddress.firstName}</p>
-                                            <p className="family-name fw-bold info">Family Name: {orderDetails.billingAddress.lastName}</p>
-                                            <p className="phone fw-bold info">Phone: {orderDetails.billingAddress.phone}</p>
-                                            <p className="postal-code fw-bold info">Postal Code: {orderDetails.billingAddress.postalCode}</p>
-                                            <p className="street-address fw-bold info">Street Address: {orderDetails.billingAddress.streetAddress}</p>
-                                            <p className="apartment-number fw-bold info">Apartment Number: {orderDetails.billingAddress.apartmentNumber}</p>
+                                            <p className="city fw-bold">City: {orderDetails.billingAddress.city}</p>
+                                            <p className="email fw-bold">Email: {orderDetails.billingAddress.email}</p>
+                                            <p className="name fw-bold">Name: {orderDetails.billingAddress.firstName}</p>
+                                            <p className="family-name fw-bold">Family Name: {orderDetails.billingAddress.lastName}</p>
+                                            <p className="phone fw-bold">Phone: {orderDetails.billingAddress.phone}</p>
+                                            <p className="postal-code fw-bold">Postal Code: {orderDetails.billingAddress.postalCode}</p>
+                                            <p className="street-address fw-bold">Street Address: {orderDetails.billingAddress.streetAddress}</p>
+                                            <p className="apartment-number fw-bold m-0">Apartment Number: {orderDetails.billingAddress.apartmentNumber}</p>
                                         </div>
                                     </div>
                                     <div className="col-md-6 bg-white border border-2 border-dark">
                                         <div className="shipping-address-box text-start p-3">
                                             <h6 className="fw-bold">Shipping Address</h6>
                                             <hr />
-                                            <p className="city fw-bold info">City: {orderDetails.shippingAddress.city}</p>
-                                            <p className="email fw-bold info">Email: {orderDetails.shippingAddress.email}</p>
-                                            <p className="name fw-bold info">Name: {orderDetails.shippingAddress.firstName}</p>
-                                            <p className="family-name fw-bold info">Family Name: {orderDetails.shippingAddress.lastName}</p>
-                                            <p className="phone fw-bold info">Phone: {orderDetails.shippingAddress.phone}</p>
-                                            <p className="postal-code fw-bold info">Postal Code: {orderDetails.shippingAddress.postalCode}</p>
-                                            <p className="street-address fw-bold info">Street Address: {orderDetails.shippingAddress.streetAddress}</p>
-                                            <p className="apartment-number fw-bold info">Apartment Number: {orderDetails.shippingAddress.apartmentNumber}</p>
+                                            <p className="city fw-bold">City: {orderDetails.shippingAddress.city}</p>
+                                            <p className="email fw-bold">Email: {orderDetails.shippingAddress.email}</p>
+                                            <p className="name fw-bold">Name: {orderDetails.shippingAddress.firstName}</p>
+                                            <p className="family-name fw-bold">Family Name: {orderDetails.shippingAddress.lastName}</p>
+                                            <p className="phone fw-bold">Phone: {orderDetails.shippingAddress.phone}</p>
+                                            <p className="postal-code fw-bold">Postal Code: {orderDetails.shippingAddress.postalCode}</p>
+                                            <p className="street-address fw-bold">Street Address: {orderDetails.shippingAddress.streetAddress}</p>
+                                            <p className="apartment-number fw-bold m-0">Apartment Number: {orderDetails.shippingAddress.apartmentNumber}</p>
                                         </div>
                                     </div>
                                 </div>
-                        </section>}
+                            </section>
+                            <section className="shipping-info mb-5">
+                                <h4 className="fw-bold mb-4 border border-2 border-dark bg-white p-3">Shipping Info</h4>
+                                <div className="row">
+                                    <div className="col-md-6 bg-white border border-2 border-dark">
+                                        <div className="shipping-cost-box text-start p-3">
+                                            <h6 className="fw-bold">Shipping Cost</h6>
+                                            <hr />
+                                            <p className="shipping-cost shipping-cost-for-local-products fw-bold">For Local Products: {orderDetails.shippingCost.forLocalProducts}</p>
+                                            <p className="shipping-cost shipping-cost-for-international-products fw-bold">For Interantional Products: {orderDetails.shippingCost.forInternationalProducts}</p>
+                                            <p className="shipping-cost total-shipping-cost fw-bold m-0">Total Cost: {orderDetails.shippingCost.forLocalProducts + orderDetails.shippingCost.forInternationalProducts}</p>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6 bg-white border border-2 border-dark">
+                                        <div className="shipping-methods-box text-start p-3">
+                                            <h6 className="fw-bold">Shipping Methods</h6>
+                                            <hr />
+                                            <p className="shipping-method shipping-method-for-local-products fw-bold">For Local Products: {orderDetails.shippingMethod.forLocalProducts}</p>
+                                            <p className="shipping-method shipping-method-for-international-products fw-bold m-0">For Interantional Products: {orderDetails.shippingMethod.forInternationalProducts}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section className="other-info mb-4">
+                                <h4 className="fw-bold mb-4 border border-2 border-dark bg-white p-3">Other Info</h4>
+                                <div className="row">
+                                    <div className="col-md-6 bg-white border border-2 border-dark">
+                                        <div className="creator-box text-start p-3">
+                                            <h6 className="fw-bold m-0">Creator: {orderDetails.creator}</h6>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6 bg-white border border-2 border-dark">
+                                        <div className="payment-gateway-box text-start p-3">
+                                            <h6 className="fw-bold m-0">Payment Gateway: {orderDetails.paymentGateway}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>}
                     </div>
                 </section>
                 {/* End Content Section */}

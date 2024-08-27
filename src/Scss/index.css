@@ -194,7 +194,7 @@ input:focus, textarea:focus, select:focus, .checkbox:focus {
   color: #FFF;
 }
 
-.order-details .customer-info p {
+.order-details .rest-info p {
   font-size: 13px;
 }
 

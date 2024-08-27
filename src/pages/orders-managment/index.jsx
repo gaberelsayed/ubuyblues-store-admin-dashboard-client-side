@@ -153,18 +153,19 @@ export default function OrdersManagment() {
     const filterOrders = async (filters) => {
         try {
             setFormValidationErrors({});
-            const errorsObject = inputValuesValidation([
-                {
-                    name: "orderNumber",
-                    value: filters.orderNumber,
-                    rules: {
-                        minNumber: {
-                            value: 1,
-                            msg: "Sorry, Min Number Is: 1 !!",
-                        },
-                    },
-                },
-            ]);
+            // const errorsObject = inputValuesValidation([
+            //     {
+            //         name: "orderNumber",
+            //         value: filters.orderNumber,
+            //         rules: {
+            //             minNumber: {
+            //                 value: 1,
+            //                 msg: "Sorry, Min Number Is: 1 !!",
+            //             },
+            //         },
+            //     },
+            // ]);
+            const errorsObject = {};
             if (Object.keys(errorsObject).length == 0) {
                 setIsFilteringOrdersStatus(true);
                 setCurrentPage(1);
@@ -182,14 +183,16 @@ export default function OrdersManagment() {
             }
         }
         catch (err) {
+            console.log(err)
+
             if (err?.response?.data?.msg === "Unauthorized Error") {
                 await router.replace("/login");
                 return;
             }
             setIsFilteringOrdersStatus(false);
-            setErrorMsg(true);
+            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
-                setErrorMsg(false);
+                setErrorMsg("");
                 clearTimeout(errorTimeout);
             }, 1500);
         }
@@ -330,7 +333,7 @@ export default function OrdersManagment() {
                                         placeholder="Pleae Enter Order Number"
                                         min="1"
                                         max={allOrdersInsideThePage.length}
-                                        onChange={(e) => setFilters({ ...filters, orderNumber: e.target.valueAsNumber })}
+                                        onChange={(e) => setFilters({ ...filters, orderNumber: e.target.valueAsNumber ? e.target.valueAsNumber : -1 })}
                                     />
                                 </div>
                                 <div className="col-md-4">

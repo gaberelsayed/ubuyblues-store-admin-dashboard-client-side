@@ -47,8 +47,8 @@ export default function OrderDetails({ orderIdAsProperty }) {
                             result = await getOrderDetails(orderIdAsProperty);
                             if (!result.error) {
                                 setOrderDetails(result.data);
-                                setIsLoadingPage(false);
                             }
+                            setIsLoadingPage(false);
                         }
                     }
                 })

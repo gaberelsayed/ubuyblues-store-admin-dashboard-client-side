@@ -21,6 +21,8 @@ export default function OrdersManagment() {
 
     const [allOrdersInsideThePage, setAllOrdersInsideThePage] = useState([]);
 
+    const [isSendEmailToTheCustomerList, setIsSendEmailToTheCustomerList] = useState([]);
+
     const [isFilteringOrdersStatus, setIsFilteringOrdersStatus] = useState(false);
 
     const [selectedOrderIndex, setSelectedOrderIndex] = useState(-1);
@@ -198,8 +200,12 @@ export default function OrdersManagment() {
         }
     }
 
-    const changeOrderData = (productIndex, fieldName, newValue) => {
-        allOrdersInsideThePage[productIndex][fieldName] = newValue;
+    const changeOrderData = (orderIndex, fieldName, newValue) => {
+        if (fieldName === "isSendEmailToTheCustomer") {
+            isSendEmailToTheCustomerList[orderIndex] = newValue;
+        } else {
+            allOrdersInsideThePage[orderIndex][fieldName] = newValue;
+        }
     }
 
     const updateOrderData = async (orderIndex) => {
@@ -224,7 +230,7 @@ export default function OrdersManagment() {
             setSelectedOrderIndex(orderIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting Updating ...");
-                const result = (await axios.post(`${process.env.BASE_API_URL}/orders/update-order/${allOrdersInsideThePage[orderIndex]._id}`, {
+                const result = (await axios.post(`${process.env.BASE_API_URL}/orders/update-order/${allOrdersInsideThePage[orderIndex]._id}${isSendEmailToTheCustomerList[orderIndex] && allOrdersInsideThePage[orderIndex].status !== "pending" && "?isSendEmailToTheCustomer=true"}`, {
                     orderAmount: allOrdersInsideThePage[orderIndex].orderAmount,
                     status: allOrdersInsideThePage[orderIndex].status,
                 }, {
@@ -414,7 +420,7 @@ export default function OrdersManagment() {
                                                 {order.checkoutStatus === "Checkout Successfull" && <>
                                                     <hr />
                                                     <select
-                                                        className="select-order-status form-select"
+                                                        className="select-order-status form-select mb-5"
                                                         onChange={(e) => changeOrderData(orderIndex, "status", e.target.value)}
                                                     >
                                                         <option value="" hidden>Pleae Enter Status</option>
@@ -422,6 +428,18 @@ export default function OrdersManagment() {
                                                         <option value="shipping">Shipping</option>
                                                         <option value="completed">Completed</option>
                                                     </select>
+                                                    <div className="form-check border border-2 border-dark p-3">
+                                                        <input
+                                                            className="form-check-input m-0"
+                                                            type="checkbox"
+                                                            id="sendEmailCheckout"
+                                                            onChange={(e) => changeOrderData(orderIndex, "isSendEmailToTheCustomer", e.target.checked)}
+                                                        />
+                                                        <label className="form-check-label" htmlFor="sendEmailCheckout" onClick={(e) => changeOrderData(orderIndex, "isSendEmailToTheCustomer", e.target.checked)}>
+                                                            Send Email To Customer
+                                                            <span className="d-block mt-3 fw-bold">( In Status: Shipping Or Completed)</span>
+                                                        </label>
+                                                    </div>
                                                 </>}
                                             </td>
                                             <td>

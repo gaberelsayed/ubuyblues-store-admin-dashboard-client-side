@@ -27,13 +27,13 @@ a{
     text-decoration: none;
 }
 
-input, textarea, select, .checkbox{
+input, textarea, select, checkbox{
     background: transparent;
     border: 1px solid #FFF;
     border-radius: 3px;
     color: #FFF;
     width: 100%;
-    font-size: 13px !important;
+    font-size: 11px !important;
     &::placeholder{
         color: #FFF;
     }
@@ -52,7 +52,7 @@ input, textarea, select, .checkbox{
 }
 
 .global-button{
-    font-size: 13px;
+    font-size: 11px;
 }
 
 .not-found-error{
@@ -110,12 +110,12 @@ input, textarea, select, .checkbox{
     }
 }
 
-.managment-table, .customer-table{
+.managment-table{
     td, th{
         border: 1px solid;
         padding: 15px;
         text-align: center;
-        font-size: 13px;
+        font-size: 11px;
     }
 }
 
@@ -129,10 +129,6 @@ input, textarea, select, .checkbox{
     }
 }
 
-.customer-table{
-    color: #FFF;
-}
-
 .order-details{
     .rest-info{
         p{
@@ -143,7 +139,7 @@ input, textarea, select, .checkbox{
 
 .filters{
     h6{
-        font-size: 13px;
+        font-size: 12px;
     }
 }
 
@@ -306,17 +302,6 @@ input, textarea, select, .checkbox{
     }
 }
 
-.caption-page{
-    .content{
-        ul{
-            list-style: square inside;
-        }
-        li, p{
-            line-height: 2;
-        }
-    }
-}
-
 .customer-favorite-products-list, .customer-wallet-products-list{
     .favorite-products-list-for-user, .wallet-products-list-for-user{
         .favorite-products-table-for-user, .wallet-products-table-for-user{
@@ -340,7 +325,7 @@ input, textarea, select, .checkbox{
         min-height: 100vh;
         background-color: #EEE;
         h1{
-            font-size: 30px;
+            font-size: 25px;
             text-align: center;
         }
         .filters{
@@ -390,62 +375,6 @@ input, textarea, select, .checkbox{
     }
 }
 
-.customer-billing-address, .customer-shipping-address{
-    .edit-customer-billing-address-form, .edit-customer-shipping-address-form{
-        color: #FFF;
-        font-size: 13px;
-        h6{
-            font-size: 14px;
-        }
-        .address-name-and-editing-link{
-            border: 2px dotted #FFF;
-            .editing-link{
-                background: none;
-                border: none;
-                color: var(--main-color-two);
-                border-bottom: 1px solid var(--main-color-two);
-            }
-        }
-    }
-}
-
-.popup-box {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba($color: #000, $alpha: 0.5);
-    z-index: 3;
-    .content-box{
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        background-color: var(--main-color-one);
-        box-shadow: 1px 1px 10px #000;
-        width: 90%;
-        height: 60%;
-        &.share-icons-box{
-            .row{
-                @media (max-width: 767px) {
-                    gap: 20px;
-                }
-            }
-        }
-    }
-    .close-popup-box-icon{
-        position: absolute;
-        right: -20px;
-        top: -20px;
-        font-size: 40px;
-        background-color: red;
-        cursor: pointer;
-        border-radius: 50%;
-        padding: 5px;
-    }
-}
-
 .table-for-mobiles-and-tablets{
     th, td{
         border: 1px solid;
@@ -456,118 +385,6 @@ input, textarea, select, .checkbox{
     }
     td{
         text-align: center;
-    }
-}
-
-.card-box{
-    margin: auto;
-    height: auto;
-    @media (min-width: 320px) and (max-width: 400px) {
-        width: 280px;
-    }
-    @media (min-width: 401px) and (max-width: 500px) {
-        width: 360px;
-    }
-    @media (min-width: 501px) and (max-width: 600px) {
-        width: 450px;
-    }
-    @media (min-width: 601px) and (max-width: 700px) {
-        width: 500px;
-    }
-    @media (min-width: 701px) and (max-width: 767px) {
-        width: 550px;
-    }
-    @media (min-width: 768px) and (max-width: 991px) {
-        width: 500px;
-    }
-    @media (min-width: 992px) and (max-width: 1199px) {
-        width: 450px;
-    }
-    @media (min-width: 1200px) and (max-width: 1300px) {
-        width: 360px;
-    }
-    @media (min-width: 1301px) {
-        width: 400px;
-    }
-    .managment-box{
-        position: relative;
-        cursor: pointer;
-        border-top-right-radius: 8px;
-        border-top-left-radius: 8px;
-        @media (min-width: 320px) and (max-width: 400px) {
-            width: 280px;
-            height: 280px;
-        }
-        @media (min-width: 401px) and (max-width: 500px) {
-            width: 360px;
-            height: 360px;
-        }
-        @media (min-width: 501px) and (max-width: 600px) {
-            width: 450px;
-            height: 450px;
-        }
-        @media (min-width: 601px) and (max-width: 700px) {
-            width: 500px;
-            height: 500px;
-        }
-        @media (min-width: 701px) and (max-width: 767px) {
-            width: 550px;
-            height: 550px;
-        }
-        @media (min-width: 768px) and (max-width: 991px) {
-            width: 500px;
-            height: 500px;
-        }
-        @media (min-width: 992px) and (max-width: 1199px) {
-            width: 450px;
-            height: 450px;
-        }
-        @media (min-width: 1200px) and (max-width: 1300px) {
-            width: 360px;
-            height: 360px;
-        }
-        @media (min-width: 1301px) {
-            width: 400px;
-            height: 400px;
-        }
-        img{
-            width: 100%;
-            height: 100%;
-        }
-        .card-overlay{
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: inherit;
-            background-color: rgba($color: #000000, $alpha: 0.6);
-            opacity: 0;
-            transition: .3s;
-            
-        }
-        .managment-buttons{
-            position: absolute;
-            right: 8px;
-            top: 8px;
-            background-color: #FFF;
-            border-radius: 10px;
-            opacity: 0;
-            .managment-icon{
-                font-size: 20px;
-            }
-        }
-        &:hover{
-            .card-overlay, .managment-buttons, .add-to-cart-button-box{
-                opacity: 1;
-            }
-        }
-    }
-    .details-box{
-        position: relative;
-        background-color: #FFF;
-        border-bottom-right-radius: 8px;
-        border-bottom-left-radius: 8px;
-        min-height: 142px;
     }
 }
 

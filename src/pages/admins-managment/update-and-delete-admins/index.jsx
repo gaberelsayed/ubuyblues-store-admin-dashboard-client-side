@@ -277,7 +277,7 @@ export default function UpdateAndDeleteAdmins() {
         try {
             setWaitMsg("Please Waiting Deleting ...");
             setSelectedAdminIndex(adminIndex);
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/admins/delete-admin/${allAdminsInsideThePage[adminIndex]._id}`, {
+            let result = (await axios.delete(`${process.env.BASE_API_URL}/admins/delete-admin/${allAdminsInsideThePage[adminIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

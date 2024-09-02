@@ -29,6 +29,7 @@ export default function AddNewProduct() {
         categoryId: "",
         discount: "",
         quantity: "",
+        country: "",
         image: null,
         galleryImages: [],
     });
@@ -209,6 +210,7 @@ export default function AddNewProduct() {
                 formData.append("categoryId", productData.categoryId);
                 formData.append("discount", productData.discount);
                 formData.append("quantity", productData.quantity);
+                formData.append("quantity", productData.country);
                 formData.append("productImage", productData.image);
                 for(let galleryImage of productData.galleryImages) {
                     formData.append("galleryImages", galleryImage);

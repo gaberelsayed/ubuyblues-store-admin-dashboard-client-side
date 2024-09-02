@@ -45,16 +45,12 @@ export default function AddNewAdmin() {
                         await router.replace("/login");
                     } else {
                         const adminDetails = result.data;
-                        if (adminDetails.isMerchant) {
-                            if (adminDetails.isBlocked) {
-                                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                                await router.replace("/login");
-                            } else {
-                                setAdminInfo(adminDetails);
-                                setIsLoadingPage(false);
-                            }
-                        } else {
+                        if (!adminDetails.isMainAdmin) {
+                            localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                             await router.replace("/");
+                        } else {
+                            setAdminInfo(adminDetails);
+                            setIsLoadingPage(false);
                         }
                     }
                 })

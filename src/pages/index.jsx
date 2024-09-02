@@ -26,15 +26,8 @@ export default function Home() {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     } else {
-                        const adminDetails = result.data;
-                        if (adminDetails.isBlocked) {
-                            localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                            await router.replace("/login");
-                        }
-                        else {
-                            setAdminInfo(adminDetails);
-                            setIsLoadingPage(false);
-                        }
+                        setAdminInfo(result.data);
+                        setIsLoadingPage(false);
                     }
                 })
                 .catch(async (err) => {

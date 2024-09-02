@@ -35,7 +35,6 @@ export default function UpdateAndDeleteAdmins() {
     const [totalPagesCount, setTotalPagesCount] = useState(0);
 
     const [filters, setFilters] = useState({
-        storeId: "",
         adminId: "",
         firstName: "",
         lastName: "",
@@ -58,27 +57,27 @@ export default function UpdateAndDeleteAdmins() {
                         await router.replace("/login");
                     } else {
                         const adminDetails = result.data;
-                        if (adminDetails.isMerchant) {
-                            if (adminDetails.isBlocked) {
-                                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                                await router.replace("/login");
-                            } else {
-                                setAdminInfo(adminDetails);
-                                const tempFilters = { ...filters, storeId: adminDetails.storeId };
-                                setFilters(tempFilters);
-                                result = await getAdminsCount();
-                                if (result.data > 0) {
-                                    setAllAdminsInsideThePage((await getAllAdminsInsideThePage(1, pageSize, getFilteringString(tempFilters))).data);
-                                    setTotalPagesCount(Math.ceil(result.data / pageSize));
-                                }
-                                setIsLoadingPage(false);
-                            }
-                        } else {
+                        if (!adminDetails.isMainAdmin) {
+                            localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                             await router.replace("/");
+                        } else {
+                            setAdminInfo(adminDetails);
+                            const tempFilters = { ...filters, storeId: adminDetails.storeId };
+                            setFilters(tempFilters);
+                            result = await getAdminsCount();
+                            if (result.data > 0) {
+                                setAllAdminsInsideThePage((await getAllAdminsInsideThePage(1, pageSize, getFilteringString(tempFilters))).data);
+                                setTotalPagesCount(Math.ceil(result.data / pageSize));
+                            }
+                            setIsLoadingPage(false);
                         }
                     }
                 })
                 .catch(async (err) => {
+                    if (err?.message === "Network Error") {
+                        setIsLoadingPage(false);
+                        setIsErrorMsgOnLoadingThePage(true);
+                    }
                     if (err?.response?.data?.msg === "Unauthorized Error") {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
@@ -93,12 +92,11 @@ export default function UpdateAndDeleteAdmins() {
 
     const getAdminsCount = async (filters) => {
         try {
-            const res = await axios.get(`${process.env.BASE_API_URL}/admins/admins-count?${filters ? filters : ""}`, {
+            return (await axios.get(`${process.env.BASE_API_URL}/admins/admins-count?${filters ? filters : ""}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
                 }
-            });
-            return res.data;
+            })).data;
         }
         catch (err) {
             throw Error(err);
@@ -107,12 +105,11 @@ export default function UpdateAndDeleteAdmins() {
 
     const getAllAdminsInsideThePage = async (pageNumber, pageSize, filters) => {
         try {
-            const res = await axios.get(`${process.env.BASE_API_URL}/admins/all-admins-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`, {
+            return (await axios.get(`${process.env.BASE_API_URL}/admins/all-admins-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
                 }
-            });
-            return res.data;
+            })).data;
         }
         catch (err) {
             throw Error(err);
@@ -276,13 +273,12 @@ export default function UpdateAndDeleteAdmins() {
         try {
             setWaitMsg("Please Waiting Deleting ...");
             setSelectedAdminIndex(adminIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/admins/delete-admin/${allAdminsInsideThePage[adminIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/admins/delete-admin/${allAdminsInsideThePage[adminIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            let result = res.data;
-            setWaitMsg(false);
+            })).data;
+            setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg("Updating Successfull !!");
                 let successTimeout = setTimeout(async () => {
@@ -299,7 +295,12 @@ export default function UpdateAndDeleteAdmins() {
                     clearTimeout(successTimeout);
                 }, 3000);
             } else {
-                setSelectedAdminIndex(-1);
+                setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedAdminIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 3000);
             }
         }
         catch (err) {

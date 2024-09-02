@@ -57,7 +57,7 @@ export default function UpdateAndDeleteAdmins() {
                         await router.replace("/login");
                     } else {
                         const adminDetails = result.data;
-                        if (!adminDetails.isMainAdmin) {
+                        if (!adminDetails.isMerchant) {
                             localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                             await router.replace("/");
                         } else {

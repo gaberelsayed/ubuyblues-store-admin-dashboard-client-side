@@ -206,7 +206,6 @@ export default function AddNewProduct() {
                 formData.append("name", productData.name);
                 formData.append("price", productData.price);
                 formData.append("description", productData.description);
-                formData.append("category", productData.category);
                 formData.append("categoryId", productData.categoryId);
                 formData.append("discount", productData.discount);
                 formData.append("quantity", productData.quantity);
@@ -322,13 +321,13 @@ export default function AddNewProduct() {
                             <select
                                 className={`category-select form-select p-2 border-2 category-field ${formValidationErrors["category"] ? "border-danger mb-3" : "mb-4"}`}
                                 onChange={(e) => {
-                                    const categoryNameAndCategoryId = e.target.value.split("-");
+                                    const categoryNameAndCategoryId = e.target.value.split("-categoryId=");
                                     setProductData({ ...productData, category: categoryNameAndCategoryId[0], categoryId: categoryNameAndCategoryId[1] })
                                 }}
                             >
                                 <option defaultValue="" hidden>Please Select Your Category</option>
                                 {allCategories.map((category) => (
-                                    <option value={`${category.name}-${category._id}`} key={category._id}>{category.name}</option>
+                                    <option value={`${category.name}-categoryId=${category._id}`} key={category._id}>{category.name}</option>
                                 ))}
                             </select>
                             {formValidationErrors["category"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">

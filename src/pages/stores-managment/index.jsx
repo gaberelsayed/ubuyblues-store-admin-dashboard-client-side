@@ -256,7 +256,7 @@ export default function StoresManagment() {
         try {
             setIsDeletingStatus(true);
             setSelectedStoreIndex(storeIndex);
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/stores/delete-store/${allStoresInsideThePage[storeIndex]._id}`, {
+            let result = (await axios.delete(`${process.env.BASE_API_URL}/stores/delete-store/${allStoresInsideThePage[storeIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

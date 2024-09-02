@@ -26,7 +26,7 @@ export default function AddNewAd() {
 
     const adImageFileRef = useRef();
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -115,14 +115,13 @@ export default function AddNewAd() {
                     advertisementData.append("adImage", adImage);
                     advertisementData.append("storeId", adminInfo.storeId);
                 }
-                setIsWaitStatus(true);
-                const res = await axios.post(`${process.env.BASE_API_URL}/ads/add-new-${advertisementType}-ad`, advertisementData, {
+                setWaitMsg("Please Waiting To Add New Advertisement ...");
+                const result = (await axios.post(`${process.env.BASE_API_URL}/ads/add-new-${advertisementType}-ad`, advertisementData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
-                setIsWaitStatus(false);
+                })).data;
+                setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
@@ -150,7 +149,7 @@ export default function AddNewAd() {
                 await router.replace("/login");
                 return;
             }
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
@@ -216,18 +215,18 @@ export default function AddNewAd() {
                                 <span>{formValidationErrors["adImage"]}</span>
                             </p>}
                         </section>}
-                        {!isWaitStatus && !successMsg && !errorMsg && <button
+                        {!waitMsg && !successMsg && !errorMsg && <button
                             type="submit"
                             className="btn btn-success w-50 d-block mx-auto p-2 global-button"
                         >
                             Add Now
                         </button>}
-                        {isWaitStatus && <button
+                        {waitMsg && <button
                             type="button"
                             className="btn btn-danger w-50 d-block mx-auto p-2 global-button"
                             disabled
                         >
-                            Waiting Add New Advertisement ...
+                            {waitMsg}
                         </button>}
                         {errorMsg && <button
                             type="button"

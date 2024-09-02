@@ -33,7 +33,7 @@ export default function AddNewProduct() {
         galleryImages: [],
     });
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -215,14 +215,13 @@ export default function AddNewProduct() {
                     formData.append("galleryImages", galleryImage);
                 }
                 formData.append("storeId", adminInfo.storeId);
-                setIsWaitStatus(true);
-                const res = await axios.post(`${process.env.BASE_API_URL}/products/add-new-product`, formData, {
+                setWaitMsg("Please Waiting To Add New Product ...");
+                const result = (await axios.post(`${process.env.BASE_API_URL}/products/add-new-product`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
-                setIsWaitStatus(false);
+                })).data;
+                setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
@@ -255,7 +254,7 @@ export default function AddNewProduct() {
                 await router.replace("/login");
                 return;
             }
-            setIsWaitStatus(false);
+            setWaitMsg("");
             if (err.response.data?.msg === "Sorry, Please Send Valid Discount Value !!") {
                 setErrorMsg(err.response.data.msg);
             }
@@ -409,18 +408,18 @@ export default function AddNewProduct() {
                                 <span>{formValidationErrors["galleryImages"]}</span>
                             </p>}
                         </section>
-                        {!isWaitStatus && !successMsg && !errorMsg && <button
+                        {!waitMsg && !successMsg && !errorMsg && <button
                             type="submit"
                             className="btn btn-success w-50 d-block mx-auto p-2 global-button"
                         >
                             Add Now
                         </button>}
-                        {isWaitStatus && <button
+                        {waitMsg && <button
                             type="button"
                             className="btn btn-danger w-50 d-block mx-auto p-2 global-button"
                             disabled
                         >
-                            Waiting Add New Product ...
+                            {waitMsg}
                         </button>}
                         {errorMsg && <button
                             type="button"

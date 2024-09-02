@@ -21,13 +21,13 @@ export default function UsersManagment() {
 
     const [allUsersInsideThePage, setAllUsersInsideThePage] = useState([]);
 
-    const [waitMsg, setWaitMsg] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [selectedUserIndex, setSelectedUserIndex] = useState(-1);
 
-    const [errorMsg, setErrorMsg] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
-    const [successMsg, setSuccessMsg] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 

@@ -23,7 +23,7 @@ export default function AdminLogin() {
 
     const [blockingDateAndReason, setBlockingDateAndReason] = useState({});
 
-    const [isLoginingStatus, setIsLoginingStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [errMsg, setErrorMsg] = useState("");
 
@@ -88,11 +88,10 @@ export default function AdminLogin() {
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setIsLoginingStatus(true);
-                const res = await axios.get(`${process.env.BASE_API_URL}/admins/login?email=${email}&password=${password}`);
-                const result = res.data;
+                setWaitMsg("Wait Logining ...");
+                const result = (await axios.get(`${process.env.BASE_API_URL}/admins/login?email=${email}&password=${password}`)).data;
                 if (result.error) {
-                    setIsLoginingStatus(false);
+                    setWaitMsg("Wait Logining ...");
                     setErrorMsg(result.msg);
                     if (Object.keys(result.data).length > 0) {
                         setBlockingDateAndReason(result.data);
@@ -106,7 +105,7 @@ export default function AdminLogin() {
                 }
             }
         } catch (err) {
-            setIsLoginingStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Try Again The Process !!");
             setTimeout(() => {
                 setErrorMsg("");
@@ -148,12 +147,12 @@ export default function AdminLogin() {
                             </div>
                         </div>
                         {formValidationErrors["password"] && <p className='error-msg text-danger'>{formValidationErrors["password"]}</p>}
-                        {!isLoginingStatus && !errMsg && <button type="submit" className="btn btn-success mx-auto d-block mb-4 p-3">
+                        {!waitMsg && !errMsg && <button type="submit" className="btn btn-success mx-auto d-block mb-4 p-3">
                             <span className="me-2">Login</span>
                             <FiLogIn />
                         </button>}
-                        {isLoginingStatus && <button disabled className="btn btn-primary mx-auto d-block mb-4">
-                            <span className="me-2">Wait Logining ...</span>
+                        {waitMsg && <button disabled className="btn btn-primary mx-auto d-block mb-4">
+                            <span className="me-2">{waitMsg}</span>
                         </button>}
                         {errMsg && <button disabled className="btn btn-danger mx-auto d-block mb-4">
                             <span className="me-2">{errMsg}</span>

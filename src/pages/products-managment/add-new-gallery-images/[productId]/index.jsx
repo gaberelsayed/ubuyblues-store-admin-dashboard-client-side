@@ -20,7 +20,7 @@ export default function AddNewProductGalleryImage({ productIdAsProperty }) {
 
     const [newGalleryImageFiles, setNewGalleryImageFiles] = useState([]);
 
-    const [waitMsg, setWaitMsg] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -90,12 +90,11 @@ export default function AddNewProductGalleryImage({ productIdAsProperty }) {
                 for (let galleryImageFile of newGalleryImageFiles) {
                     formData.append("productGalleryImage", galleryImageFile);
                 }
-                const res = await axios.post(`${process.env.BASE_API_URL}/products/add-new-images-to-product-gallery/${productIdAsProperty}`, formData, {
+                const result = (await axios.post(`${process.env.BASE_API_URL}/products/add-new-images-to-product-gallery/${productIdAsProperty}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg(result.msg);

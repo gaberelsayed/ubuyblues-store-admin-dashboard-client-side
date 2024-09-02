@@ -185,8 +185,6 @@ export default function OrdersManagment() {
             }
         }
         catch (err) {
-            console.log(err)
-
             if (err?.response?.data?.msg === "Unauthorized Error") {
                 await router.replace("/login");
                 return;
@@ -247,7 +245,12 @@ export default function OrdersManagment() {
                         clearTimeout(successTimeout);
                     }, 3000);
                 } else {
-                    setSelectedOrderIndex(-1);
+                    setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorMsg("");
+                        setSelectedOrderIndex(-1);
+                        clearTimeout(errorTimeout);
+                    }, 3000);
                 }
             }
         }
@@ -271,12 +274,11 @@ export default function OrdersManagment() {
         try {
             setWaitMsg("Please Waiting Deleting ...");
             setSelectedOrderIndex(orderIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/orders/delete-order/${allOrdersInsideThePage[orderIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/orders/delete-order/${allOrdersInsideThePage[orderIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            const result = res.data;
+            })).data;
             setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg("Deleting Successfull !!");

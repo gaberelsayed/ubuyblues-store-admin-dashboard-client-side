@@ -141,7 +141,7 @@ export default function StoreDetails({ storeId }) {
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 setIsUpdatingStatus(true);
-                const res = await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${storeId}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${storeId}`, {
                     name: storeDetails.name,
                     ownerFirstName: storeDetails.ownerFirstName,
                     ownerLastName: storeDetails.ownerLastName,
@@ -152,14 +152,19 @@ export default function StoreDetails({ storeId }) {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 if (!result.error) {
                     setIsUpdatingStatus(false);
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
                         clearTimeout(successTimeout);
+                    }, 3000);
+                } else {
+                    setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorMsg("");
+                        clearTimeout(errorTimeout);
                     }, 3000);
                 }
             }
@@ -201,12 +206,11 @@ export default function StoreDetails({ storeId }) {
                 setIsWaitChangeStoreImage(true);
                 let formData = new FormData();
                 formData.append("storeImage", storeDetails.image);
-                const res = await axios.put(`${process.env.BASE_API_URL}/stores/change-store-image/${storeId}`, formData, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/change-store-image/${storeId}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 if (!result.error) {
                     setIsWaitChangeStoreImage(false);
                     setSuccessChangeStoreImageMsg(result.msg);
@@ -215,6 +219,12 @@ export default function StoreDetails({ storeId }) {
                         storeImageFileElementRef.current.value = "";
                         setStoreDetails({ ...storeDetails, imagePath: result.data.newStoreImagePath });
                         clearTimeout(successTimeout);
+                    }, 1500);
+                } else {
+                    setErrorChangeStoreImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorChangeStoreImageMsg("");
+                        clearTimeout(errorTimeout);
                     }, 1500);
                 }
             }

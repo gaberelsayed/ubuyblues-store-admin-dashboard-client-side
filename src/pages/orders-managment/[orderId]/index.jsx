@@ -5,7 +5,7 @@ import axios from "axios";
 import LoaderPage from "@/components/LoaderPage";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
-import { getAdminInfo } from "../../../../public/global_functions/popular";
+import { getAdminInfo, getOrderDetails } from "../../../../public/global_functions/popular";
 
 export default function OrderDetails({ orderIdAsProperty }) {
 
@@ -64,15 +64,6 @@ export default function OrderDetails({ orderIdAsProperty }) {
                 });
         } else router.replace("/login");
     }, []);
-
-    const getOrderDetails = async (orderId) => {
-        try {
-            return (await axios.get(`${process.env.BASE_API_URL}/orders/order-details/${orderId}`)).data;
-        }
-        catch (err) {
-            throw Error(err);
-        }
-    }
 
     const changeOrderProductData = (productIndex, fieldName, newValue) => {
         let productsTemp = orderDetails.products;

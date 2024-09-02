@@ -127,24 +127,22 @@ export default function UpdateAndDeleteCategories() {
                 setWaitMsg("Please Wait Updating ...");
                 let result;
                 if (advertisementType === "text") {
-                    const res = await axios.put(`${process.env.BASE_API_URL}/ads/update-ad-content/${allTextAds[adIndex]._id}`, {
+                    const result = (await axios.put(`${process.env.BASE_API_URL}/ads/update-ad-content/${allTextAds[adIndex]._id}`, {
                         content: allTextAds[adIndex].content,
                     }, {
                         headers: {
                             Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                         }
-                    });
-                    result = res.data;
+                    })).data;
                 }
                 else {
                     let formData = new FormData();
                     formData.append("adImage", newAdImageFiles[adIndex]);
-                    const res = await axios.put(`${process.env.BASE_API_URL}/ads/update-ad-image/${allImageAds[adIndex]._id}`, formData, {
+                    const result = (await axios.put(`${process.env.BASE_API_URL}/ads/update-ad-image/${allImageAds[adIndex]._id}`, formData, {
                         headers: {
                             Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                         }
-                    });
-                    result = res.data;
+                    })).data;
                 }
                 setWaitMsg("");
                 if (!result.error) {
@@ -158,7 +156,12 @@ export default function UpdateAndDeleteCategories() {
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
-                    setSelectedAdIndex(-1);
+                    setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorMsg("");
+                        setSelectedAdIndex(-1);
+                        clearTimeout(errorTimeout);
+                    }, 1500);
                 }
             }
         }
@@ -182,12 +185,11 @@ export default function UpdateAndDeleteCategories() {
         try {
             setWaitMsg("Please Wait Deleting ...");
             setSelectedAdIndex(adIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/ads/${advertisementType === "text" ? allTextAds[adIndex]._id : allImageAds[adIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/ads/${advertisementType === "text" ? allTextAds[adIndex]._id : allImageAds[adIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            const result = res.data;
+            })).data;
             setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg("Deleting Successfull !!");
@@ -202,11 +204,15 @@ export default function UpdateAndDeleteCategories() {
                     clearTimeout(successTimeout);
                 }, 1500);
             } else {
-                setSelectedAdIndex(-1);
+                setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedAdIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
             }
         }
         catch (err) {
-            console.log(err)
             if (err?.response?.data?.msg === "Unauthorized Error") {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.push("/login");

@@ -1,11 +1,10 @@
 import Head from "next/head";
 import LoaderPage from "@/components/LoaderPage";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import { FaRegSmileWink } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { getAdminInfo, getStoreDetails } from "../../../../../public/global_functions/popular";
+import { getAdminInfo, getStoreDetails, getOrderDetails } from "../../../../../public/global_functions/popular";
 import { useRouter } from "next/router";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { getCurrencyNameByCountry, getUSDPriceAgainstCurrency } from "../../../../../public/global_functions/prices";
@@ -103,15 +102,6 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
             setIsLoadingPage(false);
         }
     }, [isGetOrderDetails]);
-
-    const getOrderDetails = async () => {
-        try {
-            return (await axios.get(`${process.env.BASE_API_URL}/orders/order-details/${orderIdAsProperty}`)).data;
-        }
-        catch (err) {
-            throw Error(err);
-        }
-    }
 
     const handleSelectUserLanguage = (userLanguage) => {
         i18n.changeLanguage(userLanguage);

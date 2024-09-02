@@ -153,6 +153,15 @@ async function getAdminInfo() {
     }
 }
 
+const getOrderDetails = async (orderId) => {
+    try {
+        return (await axios.get(`${process.env.BASE_API_URL}/orders/order-details/${orderId}`)).data;
+    }
+    catch (err) {
+        throw Error(err);
+    }
+}
+
 export {
     getProductsCount,
     getAllProductsInsideThePage,
@@ -168,5 +177,6 @@ export {
     getRemainingTime,
     getDateInUTCFormat,
     calcTotalOrderPriceAfterDiscount,
-    getAdminInfo
+    getAdminInfo,
+    getOrderDetails
 }

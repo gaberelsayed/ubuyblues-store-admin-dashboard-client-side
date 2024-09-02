@@ -20,7 +20,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const [allAdminsInsideThePage, setAllAdminsInsideThePage] = useState([]);
 
-    const [isFilteringAdminsStatus, setIsFilteringAdminsStatus] = useState(false);
+    const [iGetAdmins, setIsGetAdmins] = useState(false);
 
     const [selectedAdminIndex, setSelectedAdminIndex] = useState(-1);
 
@@ -117,26 +117,26 @@ export default function UpdateAndDeleteAdmins() {
     }
 
     const getPreviousPage = async () => {
-        setIsFilteringAdminsStatus(true);
+        setIsGetAdmins(true);
         const newCurrentPage = currentPage - 1;
         setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
-        setIsFilteringAdminsStatus(false);
+        setIsGetAdmins(false);
     }
 
     const getNextPage = async () => {
-        setIsFilteringAdminsStatus(true);
+        setIsGetAdmins(true);
         const newCurrentPage = currentPage + 1;
         setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
-        setIsFilteringAdminsStatus(false);
+        setIsGetAdmins(false);
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsFilteringAdminsStatus(true);
+        setIsGetAdmins(true);
         setAllAdminsInsideThePage((await getAllAdminsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
         setCurrentPage(pageNumber);
-        setIsFilteringAdminsStatus(false);
+        setIsGetAdmins(false);
     }
 
     const getFilteringString = (filters) => {
@@ -152,18 +152,18 @@ export default function UpdateAndDeleteAdmins() {
 
     const filterAdmins = async (filters) => {
         try {
-            setIsFilteringAdminsStatus(true);
+            setIsGetAdmins(true);
             setCurrentPage(1);
             const filteringString = getFilteringString(filters);
             const result = await getAdminsCount(filteringString);
             if (result.data > 0) {
                 setAllAdminsInsideThePage((await getAllAdminsInsideThePage(1, pageSize, filteringString)).data);
                 setTotalPagesCount(Math.ceil(result.data / pageSize));
-                setIsFilteringAdminsStatus(false);
+                setIsGetAdmins(false);
             } else {
                 setAllAdminsInsideThePage([]);
                 setTotalPagesCount(0);
-                setIsFilteringAdminsStatus(false);
+                setIsGetAdmins(false);
             }
         }
         catch (err) {
@@ -172,7 +172,7 @@ export default function UpdateAndDeleteAdmins() {
                 await router.replace("/login");
                 return;
             }
-            setIsFilteringAdminsStatus(false);
+            setIsGetAdmins(false);
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
@@ -230,7 +230,7 @@ export default function UpdateAndDeleteAdmins() {
             setSelectedAdminIndex(adminIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting Updating ...");
-                const res = await axios.put(`${process.env.BASE_API_URL}/admins/update-admin-info/${allAdminsInsideThePage[adminIndex]._id}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/admins/update-admin-info/${allAdminsInsideThePage[adminIndex]._id}`, {
                     firstName: allAdminsInsideThePage[adminIndex].firstName,
                     lastName: allAdminsInsideThePage[adminIndex].lastName,
                     email: allAdminsInsideThePage[adminIndex].email,
@@ -238,8 +238,7 @@ export default function UpdateAndDeleteAdmins() {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 if (!result.error) {
                     setWaitMsg("");
                     setSuccessMsg("Updating Successfull !!");
@@ -249,7 +248,12 @@ export default function UpdateAndDeleteAdmins() {
                         clearTimeout(successTimeout);
                     }, 3000);
                 } else {
-                    setSelectedAdminIndex(-1);
+                    setErrorMsg("");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorMsg("");
+                        setSelectedAdminIndex(-1);
+                        clearTimeout(errorTimeout);
+                    }, 3000);
                 }
             }
         }
@@ -284,14 +288,14 @@ export default function UpdateAndDeleteAdmins() {
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedAdminIndex(-1);
-                    setIsFilteringAdminsStatus(true);
+                    setIsGetAdmins(true);
                     result = await getAdminsCount();
                     if (result.data > 0) {
                         setAllAdminsInsideThePage((await getAllAdminsInsideThePage(currentPage, pageSize)).data);
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
                     }
                     setCurrentPage(1);
-                    setIsFilteringAdminsStatus(false);
+                    setIsGetAdmins(false);
                     clearTimeout(successTimeout);
                 }, 3000);
             } else {
@@ -373,20 +377,20 @@ export default function UpdateAndDeleteAdmins() {
                                     />
                                 </div>
                             </div>
-                            {!isFilteringAdminsStatus && <button
+                            {!iGetAdmins && <button
                                 className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                                 onClick={() => filterAdmins(filters)}
                             >
                                 Filter
                             </button>}
-                            {isFilteringAdminsStatus && <button
+                            {iGetAdmins && <button
                                 className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                                 disabled
                             >
                                 Filtering ...
                             </button>}
                         </section>
-                        {allAdminsInsideThePage.length > 0 && !isFilteringAdminsStatus && <section className="admins-data-box p-3 data-box admin-dashbboard-data-box">
+                        {allAdminsInsideThePage.length > 0 && !iGetAdmins && <section className="admins-data-box p-3 data-box admin-dashbboard-data-box">
                             <table className="admins-data-table mb-4 managment-table bg-white admin-dashbboard-data-table">
                                 <thead>
                                     <tr>
@@ -489,11 +493,11 @@ export default function UpdateAndDeleteAdmins() {
                                 </tbody>
                             </table>
                         </section>}
-                        {allAdminsInsideThePage.length === 0 && !isFilteringAdminsStatus && <p className="alert alert-danger">Sorry, Can't Find Any Stores !!</p>}
-                        {isFilteringAdminsStatus && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
+                        {allAdminsInsideThePage.length === 0 && !iGetAdmins && <p className="alert alert-danger">Sorry, Can't Find Any Stores !!</p>}
+                        {iGetAdmins && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
                             <span className="loader-table-data"></span>
                         </div>}
-                        {totalPagesCount > 1 && !isFilteringAdminsStatus &&
+                        {totalPagesCount > 1 && !iGetAdmins &&
                             <PaginationBar
                                 totalPagesCount={totalPagesCount}
                                 currentPage={currentPage}

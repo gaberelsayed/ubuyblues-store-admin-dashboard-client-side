@@ -20,7 +20,7 @@ export default function AddNewCategory() {
 
     const [categoryName, setCategoryName] = useState("");
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -79,17 +79,16 @@ export default function AddNewCategory() {
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setIsWaitStatus(true);
-                const res = await axios.post(`${process.env.BASE_API_URL}/categories/add-new-category`, {
+                setWaitMsg("Please Waiting To Add New Category ...");
+                const result = (await axios.post(`${process.env.BASE_API_URL}/categories/add-new-category`, {
                     categoryName,
                     storeId: adminInfo.storeId,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
-                setIsWaitStatus(false);
+                })).data;
+                setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
@@ -113,7 +112,7 @@ export default function AddNewCategory() {
                 await router.replace("/login");
                 return;
             }
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
@@ -148,18 +147,18 @@ export default function AddNewCategory() {
                                 <span>{formValidationErrors["categoryName"]}</span>
                             </p>}
                         </section>
-                        {!isWaitStatus && !successMsg && !errorMsg && <button
+                        {!waitMsg && !successMsg && !errorMsg && <button
                             type="submit"
                             className="btn btn-success w-50 d-block mx-auto p-2 global-button"
                         >
                             Add Now
                         </button>}
-                        {isWaitStatus && <button
+                        {waitMsg && <button
                             type="button"
                             className="btn btn-danger w-50 d-block mx-auto p-2 global-button"
                             disabled
                         >
-                            Waiting Add New Category ...
+                            {waitMsg}
                         </button>}
                         {errorMsg && <button
                             type="button"

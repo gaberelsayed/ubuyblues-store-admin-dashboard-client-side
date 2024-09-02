@@ -33,7 +33,7 @@ export default function ChangeBussinessEmailPassword() {
 
     const [isVisibleConfirmNewPassword, setIsVisibleConfirmNewPassword] = useState(false);
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -132,14 +132,13 @@ export default function ChangeBussinessEmailPassword() {
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setIsWaitStatus(true);
-                const res = await axios.put(`${process.env.BASE_API_URL}/global-passwords/change-bussiness-email-password?email=${email}&password=${currentPassword}&newPassword=${newPassword}`, undefined, {
+                setWaitMsg("Please Waiting To Change ...");
+                const result = (await axios.put(`${process.env.BASE_API_URL}/global-passwords/change-bussiness-email-password?email=${email}&password=${currentPassword}&newPassword=${newPassword}`, undefined, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     },
-                });
-                const result = res.data;
-                setIsWaitStatus(false);
+                })).data;
+                setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
@@ -165,7 +164,7 @@ export default function ChangeBussinessEmailPassword() {
                 await router.replace("/login");
                 return;
             }
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
@@ -257,18 +256,18 @@ export default function ChangeBussinessEmailPassword() {
                                 <span>{formValidationErrors.confirmNewPassword}</span>
                             </p>}
                         </section>
-                        {!isWaitStatus && !successMsg && !errorMsg && <button
+                        {!waitMsg && !successMsg && !errorMsg && <button
                             type="submit"
                             className="btn btn-success w-50 d-block mx-auto p-2 global-button"
                         >
                             Change Now
                         </button>}
-                        {isWaitStatus && <button
+                        {waitMsg && <button
                             type="button"
                             className="btn btn-danger w-50 d-block mx-auto p-2 global-button"
                             disabled
                         >
-                            Wait Changing ...
+                            {waitMsg}
                         </button>}
                         {errorMsg && <button
                             type="button"

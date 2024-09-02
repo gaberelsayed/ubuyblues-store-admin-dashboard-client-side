@@ -209,7 +209,7 @@ export default function StoresManagment() {
             setSelectedStoreIndex(storeIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setIsUpdatingStatus(true);
-                const res = await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${allStoresInsideThePage[storeIndex]._id}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${allStoresInsideThePage[storeIndex]._id}`, {
                     name: allStoresInsideThePage[storeIndex].name,
                     ownerEmail: allStoresInsideThePage[storeIndex].ownerEmail,
                     productsType: allStoresInsideThePage[storeIndex].productsType,
@@ -217,8 +217,7 @@ export default function StoresManagment() {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 if (!result.error) {
                     setIsUpdatingStatus(false);
                     setIsSuccessStatus(true);
@@ -226,6 +225,13 @@ export default function StoresManagment() {
                         setIsSuccessStatus(false);
                         setSelectedStoreIndex(-1);
                         clearTimeout(successTimeout);
+                    }, 3000);
+                } else {
+                    setIsErrorStatus(true);
+                    let errorTimeout = setTimeout(() => {
+                        setIsErrorStatus(false);
+                        setSelectedStoreIndex(-1);
+                        clearTimeout(errorTimeout);
                     }, 3000);
                 }
             }
@@ -250,12 +256,11 @@ export default function StoresManagment() {
         try {
             setIsDeletingStatus(true);
             setSelectedStoreIndex(storeIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/stores/delete-store/${allStoresInsideThePage[storeIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/stores/delete-store/${allStoresInsideThePage[storeIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            let result = res.data;
+            })).data;
             setIsDeletingStatus(false);
             if (!result.error) {
                 setIsSuccessStatus(true);
@@ -271,6 +276,13 @@ export default function StoresManagment() {
                     setCurrentPage(1);
                     setIsFilteringStoresStatus(false);
                     clearTimeout(successTimeout);
+                }, 3000);
+            } else {
+                setIsErrorStatus(true);
+                let errorTimeout = setTimeout(() => {
+                    setIsErrorStatus(false);
+                    setSelectedStoreIndex(-1);
+                    clearTimeout(errorTimeout);
                 }, 3000);
             }
         }

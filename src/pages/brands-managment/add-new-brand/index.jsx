@@ -101,12 +101,11 @@ export default function AddNewBrand() {
                 formData.append("brandImg", brandImage);
                 formData.append("title", brandTitle);
                 formData.append("storeId", adminInfo.storeId);
-                const res = await axios.post(`${process.env.BASE_API_URL}/brands/add-new-brand`, formData, {
+                const result =( await axios.post(`${process.env.BASE_API_URL}/brands/add-new-brand`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg(result.msg);

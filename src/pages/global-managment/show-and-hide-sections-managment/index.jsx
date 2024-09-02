@@ -18,11 +18,11 @@ export default function ShowAndHideSections() {
 
     const [allSections, setAllSections] = useState();
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
-    const [errorMsg, setErrorMsg] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
-    const [successMsg, setSuccessMsg] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
 
     const router = useRouter();
 
@@ -68,16 +68,15 @@ export default function ShowAndHideSections() {
 
     const changeSectionsStatus = async () => {
         try {
-            setIsWaitStatus(true);
-            const res = await axios.put(`${process.env.BASE_API_URL}/appeared-sections/update-sections-status`, {
+            setWaitMsg("Please Wait To Change ...");
+            const result = (await axios.put(`${process.env.BASE_API_URL}/appeared-sections/update-sections-status`, {
                 sectionsStatus: allSections.map((section) => ({ _id: section._id, isAppeared: section.isAppeared })),
             }, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            const result = res.data;
-            setIsWaitStatus(false);
+            })).data;
+            setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg(result.msg);
                 let successTimeout = setTimeout(() => {
@@ -92,7 +91,7 @@ export default function ShowAndHideSections() {
                 await router.replace("/login");
                 return;
             }
-            setIsWaitStatus(false);
+            setWaitMsg("");
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
@@ -145,16 +144,16 @@ export default function ShowAndHideSections() {
                                 ))}
                                 <tr>
                                     <td colSpan={2}>
-                                        {!isWaitStatus && !errorMsg && !successMsg &&
+                                        {!waitMsg && !errorMsg && !successMsg &&
                                             <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 onClick={() => changeSectionsStatus()}
                                             >Change Sections Status</button>
                                         }
-                                        {isWaitStatus && <button
+                                        {waitMsg && <button
                                             className="btn btn-warning d-block mx-auto global-button"
                                             disabled
-                                        >Please Waiting</button>}
+                                        >{waitMsg}</button>}
                                         {successMsg && <button
                                             className="btn btn-success d-block mx-auto global-button"
                                             disabled

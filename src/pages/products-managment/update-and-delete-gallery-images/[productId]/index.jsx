@@ -113,12 +113,11 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                 setWaitMsg("Please Waiting Updating ...");
                 let formData = new FormData();
                 formData.append("productGalleryImage", newProductGalleryImageFiles[imageIndex]);
-                const res = await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${productIdAsProperty}?oldGalleryImagePath=${allGalleryImages[imageIndex]}`, formData, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${productIdAsProperty}?oldGalleryImagePath=${allGalleryImages[imageIndex]}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
-                });
-                const result = res.data;
+                })).data;
                 setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg("Change Image Successfull !!");
@@ -129,7 +128,12 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
-                    setSelectedGalleryImageIndex(-1);
+                    setErrorMsg("Sorry, Someting Went Wrong When Updating, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorMsg("");
+                        setSelectedGalleryImageIndex(-1);
+                        clearTimeout(errorTimeout);
+                    }, 1500);
                 }
             }
         }
@@ -153,12 +157,11 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
         try {
             setWaitMsg("Please Waiting Deleting ...");
             setSelectedGalleryImageIndex(imageIndex);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/products/gallery-images/${productIdAsProperty}?galleryImagePath=${allGalleryImages[imageIndex]}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/products/gallery-images/${productIdAsProperty}?galleryImagePath=${allGalleryImages[imageIndex]}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            const result = res.data;
+            })).data;
             setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg("Deleting Successfull !!");

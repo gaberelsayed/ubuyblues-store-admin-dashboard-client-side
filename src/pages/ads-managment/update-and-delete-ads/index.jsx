@@ -231,7 +231,7 @@ export default function UpdateAndDeleteCategories() {
     return (
         <div className="update-and-delete-ads admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Update / Delete Ads</title>
+                <title>{process.env.storeName} Admin Dashboard - Update / Delete Ads</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

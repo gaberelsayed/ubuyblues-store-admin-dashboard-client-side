@@ -159,7 +159,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
     return (
         <div className="order-details admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Order Details</title>
+                <title>{process.env.storeName} Admin Dashboard - Order Details</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 {/* Start Admin Dashboard Side Bar */}

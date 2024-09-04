@@ -319,7 +319,7 @@ export default function OrdersManagment() {
     return (
         <div className="orders-managment admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Orders Managment</title>
+                <title>{process.env.storeName} Admin Dashboard - Orders Managment</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 {/* Start Admin Dashboard Side Bar */}

@@ -116,7 +116,7 @@ export default function AdminLogin() {
     return (
         <div className="admin-login d-flex flex-column justify-content-center">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Login</title>
+                <title>{process.env.storeName} Admin Dashboard - Login</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <div className="page-content text-center p-4">
                 <div className="container p-4">

@@ -147,7 +147,7 @@ export default function AddNewCoupon() {
     return (
         <div className="add-new-coupon admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Add New Coupon</title>
+                <title>{process.env.storeName} Admin Dashboard - Add New Coupon</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

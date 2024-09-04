@@ -144,7 +144,7 @@ export default function AddNewBrand() {
     return (
         <div className="add-new-brand admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Add New Brand</title>
+                <title>{process.env.storeName} Admin Dashboard - Add New Brand</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

@@ -310,7 +310,7 @@ export default function UpdateAndDeleteBrands() {
     return (
         <div className="update-and-delete-brands admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Update / Delete Brands</title>
+                <title>{process.env.storeName} Admin Dashboard - Update / Delete Brands</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

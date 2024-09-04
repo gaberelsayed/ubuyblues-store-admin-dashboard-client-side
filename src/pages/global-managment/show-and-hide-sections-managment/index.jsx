@@ -103,7 +103,7 @@ export default function ShowAndHideSections() {
     return (
         <div className="show-and-hide-sections admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Show And Hide Sections</title>
+                <title>{process.env.storeName} Admin Dashboard - Show And Hide Sections</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

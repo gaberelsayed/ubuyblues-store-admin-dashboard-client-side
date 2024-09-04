@@ -132,7 +132,7 @@ export default function AddNewProductGalleryImage({ productIdAsProperty }) {
     return (
         <div className="add-new-gallery-images admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Add New Product Gallery Images</title>
+                <title>{process.env.storeName} Admin Dashboard - Add New Product Gallery Images</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

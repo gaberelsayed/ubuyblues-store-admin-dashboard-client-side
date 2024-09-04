@@ -219,7 +219,7 @@ export default function UsersManagment() {
     return (
         <div className="users-managment admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Users Managment</title>
+                <title>{process.env.storeName} Admin Dashboard - Users Managment</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

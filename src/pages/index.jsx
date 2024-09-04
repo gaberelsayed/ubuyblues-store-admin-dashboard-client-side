@@ -46,7 +46,7 @@ export default function Home() {
     return (
         <div className="main admin-dashboard">
             <Head>
-                <title>Ubuyblues Store - Admin Dashboard</title>
+                <title>{process.env.storeName} - Admin Dashboard</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

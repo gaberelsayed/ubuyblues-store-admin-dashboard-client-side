@@ -2,7 +2,6 @@ import Head from "next/head";
 import { PiHandWavingThin } from "react-icons/pi";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { GrFormClose } from "react-icons/gr";
 import LoaderPage from "@/components/LoaderPage";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
@@ -441,9 +440,9 @@ export default function UpdateAndDeleteProducts() {
     }
 
     return (
-        <div className="update-and-delete-product admin-dashboard">
+        <div className="update-and-delete-products admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Update / Delete Products</title>
+                <title>{process.env.storeName} Admin Dashboard - Update / Delete Products</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

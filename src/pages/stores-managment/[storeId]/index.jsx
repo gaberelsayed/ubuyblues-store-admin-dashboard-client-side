@@ -247,7 +247,7 @@ export default function StoreDetails({ storeId }) {
     return (
         <div className="store-details admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Store Details</title>
+                <title>{process.env.storeName} Admin Dashboard - Store Details</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 {/* Start Admin Dashboard Side Bar */}

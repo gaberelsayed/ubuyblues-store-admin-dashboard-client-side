@@ -6,7 +6,6 @@ import LoaderPage from "@/components/LoaderPage";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { useRouter } from "next/router";
-import PaginationBar from "@/components/PaginationBar";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { inputValuesValidation } from "../../../../../public/global_functions/validations";
 import { getAdminInfo } from "../../../../../public/global_functions/popular";
@@ -192,7 +191,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
     return (
         <div className="update-and-delete-product-gallery-images admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Update / Delete Product Gallery Images</title>
+                <title>{process.env.storeName} Admin Dashboard - Update / Delete Product Gallery Images</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

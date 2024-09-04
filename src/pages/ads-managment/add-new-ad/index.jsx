@@ -161,7 +161,7 @@ export default function AddNewAd() {
     return (
         <div className="add-new-ad admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Add New Advertisement</title>
+                <title>{process.env.storeName} Admin Dashboard - Add New Advertisement</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

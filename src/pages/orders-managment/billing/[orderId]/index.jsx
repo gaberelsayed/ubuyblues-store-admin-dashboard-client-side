@@ -127,7 +127,7 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
     return (
         <div className="billing admin-dashboard page">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Billing</title>
+                <title>{process.env.storeName} Admin Dashboard - Billing</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

@@ -176,7 +176,7 @@ export default function ChangeBussinessEmailPassword() {
     return (
         <div className="change-bussiness-email-password admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Change Bussiness Email Password</title>
+                <title>{process.env.storeName} Admin Dashboard - Change Bussiness Email Password</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

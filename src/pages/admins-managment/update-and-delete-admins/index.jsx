@@ -326,7 +326,7 @@ export default function UpdateAndDeleteAdmins() {
     return (
         <div className="admins-managment admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Admins Managment</title>
+                <title>{process.env.storeName} Admin Dashboard - Admins Managment</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 {/* Start Admin Dashboard Side Bar */}

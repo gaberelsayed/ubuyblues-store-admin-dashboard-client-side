@@ -173,7 +173,7 @@ export default function AddNewAdmin() {
     return (
         <div className="add-new-admin admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Add New Admin</title>
+                <title>{process.env.storeName} Admin Dashboard - Add New Admin</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

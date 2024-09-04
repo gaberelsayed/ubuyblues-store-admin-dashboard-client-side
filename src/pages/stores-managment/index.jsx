@@ -352,7 +352,7 @@ export default function StoresManagment() {
     return (
         <div className="stores-managment admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Stores Managment</title>
+                <title>{process.env.storeName} Admin Dashboard - Stores Managment</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 {/* Start Admin Dashboard Side Bar */}

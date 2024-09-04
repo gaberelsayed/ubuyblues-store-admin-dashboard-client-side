@@ -124,7 +124,7 @@ export default function AddNewCategory() {
     return (
         <div className="add-new-cateogry admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Add New Category</title>
+                <title>{process.env.storeName} Admin Dashboard - Add New Category</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

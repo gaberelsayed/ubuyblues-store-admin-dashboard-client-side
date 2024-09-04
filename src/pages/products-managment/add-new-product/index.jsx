@@ -270,7 +270,7 @@ export default function AddNewProduct() {
     return (
         <div className="add-new-product admin-dashboard">
             <Head>
-                <title>Ubuyblues Store Admin Dashboard - Add New Product</title>
+                <title>{process.env.storeName} Admin Dashboard - Add New Product</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />

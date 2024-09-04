@@ -6,7 +6,6 @@ import LoaderPage from "@/components/LoaderPage";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { useRouter } from "next/router";
-import PaginationBar from "@/components/PaginationBar";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { getAdminInfo, getCategoriesCount, getAllCategoriesInsideThePage } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
@@ -19,31 +18,19 @@ export default function UpdateAndDeleteCoupons() {
 
     const [adminInfo, setAdminInfo] = useState({});
 
-    const [isGetCategories, setIsGetCategories] = useState(false);
-
-    const [allCategoriesInsideThePage, setAllCategoriesInsideThePage] = useState([]);
+    const [allCoupons, setAllCoupons] = useState([]);
 
     const [waitMsg, setWaitMsg] = useState(false);
 
-    const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(-1);
+    const [selectedCouponIndex, setSelectedCouponIndex] = useState(-1);
 
     const [errorMsg, setErrorMsg] = useState(false);
 
     const [successMsg, setSuccessMsg] = useState(false);
 
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const [totalPagesCount, setTotalPagesCount] = useState(0);
-
-    const [filters, setFilters] = useState({
-        storeId: "",
-    });
-
     const [formValidationErrors, setFormValidationErrors] = useState({});
 
     const router = useRouter();
-
-    const pageSize = 10;
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
@@ -61,14 +48,7 @@ export default function UpdateAndDeleteCoupons() {
                         }
                         else {
                             setAdminInfo(adminDetails);
-                            const tempFilters = { ...filters, storeId: adminDetails.storeId };
-                            setFilters(tempFilters);
-                            const filtersAsQuery = getFiltersAsQuery(tempFilters);
-                            result = await getCategoriesCount(filtersAsQuery);
-                            if (result.data > 0) {
-                                setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize, filtersAsQuery)).data);
-                                setTotalPagesCount(Math.ceil(result.data / pageSize));
-                            }
+                            setAllCoupons((await getAllCoupons()).data);
                             setIsLoadingPage(false);
                         }
                     }
@@ -86,63 +66,52 @@ export default function UpdateAndDeleteCoupons() {
         } else router.replace("/login");
     }, []);
 
-    const getFiltersAsQuery = (filters) => {
-        let filteringString = "";
-        if (filters.storeId) filteringString += `storeId=${filters.storeId}&`;
-        if (filteringString) filteringString = filteringString.substring(0, filteringString.length - 1);
-        return filteringString;
+    const getAllCoupons = async () => {
+        return (await axios.get(`${process.env.BASE_API_URL}/coupons/all-coupons`, {
+            headers: {
+                Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
+            }
+        })).data;
     }
 
-    const getPreviousPage = async () => {
-        setIsGetCategories(true);
-        const newCurrentPage = currentPage - 1;
-        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetCategories(false);
+    const changeCouponDiscountPercentage = (couponIndex, newValue) => {
+        setSelectedCouponIndex(-1);
+        let couponsTemp = allCoupons;
+        couponsTemp[couponIndex].discountPercentage = newValue;
+        setAllCoupons(couponsTemp);
     }
 
-    const getNextPage = async () => {
-        setIsGetCategories(true);
-        const newCurrentPage = currentPage + 1;
-        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetCategories(false);
-    }
-
-    const getSpecificPage = async (pageNumber) => {
-        setIsGetCategories(true);
-        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(pageNumber, pageSize)).data);
-        setCurrentPage(pageNumber);
-        setIsGetCategories(false);
-    }
-
-    const changeCategoryName = (categoryIndex, newValue) => {
-        setSelectedCategoryIndex(-1);
-        let categoriesTemp = allCategoriesInsideThePage;
-        categoriesTemp[categoryIndex].name = newValue;
-        setAllCategoriesInsideThePage(categoriesTemp);
-    }
-
-    const updateCategory = async (categoryIndex) => {
+    const updateCoupon = async (couponIndex) => {
         try {
             setFormValidationErrors({});
             const errorsObject = inputValuesValidation([
                 {
-                    name: "categoryName",
-                    value: allCategoriesInsideThePage[categoryIndex].name,
+                    name: "discountPercentage",
+                    value: allCoupons[couponIndex].discountPercentage,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
                         },
+                        isNumber: {
+                            msg: "Sorry, This Field Must Be Number !!",
+                        },
+                        minNumber: {
+                            value: 0.1,
+                            msg: "Sorry, Minimum Value Can't Be Less Than 0.1 !!",
+                        },
+                        maxNumber: {
+                            value: 100,
+                            msg: "Sorry, Minimum Value Can't Be Greater Than 100 !!",
+                        }
                     },
                 },
             ]);
             setFormValidationErrors(errorsObject);
-            setSelectedCategoryIndex(categoryIndex);
+            setSelectedCouponIndex(couponIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting Updating ...");
-                const result = (await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
-                    newCategoryName: allCategoriesInsideThePage[categoryIndex].name,
+                const result = (await axios.put(`${process.env.BASE_API_URL}/coupons/update-coupon-info/${allCoupons[couponIndex]._id}`, {
+                    discountPercentage: Number(allCoupons[couponIndex].discountPercentage),
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -153,14 +122,14 @@ export default function UpdateAndDeleteCoupons() {
                     setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
-                        setSelectedCategoryIndex(-1);
+                        setSelectedCouponIndex(-1);
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
                     setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
                     let errorTimeout = setTimeout(() => {
                         setErrorMsg("");
-                        setSelectedCategoryIndex(-1);
+                        setSelectedCouponIndex(-1);
                         clearTimeout(errorTimeout);
                     }, 1500);
                 }
@@ -176,17 +145,17 @@ export default function UpdateAndDeleteCoupons() {
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
-                setSelectedCategoryIndex(-1);
+                setSelectedCouponIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
     }
 
-    const deleteCategory = async (categoryIndex) => {
+    const deleteCoupon = async (couponIndex) => {
         try {
             setWaitMsg("Please Waiting Deleting ...");
-            setSelectedCategoryIndex(categoryIndex);
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
+            setSelectedCouponIndex(couponIndex);
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/coupons/${allCoupons[couponIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
@@ -196,15 +165,15 @@ export default function UpdateAndDeleteCoupons() {
                 setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
-                    setSelectedCategoryIndex(-1);
-                    setAllCategoriesInsideThePage(allCategoriesInsideThePage.filter((category, index) => index !== categoryIndex));
+                    setSelectedCouponIndex(-1);
+                    setAllCoupons(allCoupons.filter((coupon, index) => index !== couponIndex));
                     clearTimeout(successTimeout);
                 }, 1500);
             } else {
                 setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
                 let errorTimeout = setTimeout(() => {
                     setErrorMsg("");
-                    setSelectedCategoryIndex(-1);
+                    setSelectedCouponIndex(-1);
                     clearTimeout(errorTimeout);
                 }, 1500);
             }
@@ -219,70 +188,74 @@ export default function UpdateAndDeleteCoupons() {
             setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
             let errorTimeout = setTimeout(() => {
                 setErrorMsg("");
-                setSelectedCategoryIndex(-1);
+                setSelectedCouponIndex(-1);
                 clearTimeout(errorTimeout);
             }, 1500);
         }
     }
 
     return (
-        <div className="update-and-delete-categories admin-dashboard">
+        <div className="update-and-delete-coupons admin-dashboard">
             <Head>
-                <title>{process.env.storeName} Admin Dashboard - Update / Delete Categories</title>
+                <title>{process.env.storeName} Admin Dashboard - Update / Delete Coupons</title>
             </Head>
             {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-5">
                     <h1 className="fw-bold w-fit pb-2 mb-4">
                         <PiHandWavingThin className="me-2" />
-                        Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Categories Page
+                        Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Update / Delete Coupons Page
                     </h1>
-                    {allCategoriesInsideThePage.length > 0 && !isGetCategories && <section className="categories-box w-100">
+                    {allCoupons.length > 0 && <section className="coupons-box w-100">
                         <table className="users-table mb-4 managment-table bg-white w-100">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
+                                    <th>Code</th>
+                                    <th>Discount Percentage</th>
                                     <th>Process</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {allCategoriesInsideThePage.map((category, categoryIndex) => (
-                                    <tr key={category._id}>
-                                        <td className="category-name-cell">
-                                            <section className="category-name mb-4">
+                                {allCoupons.map((coupon, couponIndex) => (
+                                    <tr key={coupon._id}>
+                                        <td className="code-cell">
+                                            {coupon.code}
+                                        </td>
+                                        <td className="discount-percentage-cell">
+                                            <section className="discount-percentage mb-4">
                                                 <input
                                                     type="text"
-                                                    className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["categoryName"] && categoryIndex === selectedCategoryIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    defaultValue={category.name}
-                                                    onChange={(e) => changeCategoryName(categoryIndex, e.target.value.trim())}
+                                                    className={`form-control d-block mx-auto p-2 border-2 discount-percentage-field ${formValidationErrors["discountPercentage"] && couponIndex === selectedCouponIndex ? "border-danger mb-3" : "mb-4"}`}
+                                                    defaultValue={coupon.discountPercentage}
+                                                    onChange={(e) => changeCouponDiscountPercentage(couponIndex, e.target.value.trim())}
                                                 ></input>
-                                                {formValidationErrors["categoryName"] && categoryIndex === selectedCategoryIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                {formValidationErrors["discountPercentage"] && couponIndex === selectedCouponIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                                    <span>{formValidationErrors["categoryName"]}</span>
+                                                    <span>{formValidationErrors["discountPercentage"]}</span>
                                                 </p>}
                                             </section>
                                         </td>
                                         <td className="update-cell">
-                                            {selectedCategoryIndex !== categoryIndex && <>
+                                            {selectedCouponIndex !== couponIndex && <>
                                                 <button
                                                     className="btn btn-success d-block mb-3 mx-auto global-button"
-                                                    onClick={() => updateCategory(categoryIndex)}
+                                                    onClick={() => updateCoupon(couponIndex)}
                                                 >Update</button>
                                                 <hr />
                                                 <button
                                                     className="btn btn-danger global-button"
-                                                    onClick={() => deleteCategory(categoryIndex)}
+                                                    onClick={() => deleteCoupon(couponIndex)}
                                                 >Delete</button>
                                             </>}
-                                            {waitMsg && selectedCategoryIndex === categoryIndex && <button
+                                            {waitMsg && selectedCouponIndex === couponIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
-                                            {successMsg && selectedCategoryIndex === categoryIndex && <button
+                                            {successMsg && selectedCouponIndex === couponIndex && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
                                             >{successMsg}</button>}
-                                            {errorMsg && selectedCategoryIndex === categoryIndex && <button
+                                            {errorMsg && selectedCouponIndex === couponIndex && <button
                                                 className="btn btn-danger d-block mx-auto global-button"
                                                 disabled
                                             >{errorMsg}</button>}
@@ -292,19 +265,7 @@ export default function UpdateAndDeleteCoupons() {
                             </tbody>
                         </table>
                     </section>}
-                    {allCategoriesInsideThePage.length === 0 && !isGetCategories && <p className="alert alert-danger w-100">Sorry, Can't Find Any Categories !!</p>}
-                    {isGetCategories && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                        <span className="loader-table-data"></span>
-                    </div>}
-                    {totalPagesCount > 1 && !isGetCategories &&
-                        <PaginationBar
-                            totalPagesCount={totalPagesCount}
-                            currentPage={currentPage}
-                            getPreviousPage={getPreviousPage}
-                            getNextPage={getNextPage}
-                            getSpecificPage={getSpecificPage}
-                        />
-                    }
+                    {allCoupons.length === 0 && <p className="alert alert-danger w-100">Sorry, Can't Find Any Coupons !!</p>}
                 </div>
             </>}
             {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}

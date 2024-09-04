@@ -97,6 +97,13 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
                                     <NavDropdown.Item onClick={() => handleChangeLanguage("de")}>German</NavDropdown.Item>
                                 </NavDropdown>
                             </>}
+                            <NavDropdown title="Coupons" id="categories-nav-dropdown">
+                                <NavDropdown.Item href="/coupons-managment/add-new-coupon" as={Link}>Add New</NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item href="/coupons-managment/update-and-delete-coupons" as={Link}>
+                                    Update / Delete
+                                </NavDropdown.Item>
+                            </NavDropdown>
                             {isWebsiteOwner && <>
                                 <Nav.Link href="/users-managment" as={Link}>Users</Nav.Link> 
                                 <NavDropdown title="Stores" id="stores-nav-dropdown">

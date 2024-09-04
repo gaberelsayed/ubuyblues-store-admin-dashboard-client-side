@@ -9,6 +9,7 @@ import { HiOutlineBellAlert } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { getAdminInfo } from "../../../../public/global_functions/popular";
+import CodeGenerator from "node-code-generator";
 
 export default function AddNewCoupon() {
 
@@ -20,6 +21,7 @@ export default function AddNewCoupon() {
 
     const [couponDetails, setCouponDetails] = useState({
         code: "",
+        discountPercentage: 0.1,
     });
 
     const [waitMsg, setWaitMsg] = useState(false);
@@ -31,6 +33,8 @@ export default function AddNewCoupon() {
     const [formValidationErrors, setFormValidationErrors] = useState({});
 
     const router = useRouter();
+
+    const generator = new CodeGenerator();
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
@@ -64,6 +68,10 @@ export default function AddNewCoupon() {
         } else router.replace("/login");
     }, []);
 
+    const generateCode = () => {
+        setCouponDetails({ ...couponDetails, code: generator.generateCodes("#*#**##*")[0] });
+    }
+
     const addNewCoupon = async (e) => {
         try {
             e.preventDefault();
@@ -78,11 +86,28 @@ export default function AddNewCoupon() {
                         },
                     },
                 },
+                {
+                    name: "discountPercentage",
+                    value: couponDetails.discountPercentage,
+                    rules: {
+                        isRequired: {
+                            msg: "Sorry, This Field Can't Be Empty !!",
+                        },
+                        minNumber: {
+                            value: 0.1,
+                            msg: "Sorry, Minimum Value Can't Be Less Than 0.1 !!",
+                        },
+                        maxNumber: {
+                            value: 100,
+                            msg: "Sorry, Minimum Value Can't Be Greater Than 100 !!",
+                        }
+                    },
+                },
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting To Add New Coupon ...");
-                const result = (await axios.post(`${process.env.BASE_API_URL}/coupons/add-new-coupon`, couponDetails ,{
+                const result = (await axios.post(`${process.env.BASE_API_URL}/coupons/add-new-coupon`, couponDetails, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
@@ -130,20 +155,46 @@ export default function AddNewCoupon() {
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-4">
                     <h1 className="fw-bold w-fit pb-2 mb-3">
                         <PiHandWavingThin className="me-2" />
-                        Hi, Mr { adminInfo.firstName + " " + adminInfo.lastName } In Your Add New Coupon Page
+                        Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Add New Coupon Page
                     </h1>
                     <form className="add-new-coupon-form admin-dashbboard-form" onSubmit={addNewCoupon}>
-                        <section className="code mb-4">
+                        <section className="code mb-4 row">
+                            <div className="col-md-8">
+                                <input
+                                    type="text"
+                                    className={`form-control p-2 border-2 code-field ${formValidationErrors["code"] ? "border-danger mb-3" : "mb-4"}`}
+                                    placeholder="Please Enter Code"
+                                    onChange={(e) => setCouponDetails({ ...couponDetails, code: e.target.value })}
+                                    value={couponDetails.code}
+                                    disabled
+                                />
+                                {formValidationErrors["code"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                    <span>{formValidationErrors["code"]}</span>
+                                </p>}
+                            </div>
+                            <div className="col-md-4">
+                                <button
+                                    type="button"
+                                    className="btn btn-success w-100 p-2 global-button"
+                                    onClick={generateCode}
+                                >
+                                    Generate
+                                </button>
+                            </div>
+                        </section>
+                        <section className="discount-percentage mb-4">
+                            <h6 className="mb-3 fw-bold">Please Enter Percentage Discount</h6>
                             <input
-                                type="text"
-                                className={`form-control p-2 border-2 code-field ${formValidationErrors["code"] ? "border-danger mb-3" : "mb-4"}`}
-                                placeholder="Please Enter Code"
-                                onChange={(e) => setCouponDetails({ ...couponDetails, code: e.target.value })}
-                                value={couponDetails.code}
+                                type="number"
+                                className={`form-control p-2 border-2 discount-percentage-field ${formValidationErrors["discountPercentage"] ? "border-danger mb-3" : "mb-4"}`}
+                                placeholder="Please Enter Discount Percentage"
+                                onChange={(e) => setCouponDetails({ ...couponDetails, discountPercentage: e.target.value })}
+                                value={couponDetails.discountPercentage}
                             />
-                            {formValidationErrors["code"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                            {formValidationErrors["discountPercentage"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                <span>{formValidationErrors["code"]}</span>
+                                <span>{formValidationErrors["discountPercentage"]}</span>
                             </p>}
                         </section>
                         {!waitMsg && !successMsg && !errorMsg && <button

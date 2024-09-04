@@ -69,7 +69,7 @@ export default function AddNewCoupon() {
     }, []);
 
     const generateCode = () => {
-        setCouponDetails({ ...couponDetails, code: generator.generateCodes("#*#**##*")[0] });
+        setCouponDetails({ ...couponDetails, code: generator.generateCodes("****")[0] });
     }
 
     const addNewCoupon = async (e) => {
@@ -188,7 +188,7 @@ export default function AddNewCoupon() {
                                 type="number"
                                 className={`form-control p-2 border-2 discount-percentage-field ${formValidationErrors["discountPercentage"] ? "border-danger mb-3" : "mb-4"}`}
                                 placeholder="Please Enter Discount Percentage"
-                                onChange={(e) => setCouponDetails({ ...couponDetails, discountPercentage: e.target.value })}
+                                onChange={(e) => setCouponDetails({ ...couponDetails, discountPercentage: e.target.valueAsNumber })}
                                 value={couponDetails.discountPercentage}
                             />
                             {formValidationErrors["discountPercentage"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">

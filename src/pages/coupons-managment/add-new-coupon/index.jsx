@@ -117,14 +117,13 @@ export default function AddNewCoupon() {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
-                        setCategoryName("");
+                        setCouponDetails({ code: "", discountPercentage: 0.1 });
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
                     setErrorMsg(result.msg);
                     let errorTimeout = setTimeout(() => {
                         setErrorMsg("");
-                        setCategoryName("");
                         clearTimeout(errorTimeout);
                     }, 1500);
                 }

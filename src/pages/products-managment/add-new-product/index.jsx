@@ -215,7 +215,6 @@ export default function AddNewProduct() {
                 for(let galleryImage of productData.galleryImages) {
                     formData.append("galleryImages", galleryImage);
                 }
-                formData.append("storeId", adminInfo.storeId);
                 setWaitMsg("Please Waiting To Add New Product ...");
                 const result = (await axios.post(`${process.env.BASE_API_URL}/products/add-new-product`, formData, {
                     headers: {

@@ -55,7 +55,11 @@ export default function AddNewBrand() {
                     }
                 })
                 .catch(async (err) => {
-                    if (err?.response?.data?.msg === "Unauthorized Error") {
+                    if (err?.message === "Network Error") {
+                        setIsLoadingPage(false);
+                        setIsErrorMsgOnLoadingThePage(true);
+                    }
+                    if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     }
@@ -100,7 +104,6 @@ export default function AddNewBrand() {
                 let formData = new FormData();
                 formData.append("brandImg", brandImage);
                 formData.append("title", brandTitle);
-                formData.append("storeId", adminInfo.storeId);
                 const result =( await axios.post(`${process.env.BASE_API_URL}/brands/add-new-brand`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -127,7 +130,7 @@ export default function AddNewBrand() {
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
+            if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
                 return;

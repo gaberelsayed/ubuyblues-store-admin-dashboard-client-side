@@ -54,7 +54,11 @@ export default function UpdateAndDeleteCoupons() {
                     }
                 })
                 .catch(async (err) => {
-                    if (err?.response?.data?.msg === "Unauthorized Error") {
+                    if (err?.message === "Network Error") {
+                        setIsLoadingPage(false);
+                        setIsErrorMsgOnLoadingThePage(true);
+                    }
+                    if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     }
@@ -136,9 +140,9 @@ export default function UpdateAndDeleteCoupons() {
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
+            if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                await router.push("/login");
+                await router.replace("/login");
                 return;
             }
             setWaitMsg("");
@@ -179,9 +183,9 @@ export default function UpdateAndDeleteCoupons() {
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
+            if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                await router.push("/login");
+                await router.replace("/login");
                 return;
             }
             setWaitMsg("");

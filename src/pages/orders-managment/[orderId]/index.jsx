@@ -53,7 +53,11 @@ export default function OrderDetails({ orderIdAsProperty }) {
                     }
                 })
                 .catch(async (err) => {
-                    if (err?.response?.data?.msg === "Unauthorized Error") {
+                    if (err?.message === "Network Error") {
+                        setIsLoadingPage(false);
+                        setIsErrorMsgOnLoadingThePage(true);
+                    }
+                    if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     }
@@ -75,7 +79,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
         try {
             setIsUpdatingStatus(true);
             setSelectedOrderProductIndex(orderProductIndex);
-            const res = await axios.put(`${process.env.BASE_API_URL}/orders/products/update-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}`, {
+            const result = (await axios.put(`${process.env.BASE_API_URL}/orders/products/update-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}`, {
                 quantity: orderDetails.products[orderProductIndex].quantity,
                 name: orderDetails.products[orderProductIndex].name,
                 totalAmount: orderDetails.products[orderProductIndex].totalAmount,
@@ -84,8 +88,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
-            });
-            const result = res.data;
+            })).data;
             if (!result.error) {
                 setIsUpdatingStatus(false);
                 setSuccessMsg("Updating Success !!");
@@ -99,7 +102,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
+            if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
                 return;
@@ -141,7 +144,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
+            if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
                 return;

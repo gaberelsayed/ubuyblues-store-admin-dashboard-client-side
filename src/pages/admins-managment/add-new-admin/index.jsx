@@ -59,7 +59,7 @@ export default function AddNewAdmin() {
                         setIsLoadingPage(false);
                         setIsErrorMsgOnLoadingThePage(true);
                     }
-                    if (err?.response?.data?.msg === "Unauthorized Error") {
+                    if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     }
@@ -156,7 +156,7 @@ export default function AddNewAdmin() {
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
+            if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
                 return;

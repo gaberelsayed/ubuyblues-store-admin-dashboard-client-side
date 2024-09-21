@@ -10,7 +10,6 @@ import { getAdminInfo, getAllCategories } from "../../../../public/global_functi
 import { useRouter } from "next/router";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { countries } from "countries-list";
-import { FaRegSquarePlus } from "react-icons/fa6";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 
 export default function AddNewProduct() {
@@ -52,9 +51,11 @@ export default function AddNewProduct() {
 
     const productGalleryImagesFilesElementRef = useRef();
 
-    const countryList = Object.keys(countries);
+    const allCountries = Object.keys(countries)
 
-    const [filteredCountryList, setFilteredCountryList] = useState(countryList);
+    const [countryList, setCountryList] = useState(allCountries);
+
+    const [filteredCountryList, setFilteredCountryList] = useState(allCountries);
 
     const [selectedCountriesList, setSelectedCountriesList] = useState([]);
 
@@ -283,7 +284,15 @@ export default function AddNewProduct() {
     }
 
     const handleSelectCountry = (countryCode) => {
+        setCountryList(countryList.filter((country) => country !== countryCode));
+        setFilteredCountryList(filteredCountryList.filter((country) => country !== countryCode));
+        setSelectedCountriesList([...selectedCountriesList, countryCode]);
+    }
 
+    const handleRemoveCountryFromCountryList = (countryCode) => {
+        setCountryList([...countryList, countryCode]);
+        setFilteredCountryList([...filteredCountryList, countryCode]);
+        setSelectedCountriesList(selectedCountriesList.filter((country) => country !== countryCode));
     }
 
     return (
@@ -384,36 +393,29 @@ export default function AddNewProduct() {
                         </section>
                         <h6 className="mb-3 fw-bold">Please Select Countries</h6>
                         <div className="select-country-box mb-4">
-                            <div className="row align-items-center justify-content-center mb-4">
-                                <div className="col-md-11">
-                                    <input
-                                        type="text"
-                                        className="search-box form-control p-2 border-2"
-                                        placeholder="Please Enter Your Country Name Or Part Of This"
-                                        onChange={handleSearchOfCountry}
-                                    />
-                                </div>
-                                <div className="col-md-1">
-                                    <FaRegSquarePlus className="add-icon" />
-                                </div>
-                            </div>
-                            <ul className="countries-list bg-white">
+                            <input
+                                type="text"
+                                className="search-box form-control p-2 border-2 mb-4"
+                                placeholder="Please Enter Your Country Name Or Part Of This"
+                                onChange={handleSearchOfCountry}
+                            />
+                            <ul className="countries-list bg-white border border-dark">
                                 {filteredCountryList.length > 0 ? filteredCountryList.map((countryCode) => (
                                     <li key={countryCode} onClick={() => handleSelectCountry(countryCode)}>{countries[countryCode].name}</li>
                                 )) : <li>Sorry, Can't Find Any Counties Match This Name !!</li>}
                             </ul>
                         </div>
                         {selectedCountriesList.length > 0 ? <div className="selected-countries row mb-4">
-                            {selectedCountriesList.map((countryCode) => <div className="col-md-3 mb-3" key={countryCode}>
-                                <div className="selected-country-box bg-white p-2 border border-2 border-dark w-fit">
-                                    <span className="me-2">Kuwait</span>
-                                    <IoIosCloseCircleOutline className="delete-icon" />
+                            {selectedCountriesList.map((countryCode) => <div className="col-md-4 mb-3" key={countryCode}>
+                                <div className="selected-country-box bg-white p-2 border border-2 border-dark text-center">
+                                    <span className="me-2 country-name">{countries[countryCode].name}</span>
+                                    <IoIosCloseCircleOutline className="remove-icon" onClick={() => handleRemoveCountryFromCountryList(countryCode)} />
                                 </div>
                             </div>)}
                         </div> : <p className="bg-danger p-2 m-0 text-white mb-4">
-                                <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                <span>Sorry, Can't Find Any Countries Added To The Selected Countries List !!</span>
-                            </p>}
+                            <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                            <span>Sorry, Can't Find Any Countries Added To The Selected Countries List !!</span>
+                        </p>}
                         <h6 className="mb-3 fw-bold">Please Select Product Image</h6>
                         <section className="image mb-4">
                             <input

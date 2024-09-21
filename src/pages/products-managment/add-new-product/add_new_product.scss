@@ -20,7 +20,10 @@
         }
         .selected-countries{
             .selected-country-box{
-                .delete-icon{
+                .country-name{
+                    font-size: 14px;
+                }
+                .remove-icon{
                     cursor: pointer;
                     font-size: 22px;
                 }

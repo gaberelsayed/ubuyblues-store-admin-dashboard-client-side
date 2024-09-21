@@ -10,6 +10,7 @@ import { getAdminInfo, getAllCategories } from "../../../../public/global_functi
 import { useRouter } from "next/router";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { countries } from "countries-list";
+import { FaRegSquarePlus } from "react-icons/fa6";
 
 export default function AddNewProduct() {
 
@@ -212,7 +213,7 @@ export default function AddNewProduct() {
                 formData.append("quantity", productData.quantity);
                 formData.append("country", productData.country);
                 formData.append("productImage", productData.image);
-                for(let galleryImage of productData.galleryImages) {
+                for (let galleryImage of productData.galleryImages) {
                     formData.append("galleryImages", galleryImage);
                 }
                 setWaitMsg("Please Waiting To Add New Product ...");
@@ -276,7 +277,7 @@ export default function AddNewProduct() {
                 <div className="page-content d-flex justify-content-center align-items-center flex-column pt-5 pb-5 p-4">
                     <h1 className="fw-bold w-fit pb-2 mb-3">
                         <PiHandWavingThin className="me-2" />
-                        Hi, Mr { adminInfo.firstName + " " + adminInfo.lastName } In Your Add New Product Page
+                        Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Add New Product Page
                     </h1>
                     {allCategories.length > 0 ? <form className="add-new-product-form admin-dashbboard-form" onSubmit={(e) => addNewProduct(e, productData)}>
                         <section className="name mb-4">
@@ -362,21 +363,26 @@ export default function AddNewProduct() {
                                 <span>{formValidationErrors["quantity"]}</span>
                             </p>}
                         </section>
-                        <section className="country mb-4">
-                            <select
-                                className={`country-select form-select p-2 border-2 country-field ${formValidationErrors["country"] ? "border-danger mb-3" : "mb-4"}`}
-                                onChange={(e) => setProductData({ ...productData, country: e.target.value })}
-                            >
-                                <option defaultValue="" hidden>Please Select Country</option>
+                        <h6 className="mb-3 fw-bold">Please Select Countries</h6>
+                        <div className="select-country-box mb-4">
+                            <div className="row align-items-center justify-content-center mb-4">
+                                <div className="col-md-11">
+                                    <input
+                                        type="text"
+                                        className="search-box form-control p-2 border-2"
+                                        placeholder="Please Enter Your Country Name Or Part Of This"
+                                    />
+                                </div>
+                                <div className="col-md-1">
+                                    <FaRegSquarePlus className="add-icon" />
+                                </div>
+                            </div>
+                            <ul className="countries-list bg-white">
                                 {countryList.map((countryCode) => (
-                                    <option value={countryCode} key={countryCode}>{countries[countryCode].name}</option>
+                                    <li data-value={countryCode} key={countryCode}>{countries[countryCode].name}</li>
                                 ))}
-                            </select>
-                            {formValidationErrors["country"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
-                                <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                <span>{formValidationErrors["country"]}</span>
-                            </p>}
-                        </section>
+                            </ul>
+                        </div>
                         <h6 className="mb-3 fw-bold">Please Select Product Image</h6>
                         <section className="image mb-4">
                             <input

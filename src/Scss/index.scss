@@ -403,6 +403,21 @@ input, textarea, select, checkbox{
     }
 }
 
+.select-country-box{
+    .countries-list{
+        height: 200px;
+        overflow: auto;
+        li{
+            padding: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            &:hover{
+                background-color: #CCC;
+            }
+        }
+    }
+}
+
 @keyframes rotation {
     0% {
         transform: rotate(0deg);

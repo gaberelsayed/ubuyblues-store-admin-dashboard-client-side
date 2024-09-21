@@ -485,6 +485,21 @@ input:focus, textarea:focus, select:focus, checkbox:focus {
   }
 }
 
+.select-country-box .countries-list {
+  height: 200px;
+  overflow: auto;
+}
+
+.select-country-box .countries-list li {
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.select-country-box .countries-list li:hover {
+  background-color: #CCC;
+}
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);

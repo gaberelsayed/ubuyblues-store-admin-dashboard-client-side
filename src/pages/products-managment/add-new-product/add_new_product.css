@@ -6,8 +6,3 @@
 .add-new-product .add-new-product-form .selected-countries .selected-country-box .country-name {
   font-size: 14px;
 }
-
-.add-new-product .add-new-product-form .selected-countries .selected-country-box .remove-icon {
-  cursor: pointer;
-  font-size: 22px;
-}

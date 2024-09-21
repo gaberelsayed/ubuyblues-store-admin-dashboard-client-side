@@ -19,6 +19,7 @@ import {
 } from "../../../../public/global_functions/popular";
 import Link from "next/link";
 import { countries } from "countries-list";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 
 export default function UpdateAndDeleteProducts() {
 
@@ -224,28 +225,30 @@ export default function UpdateAndDeleteProducts() {
         const searchedCountry = e.target.value;
         if (searchedCountry) {
             const regex = new RegExp(searchedCountry, 'i');
-            const tempAllProductsInsideThePage = allProductsInsideThePage;
+            const tempAllProductsInsideThePage = allProductsInsideThePage.map((product) => product);
             tempAllProductsInsideThePage[productIndex].filteredCountryList = tempAllProductsInsideThePage[productIndex].filteredCountryList.filter((country) => regex.test(countries[country].name));
             setAllProductsInsideThePage(tempAllProductsInsideThePage);
         } else {
-            const tempAllProductsInsideThePage = allProductsInsideThePage;
+            const tempAllProductsInsideThePage = allProductsInsideThePage.map((product) => product);
             tempAllProductsInsideThePage[productIndex].filteredCountryList = tempAllProductsInsideThePage[productIndex].allCountriesWithoutOriginalCountries;
             setAllProductsInsideThePage(tempAllProductsInsideThePage);
         }
     }
 
     const handleSelectCountry = (productIndex, countryCode) => {
-        const tempAllProductsInsideThePage = allProductsInsideThePage;
+        let tempAllProductsInsideThePage = allProductsInsideThePage.map((product) => product);
         tempAllProductsInsideThePage[productIndex].allCountriesWithoutOriginalCountries = tempAllProductsInsideThePage[productIndex].allCountriesWithoutOriginalCountries.filter((country) => country !== countryCode);
-        tempAllProductsInsideThePage[productIndex].filteredCountryList = tempAllProductsInsideThePage[productIndex].filteredCountryList.filter((country) => country !== countryCode)
+        tempAllProductsInsideThePage[productIndex].filteredCountryList = tempAllProductsInsideThePage[productIndex].filteredCountryList.filter((country) => country !== countryCode);
         tempAllProductsInsideThePage[productIndex].countries = [...tempAllProductsInsideThePage[productIndex].countries, countryCode];
         setAllProductsInsideThePage(tempAllProductsInsideThePage);
     }
 
     const handleRemoveCountryFromCountryList = (productIndex, countryCode) => {
-        setCountryList([...countryList, countryCode]);
-        setFilteredCountryList([...filteredCountryList, countryCode]);
-        setSelectedCountriesList(selectedCountriesList.filter((country) => country !== countryCode));
+        let tempAllProductsInsideThePage = allProductsInsideThePage.map((product) => product);
+        tempAllProductsInsideThePage[productIndex].allCountriesWithoutOriginalCountries = [...tempAllProductsInsideThePage[productIndex].allCountriesWithoutOriginalCountries, countryCode];
+        tempAllProductsInsideThePage[productIndex].filteredCountryList = [...tempAllProductsInsideThePage[productIndex].filteredCountryList, countryCode];
+        tempAllProductsInsideThePage[productIndex].countries = tempAllProductsInsideThePage[productIndex].countries.filter((country) => country !== countryCode);
+        setAllProductsInsideThePage(tempAllProductsInsideThePage);
     }
 
     const updateProductImage = async (productIndex) => {
@@ -609,7 +612,16 @@ export default function UpdateAndDeleteProducts() {
                                         </td>
                                         <td className="product-country-cell">
                                             <section className="product-country mb-4">
-                                                {product.countries.map((country) => <h6 className="bg-info p-2 fw-bold mb-3">{countries[country].name}</h6>)}
+                                            {product.countries.map((country) =>
+                                                <div className="row align-items-center mb-3" key={country}>
+                                                    <div className={product.countries.length > 1 ? "col-md-10" : "col-md-12"}>
+                                                        <h6 className="bg-info p-2 fw-bold m-0">{countries[country].name}</h6>
+                                                    </div>
+                                                    {product.countries.length > 1 && <div className="col-md-2">
+                                                        <IoIosCloseCircleOutline className="remove-icon" onClick={() => handleRemoveCountryFromCountryList(productIndex, country)} />
+                                                    </div>}
+                                                </div>
+                                            )}
                                                 <hr />
                                                 <div className="select-country-box mb-4">
                                                     <input

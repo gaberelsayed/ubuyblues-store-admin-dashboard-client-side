@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { countries } from "countries-list";
 import { FaRegSquarePlus } from "react-icons/fa6";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 
 export default function AddNewProduct() {
 
@@ -52,6 +53,10 @@ export default function AddNewProduct() {
     const productGalleryImagesFilesElementRef = useRef();
 
     const countryList = Object.keys(countries);
+
+    const [filteredCountryList, setFilteredCountryList] = useState(countryList);
+
+    const [selectedCountriesList, setSelectedCountriesList] = useState([]);
 
     const router = useRouter();
 
@@ -267,6 +272,20 @@ export default function AddNewProduct() {
         }
     }
 
+    const handleSearchOfCountry = (e) => {
+        const searchedCountry = e.target.value;
+        if (searchedCountry) {
+            const regex = new RegExp(searchedCountry, 'i');
+            setFilteredCountryList(filteredCountryList.filter((country) => regex.test(countries[country].name)));
+        } else {
+            setFilteredCountryList(countryList);
+        }
+    }
+
+    const handleSelectCountry = (countryCode) => {
+
+    }
+
     return (
         <div className="add-new-product admin-dashboard">
             <Head>
@@ -371,6 +390,7 @@ export default function AddNewProduct() {
                                         type="text"
                                         className="search-box form-control p-2 border-2"
                                         placeholder="Please Enter Your Country Name Or Part Of This"
+                                        onChange={handleSearchOfCountry}
                                     />
                                 </div>
                                 <div className="col-md-1">
@@ -378,11 +398,22 @@ export default function AddNewProduct() {
                                 </div>
                             </div>
                             <ul className="countries-list bg-white">
-                                {countryList.map((countryCode) => (
-                                    <li data-value={countryCode} key={countryCode}>{countries[countryCode].name}</li>
-                                ))}
+                                {filteredCountryList.length > 0 ? filteredCountryList.map((countryCode) => (
+                                    <li key={countryCode} onClick={() => handleSelectCountry(countryCode)}>{countries[countryCode].name}</li>
+                                )) : <li>Sorry, Can't Find Any Counties Match This Name !!</li>}
                             </ul>
                         </div>
+                        {selectedCountriesList.length > 0 ? <div className="selected-countries row mb-4">
+                            {selectedCountriesList.map((countryCode) => <div className="col-md-3 mb-3" key={countryCode}>
+                                <div className="selected-country-box bg-white p-2 border border-2 border-dark w-fit">
+                                    <span className="me-2">Kuwait</span>
+                                    <IoIosCloseCircleOutline className="delete-icon" />
+                                </div>
+                            </div>)}
+                        </div> : <p className="bg-danger p-2 m-0 text-white mb-4">
+                                <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                <span>Sorry, Can't Find Any Countries Added To The Selected Countries List !!</span>
+                            </p>}
                         <h6 className="mb-3 fw-bold">Please Select Product Image</h6>
                         <section className="image mb-4">
                             <input

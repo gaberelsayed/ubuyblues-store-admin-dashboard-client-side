@@ -18,5 +18,13 @@
             font-size: 25px;
             cursor: pointer;
         }
+        .selected-countries{
+            .selected-country-box{
+                .delete-icon{
+                    cursor: pointer;
+                    font-size: 22px;
+                }
+            }
+        }
     }
 }

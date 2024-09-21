@@ -68,10 +68,6 @@ export default function UpdateAndDeleteProducts() {
 
     const allCountries = Object.keys(countries);
 
-    const [filteredCountryList, setFilteredCountryList] = useState(allCountries);
-
-    const [selectedCountriesList, setSelectedCountriesList] = useState([]);
-
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
         if (adminToken) {
@@ -401,7 +397,7 @@ export default function UpdateAndDeleteProducts() {
                     name: allProductsInsideThePage[productIndex].name,
                     price: allProductsInsideThePage[productIndex].price,
                     quantity: allProductsInsideThePage[productIndex].quantity,
-                    country: allProductsInsideThePage[productIndex].country,
+                    countries: allProductsInsideThePage[productIndex].countries,
                     description: allProductsInsideThePage[productIndex].description,
                     discount: allProductsInsideThePage[productIndex].discount,
                     category: allProductsInsideThePage[productIndex].category,

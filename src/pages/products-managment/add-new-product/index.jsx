@@ -30,7 +30,6 @@ export default function AddNewProduct() {
         categoryId: "",
         discount: "",
         quantity: "",
-        country: "",
         image: null,
         galleryImages: [],
     });
@@ -174,15 +173,15 @@ export default function AddNewProduct() {
                         }
                     },
                 },
-                {
-                    name: "country",
-                    value: productData.country,
-                    rules: {
-                        isRequired: {
-                            msg: "Sorry, This Field Can't Be Empty !!",
-                        },
-                    },
-                },
+                // {
+                //     name: "countries",
+                //     value: selectedCountriesList,
+                //     rules: {
+                //         isRequired: {
+                //             msg: "Sorry, This Field Can't Be Empty !!",
+                //         },
+                //     },
+                // },
                 {
                     name: "image",
                     value: productData.image,
@@ -217,7 +216,9 @@ export default function AddNewProduct() {
                 formData.append("categoryId", productData.categoryId);
                 formData.append("discount", productData.discount);
                 formData.append("quantity", productData.quantity);
-                formData.append("country", productData.country);
+                for(let country of selectedCountriesList) {
+                    formData.append("countries", country);
+                }
                 formData.append("productImage", productData.image);
                 for (let galleryImage of productData.galleryImages) {
                     formData.append("galleryImages", galleryImage);

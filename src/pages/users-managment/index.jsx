@@ -13,7 +13,7 @@ export default function UsersManagment() {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
-    const [isErrorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState(false);
+    const [errorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState("");
 
     const [adminInfo, setAdminInfo] = useState({});
 
@@ -70,17 +70,13 @@ export default function UsersManagment() {
                     }
                 })
                 .catch(async (err) => {
-                    if (err?.message === "Network Error") {
-                        setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
-                    }
                     if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     }
                     else {
                         setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
+                        setErrorMsgOnLoadingThePage(err?.message === "Network Error" ? "Network Error" : "Sorry, Something Went Wrong, Please Try Again !");
                     }
                 });
         } else router.replace("/login");
@@ -166,20 +162,21 @@ export default function UsersManagment() {
             if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
-                return;
             }
-            setIsGetUsers(false);
-            setErrorMsg("");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg(false);
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setIsGetUsers(false);
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
     const deleteUser = async (userIndex) => {
         try {
-            setWaitMsg("Please Waiting Deleting ...");
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedUserIndex(userIndex);
             const result = (await axios.delete(`${process.env.BASE_API_URL}/users/${allUsersInsideThePage[userIndex]._id}`, {
                 headers: {
@@ -208,15 +205,16 @@ export default function UsersManagment() {
             if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
-                return;
             }
-            setWaitMsg("");
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                setSelectedUserIndex(-1);
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedUserIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
@@ -225,7 +223,7 @@ export default function UsersManagment() {
             <Head>
                 <title>{process.env.storeName} Admin Dashboard - Users Managment</title>
             </Head>
-            {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
+            {!isLoadingPage && !errorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content d-flex justify-content-center align-items-center flex-column text-center pt-5 pb-5">
                     <div className="container-fluid">
@@ -358,8 +356,8 @@ export default function UsersManagment() {
                     </div>
                 </div>
             </>}
-            {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}
-            {isErrorMsgOnLoadingThePage && <ErrorOnLoadingThePage />}
+            {isLoadingPage && !errorMsgOnLoadingThePage && <LoaderPage />}
+            {errorMsgOnLoadingThePage && <ErrorOnLoadingThePage errorMsg={errorMsgOnLoadingThePage} />}
         </div>
     );
 }

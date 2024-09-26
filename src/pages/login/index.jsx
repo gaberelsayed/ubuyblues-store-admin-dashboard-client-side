@@ -15,7 +15,7 @@ export default function AdminLogin() {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
-    const [isErrorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState(false);
+    const [errorMsgOnLoadingThePage, setErrorMsgOnLoadingThePage] = useState("");
 
     const [email, setEmail] = useState("");
 
@@ -44,13 +44,13 @@ export default function AdminLogin() {
                     } else await router.replace("/");
                 })
                 .catch(async (err) => {
-                    if (err?.response?.data?.msg === "Unauthorized Error") {
+                    if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
-                        setIsLoadingPage(false);
+                        await router.replace("/login");
                     }
                     else {
                         setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
+                        setErrorMsgOnLoadingThePage(err?.message === "Network Error" ? "Network Error" : "Sorry, Something Went Wrong, Please Try Again !");
                     }
                 });
         } else setIsLoadingPage(false);
@@ -106,7 +106,7 @@ export default function AdminLogin() {
             }
         } catch (err) {
             setWaitMsg("");
-            setErrorMsg("Sorry, Someting Went Wrong, Please Try Again The Process !!");
+            setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Something Went Wrong, Please Try Again !");
             setTimeout(() => {
                 setErrorMsg("");
             }, 3000);
@@ -118,7 +118,7 @@ export default function AdminLogin() {
             <Head>
                 <title>{process.env.storeName} Admin Dashboard - Login</title>
             </Head>
-            {!isLoadingPage && !isErrorMsgOnLoadingThePage && <div className="page-content text-center p-4">
+            {!isLoadingPage && !errorMsgOnLoadingThePage && <div className="page-content text-center p-4">
                 <div className="container p-4">
                     <img src={ubuybluesLogo.src} alt="logo" width="200" height="200" className="mb-5" />
                     <form className="admin-login-form mb-3" onSubmit={adminLogin}>
@@ -168,8 +168,8 @@ export default function AdminLogin() {
                     </form>
                 </div>
             </div>}
-            {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}
-            {isErrorMsgOnLoadingThePage && <ErrorOnLoadingThePage />}
+            {isLoadingPage && !errorMsgOnLoadingThePage && <LoaderPage />}
+            {errorMsgOnLoadingThePage && <ErrorOnLoadingThePage errorMsg={errorMsgOnLoadingThePage} />}
         </div>
     );
 }

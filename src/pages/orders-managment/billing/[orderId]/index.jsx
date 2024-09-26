@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import { FaRegSmileWink } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { getAdminInfo, getStoreDetails, getOrderDetails } from "../../../../../public/global_functions/popular";
+import { getAdminInfo, getStoreDetails, getOrderDetails, handleSelectUserLanguage } from "../../../../../public/global_functions/popular";
 import { useRouter } from "next/router";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { getCurrencyNameByCountry, getUSDPriceAgainstCurrency } from "../../../../../public/global_functions/prices";
@@ -13,7 +13,7 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
-    const [isErrorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState(false);
+    const [errorMsgOnLoadingThePage, setErrorMsgOnLoadingThePage] = useState("");
 
     const [usdPriceAgainstCurrency, setUsdPriceAgainstCurrency] = useState(1);
 
@@ -37,6 +37,11 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
     const { t, i18n } = useTranslation();
 
     useEffect(() => {
+        const userLanguage = localStorage.getItem(process.env.adminDashboardlanguageFieldNameInLocalStorage);
+        handleSelectUserLanguage(userLanguage === "ar" || userLanguage === "en" || userLanguage === "tr" || userLanguage === "de" ? userLanguage : "en", i18n.changeLanguage);
+    }, []);
+
+    useEffect(() => {
         setIsLoadingPage(true);
         getUSDPriceAgainstCurrency(countryAsProperty).then((price) => {
             setUsdPriceAgainstCurrency(price);
@@ -45,16 +50,11 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
                 setIsLoadingPage(false);
             }
         })
-            .catch(() => {
+            .catch((err) => {
                 setIsLoadingPage(false);
-                setIsErrorMsgOnLoadingThePage(true);
+                setErrorMsgOnLoadingThePage(err?.message === "Network Error" ? "Network Error" : "Sorry, Something Went Wrong, Please Try Again !");
             });
     }, [countryAsProperty]);
-
-    useEffect(() => {
-        const userLanguage = localStorage.getItem("ubuyblues-store-admin-dashboard-language");
-        handleSelectUserLanguage(userLanguage === "ar" || userLanguage === "en" || userLanguage === "tr" || userLanguage === "de" ? userLanguage : "en");
-    }, []);
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
@@ -85,17 +85,13 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
                     }
                 })
                 .catch(async (err) => {
-                    if (err?.message === "Network Error") {
-                        setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
-                    }
                     if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     }
                     else {
                         setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
+                        setErrorMsgOnLoadingThePage(err?.message === "Network Error" ? "Network Error" : "Sorry, Something Went Wrong, Please Try Again !");
                     }
                 });
         } else router.replace("/login");
@@ -106,11 +102,6 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
             setIsLoadingPage(false);
         }
     }, [isGetOrderDetails]);
-
-    const handleSelectUserLanguage = (userLanguage) => {
-        i18n.changeLanguage(userLanguage);
-        document.body.lang = userLanguage;
-    }
 
     const calcTotalOrderPriceBeforeDiscount = (allProductsData) => {
         let tempTotalPriceBeforeDiscount = 0;
@@ -133,7 +124,7 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
             <Head>
                 <title>{process.env.storeName} Admin Dashboard - Billing</title>
             </Head>
-            {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
+            {!isLoadingPage && !errorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content p-4 bg-white">
                     <h1 className="welcome-msg text-center mb-5">{t("Your Order Billing From Store")}: {storeDetails.name}</h1>
@@ -211,8 +202,8 @@ export default function ShowBilling({ orderIdAsProperty, countryAsProperty }) {
                     </section> : <p className="alert alert-danger">Sorry, This Order Is Not Found !!</p>}
                 </div>
             </>}
-            {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}
-            {isErrorMsgOnLoadingThePage && <ErrorOnLoadingThePage />}
+            {isLoadingPage && !errorMsgOnLoadingThePage && <LoaderPage />}
+            {errorMsgOnLoadingThePage && <ErrorOnLoadingThePage errorMsg={errorMsgOnLoadingThePage} />}
         </div>
     );
 }

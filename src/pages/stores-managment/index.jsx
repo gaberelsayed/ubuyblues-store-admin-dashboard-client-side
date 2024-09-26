@@ -16,23 +16,21 @@ export default function StoresManagment() {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
-    const [isErrorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState(false);
+    const [errorMsgOnLoadingThePage, setErrorMsgOnLoadingThePage] = useState("");
 
     const [adminInfo, setAdminInfo] = useState({});
 
     const [allStoresInsideThePage, setAllStoresInsideThePage] = useState([]);
 
-    const [isFilteringStoresStatus, setIsFilteringStoresStatus] = useState(false);
+    const [isGetStores, setIsGetStores] = useState(false);
 
     const [selectedStoreIndex, setSelectedStoreIndex] = useState(-1);
 
-    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
-    const [isDeletingStatus, setIsDeletingStatus] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
 
-    const [isSuccessStatus, setIsSuccessStatus] = useState(false);
-
-    const [isErrorStatus, setIsErrorStatus] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -85,43 +83,39 @@ export default function StoresManagment() {
                     }
                 })
                 .catch(async (err) => {
-                    if (err?.message === "Network Error") {
-                        setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
-                    }
                     if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     }
                     else {
                         setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
+                        setErrorMsgOnLoadingThePage(err?.message === "Network Error" ? "Network Error" : "Sorry, Something Went Wrong, Please Try Again !");
                     }
                 });
         } else router.replace("/login");
     }, []);
 
     const getPreviousPage = async () => {
-        setIsFilteringStoresStatus(true);
+        setIsGetStores(true);
         const newCurrentPage = currentPage - 1;
         setAllStoresInsideThePage((await getAllStoresInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
-        setIsFilteringStoresStatus(false);
+        setIsGetStores(false);
     }
 
     const getNextPage = async () => {
-        setIsFilteringStoresStatus(true);
+        setIsGetStores(true);
         const newCurrentPage = currentPage + 1;
         setAllStoresInsideThePage((await getAllStoresInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
         setCurrentPage(newCurrentPage);
-        setIsFilteringStoresStatus(false);
+        setIsGetStores(false);
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsFilteringStoresStatus(true);
+        setIsGetStores(true);
         setAllStoresInsideThePage((await getAllStoresInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
         setCurrentPage(pageNumber);
-        setIsFilteringStoresStatus(false);
+        setIsGetStores(false);
     }
 
     const getFilteringString = (filters) => {
@@ -138,32 +132,34 @@ export default function StoresManagment() {
 
     const filterStores = async (filters) => {
         try {
-            setIsFilteringStoresStatus(true);
+            setIsGetStores(true);
             setCurrentPage(1);
             const filteringString = getFilteringString(filters);
             const result = await getStoresCount(filteringString);
             if (result.data > 0) {
                 setAllStoresInsideThePage((await getAllStoresInsideThePage(1, pageSize, filteringString)).data);
                 setTotalPagesCount(Math.ceil(result.data / pageSize));
-                setIsFilteringStoresStatus(false);
+                setIsGetStores(false);
             } else {
                 setAllStoresInsideThePage([]);
                 setTotalPagesCount(0);
-                setIsFilteringStoresStatus(false);
+                setIsGetStores(false);
             }
         }
         catch (err) {
             if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
-                return;
             }
-            setIsFilteringStoresStatus(false);
-            setIsErrorStatus(true);
-            let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setIsGetStores(false);
+                setCurrentPage(-1);
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
@@ -212,7 +208,7 @@ export default function StoresManagment() {
             setFormValidationErrors(errorsObject);
             setSelectedStoreIndex(storeIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setIsUpdatingStatus(true);
+                setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${allStoresInsideThePage[storeIndex]._id}`, {
                     name: allStoresInsideThePage[storeIndex].name,
                     ownerEmail: allStoresInsideThePage[storeIndex].ownerEmail,
@@ -223,17 +219,17 @@ export default function StoresManagment() {
                     }
                 })).data;
                 if (!result.error) {
-                    setIsUpdatingStatus(false);
-                    setIsSuccessStatus(true);
+                    setWaitMsg("");
+                    setSuccessMsg("Updating Successfull !!");
                     let successTimeout = setTimeout(() => {
-                        setIsSuccessStatus(false);
+                        setSuccessMsg(false);
                         setSelectedStoreIndex(-1);
                         clearTimeout(successTimeout);
                     }, 3000);
                 } else {
-                    setIsErrorStatus(true);
+                    setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
                     let errorTimeout = setTimeout(() => {
-                        setIsErrorStatus(false);
+                        setErrorMsg("");
                         setSelectedStoreIndex(-1);
                         clearTimeout(errorTimeout);
                     }, 3000);
@@ -246,10 +242,10 @@ export default function StoresManagment() {
                 await router.replace("/login");
                 return;
             }
-            setIsUpdatingStatus(false);
-            setIsErrorStatus(true);
+            setWaitMsg(false);
+            setErrorMsg(true);
             let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
+                setErrorMsg(false);
                 setSelectedStoreIndex(-1);
                 clearTimeout(errorTimeout);
             }, 3000);
@@ -258,33 +254,33 @@ export default function StoresManagment() {
 
     const deleteStore = async (storeIndex) => {
         try {
-            setIsDeletingStatus(true);
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedStoreIndex(storeIndex);
             let result = (await axios.delete(`${process.env.BASE_API_URL}/stores/delete-store/${allStoresInsideThePage[storeIndex]._id}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
             })).data;
-            setIsDeletingStatus(false);
+            setWaitMsg("");
             if (!result.error) {
-                setIsSuccessStatus(true);
+                setSuccessMsg(true);
                 let successTimeout = setTimeout(async () => {
-                    setIsSuccessStatus(false);
+                    setSuccessMsg("Deleting Successfull !!");
                     setSelectedStoreIndex(-1);
-                    setIsFilteringStoresStatus(true);
+                    setIsGetStores(true);
                     result = await getStoresCount();
                     if (result.data > 0) {
                         setAllStoresInsideThePage((await getAllStoresInsideThePage(1, pageSize)).data);
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
                     }
                     setCurrentPage(1);
-                    setIsFilteringStoresStatus(false);
+                    setIsGetStores(false);
                     clearTimeout(successTimeout);
                 }, 3000);
             } else {
-                setIsErrorStatus(true);
+                setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
                 let errorTimeout = setTimeout(() => {
-                    setIsErrorStatus(false);
+                    setErrorMsg("");
                     setSelectedStoreIndex(-1);
                     clearTimeout(errorTimeout);
                 }, 3000);
@@ -296,10 +292,10 @@ export default function StoresManagment() {
                 await router.replace("/login");
                 return;
             }
-            setIsDeletingStatus(false);
-            setIsErrorStatus(true);
+            setWaitMsg(false);
+            setErrorMsg(true);
             let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
+                setErrorMsg(false);
                 setSelectedStoreIndex(-1);
                 clearTimeout(errorTimeout);
             }, 3000);
@@ -310,15 +306,15 @@ export default function StoresManagment() {
         try {
             switch (newStatus) {
                 case "approving": {
-                    setIsFilteringStoresStatus(true);
+                    setIsGetStores(true);
                     const filteringString = getFilteringString(filters);
                     setAllStoresInsideThePage((await getAllStoresInsideThePage(1, pageSize, filteringString)).data);
                     setCurrentPage(currentPage);
-                    setIsFilteringStoresStatus(false);
+                    setIsGetStores(false);
                     return;
                 }
                 case "rejecting": {
-                    setIsFilteringStoresStatus(true);
+                    setIsGetStores(true);
                     const filteringString = getFilteringString(filters);
                     const result = await getStoresCount(filteringString);
                     if (result.data > 0) {
@@ -326,24 +322,24 @@ export default function StoresManagment() {
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
                     }
                     setCurrentPage(1);
-                    setIsFilteringStoresStatus(false);
+                    setIsGetStores(false);
                     return;
                 }
                 case "blocking": {
-                    setIsFilteringStoresStatus(true);
+                    setIsGetStores(true);
                     const filteringString = getFilteringString(filters);
                     setAllStoresInsideThePage((await getAllStoresInsideThePage(1, pageSize, filteringString)).data);
                     setCurrentPage(currentPage);
-                    setIsFilteringStoresStatus(false);
+                    setIsGetStores(false);
                     return;
                 }
             }
         }
         catch (err) {
-            setIsFilteringStoresStatus(false);
-            setIsErrorStatus(true);
+            setIsGetStores(false);
+            setErrorMsg(true);
             let errorTimeout = setTimeout(() => {
-                setIsErrorStatus(false);
+                setErrorMsg(false);
                 clearTimeout(errorTimeout);
             }, 3000);
         }
@@ -354,7 +350,7 @@ export default function StoresManagment() {
             <Head>
                 <title>{process.env.storeName} Admin Dashboard - Stores Managment</title>
             </Head>
-            {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
+            {!isLoadingPage && !errorMsgOnLoadingThePage && <>
                 {/* Start Admin Dashboard Side Bar */}
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 {/* Start Admin Dashboard Side Bar */}
@@ -434,20 +430,20 @@ export default function StoresManagment() {
                                     />
                                 </div>
                             </div>
-                            {!isFilteringStoresStatus && <button
+                            {!isGetStores && <button
                                 className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                                 onClick={() => filterStores(filters)}
                             >
                                 Filter
                             </button>}
-                            {isFilteringStoresStatus && <button
+                            {isGetStores && <button
                                 className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                                 disabled
                             >
                                 Filtering ...
                             </button>}
                         </section>
-                        {allStoresInsideThePage.length > 0 && !isFilteringStoresStatus && <section className="stores-data-box p-3 data-box admin-dashbboard-data-box">
+                        {allStoresInsideThePage.length > 0 && !isGetStores && <section className="stores-data-box p-3 data-box admin-dashbboard-data-box">
                             <table className="stores-data-table mb-4 managment-table bg-white admin-dashbboard-data-table">
                                 <thead>
                                     <tr>
@@ -515,10 +511,9 @@ export default function StoresManagment() {
                                             </td>
                                             <td>
                                                 {
-                                                    !isUpdatingStatus &&
-                                                    !isDeletingStatus &&
-                                                    !isSuccessStatus &&
-                                                    !isErrorStatus &&
+                                                    !waitMsg &&
+                                                    !successMsg &&
+                                                    !errorMsg &&
                                                     <button
                                                         className="btn btn-info d-block mx-auto mb-3 global-button"
                                                         onClick={() => updateStoreData(storeIndex)}
@@ -526,13 +521,13 @@ export default function StoresManagment() {
                                                         Update
                                                     </button>
                                                 }
-                                                {isUpdatingStatus && storeIndex === selectedStoreIndex && <button
+                                                {waitMsg && storeIndex === selectedStoreIndex && <button
                                                     className="btn btn-info d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
                                                     Updating ...
                                                 </button>}
-                                                {isSuccessStatus && storeIndex === selectedStoreIndex && <button
+                                                {successMsg && storeIndex === selectedStoreIndex && <button
                                                     className="btn btn-success d-block mx-auto mb-3 global-button"
                                                     disabled
                                                 >
@@ -548,23 +543,22 @@ export default function StoresManagment() {
                                                             Delete
                                                         </button>
                                                     }
-                                                    {isDeletingStatus && storeIndex === selectedStoreIndex && <button
+                                                    {waitMsg && storeIndex === selectedStoreIndex && <button
                                                         className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                         disabled
                                                     >
-                                                        Deleting ...
+                                                        {waitMsg}
                                                     </button>}
-                                                    {isSuccessStatus && storeIndex === selectedStoreIndex && <button
-                                                        className="btn btn-danger d-block mx-auto mb-3 global-button"
+                                                    {successMsg && storeIndex === selectedStoreIndex && <button
+                                                        className="btn btn-success d-block mx-auto mb-3 global-button"
                                                         disabled
                                                     >
-                                                        Deleting Successful
+                                                        {successMsg}
                                                     </button>}
                                                     {
-                                                        !isUpdatingStatus &&
-                                                        !isDeletingStatus &&
-                                                        !isSuccessStatus &&
-                                                        !isErrorStatus &&
+                                                        !waitMsg &&
+                                                        !successMsg &&
+                                                        !errorMsg &&
                                                         store.status === "pending" &&
                                                         <button
                                                             className="btn btn-success d-block mx-auto mb-3 global-button"
@@ -574,10 +568,9 @@ export default function StoresManagment() {
                                                         </button>
                                                     }
                                                     {
-                                                        !isUpdatingStatus &&
-                                                        !isDeletingStatus &&
-                                                        !isSuccessStatus &&
-                                                        !isErrorStatus &&
+                                                        !waitMsg &&
+                                                        !successMsg &&
+                                                        !errorMsg &&
                                                         store.status === "pending" &&
                                                         <button
                                                             className="btn btn-danger d-block mx-auto mb-3 global-button"
@@ -587,10 +580,9 @@ export default function StoresManagment() {
                                                         </button>
                                                     }
                                                     {
-                                                        !isUpdatingStatus &&
-                                                        !isDeletingStatus &&
-                                                        !isSuccessStatus &&
-                                                        !isErrorStatus &&
+                                                        !waitMsg &&
+                                                        !successMsg &&
+                                                        !errorMsg &&
                                                         store.status === "pending" || store.status === "approving" &&
                                                         <button
                                                             className="btn btn-danger d-block mx-auto mb-3 global-button"
@@ -600,10 +592,9 @@ export default function StoresManagment() {
                                                         </button>
                                                     }
                                                     {
-                                                        !isUpdatingStatus &&
-                                                        !isDeletingStatus &&
-                                                        !isSuccessStatus &&
-                                                        !isErrorStatus &&
+                                                        !waitMsg &&
+                                                        !successMsg &&
+                                                        !errorMsg &&
                                                         store.status === "blocking" &&
                                                         <button
                                                             className="btn btn-danger d-block mx-auto mb-3 global-button"
@@ -612,14 +603,14 @@ export default function StoresManagment() {
                                                             Cancel Blocking
                                                         </button>
                                                     }
-                                                    {isErrorStatus && storeIndex === selectedStoreIndex && <button
+                                                    {errorMsg && storeIndex === selectedStoreIndex && <button
                                                         className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                         disabled
                                                     >
-                                                        Sorry, Someting Went Wrong, Please Repeate The Process !!
+                                                        {errorMsg}
                                                     </button>}
                                                 </>}
-                                                {!isUpdatingStatus && !isDeletingStatus && !isErrorStatus && !isSuccessStatus && <>
+                                                {!waitMsg && !errorMsg && !successMsg && <>
                                                     <Link
                                                         href={`/stores-managment/${store._id}`}
                                                         className="btn btn-success d-block mx-auto mb-4 global-button"
@@ -631,11 +622,11 @@ export default function StoresManagment() {
                                 </tbody>
                             </table>
                         </section>}
-                        {allStoresInsideThePage.length === 0 && !isFilteringStoresStatus && <p className="alert alert-danger">Sorry, Can't Find Any Stores !!</p>}
-                        {isFilteringStoresStatus && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
+                        {allStoresInsideThePage.length === 0 && !isGetStores && <p className="alert alert-danger">Sorry, Can't Find Any Stores !!</p>}
+                        {isGetStores && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
                             <span className="loader-table-data"></span>
                         </div>}
-                        {totalPagesCount > 1 && !isFilteringStoresStatus &&
+                        {totalPagesCount > 1 && !isGetStores &&
                             <PaginationBar
                                 totalPagesCount={totalPagesCount}
                                 currentPage={currentPage}
@@ -648,8 +639,8 @@ export default function StoresManagment() {
                 </section>
                 {/* End Content Section */}
             </>}
-            {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}
-            {isErrorMsgOnLoadingThePage && <ErrorOnLoadingThePage />}
+            {isLoadingPage && !errorMsgOnLoadingThePage && <LoaderPage />}
+            {errorMsgOnLoadingThePage && <ErrorOnLoadingThePage errorMsg={errorMsgOnLoadingThePage} />}
         </div>
     );
 }

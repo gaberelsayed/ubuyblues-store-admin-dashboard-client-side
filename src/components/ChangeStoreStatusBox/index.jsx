@@ -20,7 +20,7 @@ export default function ChangeStoreStatusBox({
 
     const [isVisiblePassword, setIsVisiblePassword] = useState("");
 
-    const [isWaitStatus, setIsWaitStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [successMsg, setSuccessMsg] = useState("");
 
@@ -54,16 +54,15 @@ export default function ChangeStoreStatusBox({
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setIsWaitStatus(true);
-                const res = await axios.post(`${process.env.BASE_API_URL}/stores/approve-store/${storeId}?password=${adminPassword}`, undefined,
+                setWaitMsg("Please Waiting ...");
+                const result = (await axios.post(`${process.env.BASE_API_URL}/stores/approve-store/${storeId}?password=${adminPassword}`, undefined,
                     {
                         headers: {
                             Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                         }
                     }
-                );
-                const result = res.data;
-                setIsWaitStatus(false);
+                )).data;
+                setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(async () => {
@@ -76,31 +75,32 @@ export default function ChangeStoreStatusBox({
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
-                await router.push("/admin-dashboard/login");
-                return;
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
             }
-            setIsWaitStatus(false);
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
     const rejectStoreCreate = async (storeId) => {
         try {
-            setIsWaitStatus(true);
-            const res = await axios.delete(`${process.env.BASE_API_URL}/stores/reject-store/${storeId}`,
+            setWaitMsg("Please Waiting ...");
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/stores/reject-store/${storeId}`,
                 {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
                 }
-            );
-            const result = res.data;
-            setIsWaitStatus(false);
+            )).data;
+            setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg(result.msg);
                 let successTimeout = setTimeout(async () => {
@@ -112,16 +112,18 @@ export default function ChangeStoreStatusBox({
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
-                await router.push("/admin-dashboard/login");
-                return;
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
             }
-            setIsWaitStatus(false);
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
@@ -141,16 +143,15 @@ export default function ChangeStoreStatusBox({
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setIsWaitStatus(true);
-                const res = await axios.put(`${process.env.BASE_API_URL}/stores/blocking-store/${storeId}?blockingReason=${changeStatusReason}`, undefined,
+                setWaitMsg("Please Waiting ...");
+                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/blocking-store/${storeId}?blockingReason=${changeStatusReason}`, undefined,
                     {
                         headers: {
                             Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                         }
                     }
-                );
-                const result = res.data;
-                setIsWaitStatus(false);
+                )).data;
+                setWaitMsg("");
                 if (!result.error) {
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(async () => {
@@ -163,31 +164,32 @@ export default function ChangeStoreStatusBox({
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
-                await router.push("/admin-dashboard/login");
-                return;
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
             }
-            setIsWaitStatus(false);
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
     const cancelBlockingStore = async (storeId) => {
         try {
-            setIsWaitStatus(true);
-            const res = await axios.put(`${process.env.BASE_API_URL}/stores/cancel-blocking/${storeId}`, undefined,
+            setWaitMsg("Please Waiting ...");
+            const result = (await axios.put(`${process.env.BASE_API_URL}/stores/cancel-blocking/${storeId}`, undefined,
                 {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
                 }
-            );
-            const result = res.data;
-            setIsWaitStatus(false);
+            )).data;
+            setWaitMsg("");
             if (!result.error) {
                 setSuccessMsg(result.msg);
                 let successTimeout = setTimeout(async () => {
@@ -199,23 +201,25 @@ export default function ChangeStoreStatusBox({
             }
         }
         catch (err) {
-            if (err?.response?.data?.msg === "Unauthorized Error") {
-                await router.push("/admin-dashboard/login");
-                return;
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
             }
-            setIsWaitStatus(false);
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
     return (
         <div className="change-store-status-box popup-box">
             <div className="content-box d-flex align-items-center justify-content-center text-white flex-column p-4 text-center">
-                {!isWaitStatus && !errorMsg && !successMsg && <GrFormClose className="close-popup-box-icon" onClick={handleClosePopupBox} />}
+                {!waitMsg && !errorMsg && !successMsg && <GrFormClose className="close-popup-box-icon" onClick={handleClosePopupBox} />}
                 <h2 className="mb-5 pb-3 border-bottom border-white">Change Store Status</h2>
                 <h4 className="mb-4">Are You Sure From: {storeAction} Store: ( {storeId} ) ?</h4>
                 <form className="change-store-status-form w-50" onSubmit={(e) => e.preventDefault()}>
@@ -233,7 +237,7 @@ export default function ChangeStoreStatusBox({
                         </p>}
                     </section>}
                     {
-                        !isWaitStatus &&
+                        !waitMsg &&
                         !errorMsg &&
                         !successMsg &&
                         storeAction === "approving" && <section className="change-store-status mb-4">
@@ -256,7 +260,7 @@ export default function ChangeStoreStatusBox({
                         </section>
                     }
                     {
-                        !isWaitStatus &&
+                        !waitMsg &&
                         !errorMsg &&
                         !successMsg &&
                         storeAction === "approving" &&
@@ -268,7 +272,7 @@ export default function ChangeStoreStatusBox({
                         </button>
                     }
                     {
-                        !isWaitStatus &&
+                        !waitMsg &&
                         !errorMsg &&
                         !successMsg &&
                         storeAction === "rejecting" &&
@@ -280,7 +284,7 @@ export default function ChangeStoreStatusBox({
                         </button>
                     }
                     {
-                        !isWaitStatus &&
+                        !waitMsg &&
                         !errorMsg &&
                         !successMsg &&
                         storeAction === "blocking" &&
@@ -292,7 +296,7 @@ export default function ChangeStoreStatusBox({
                         </button>
                     }
                     {
-                        !isWaitStatus &&
+                        !waitMsg &&
                         !errorMsg &&
                         !successMsg &&
                         storeAction === "cancel-blocking" &&
@@ -303,12 +307,12 @@ export default function ChangeStoreStatusBox({
                             Cancel Blocking
                         </button>
                     }
-                    {isWaitStatus &&
+                    {waitMsg &&
                         <button
                             className="btn btn-info d-block mx-auto mb-3 global-button"
                             disabled
                         >
-                            Please Waiting ...
+                            {waitMsg}
                         </button>
                     }
                     {errorMsg &&
@@ -329,7 +333,7 @@ export default function ChangeStoreStatusBox({
                     }
                     <button
                         className="btn btn-danger d-block mx-auto global-button"
-                        disabled={isWaitStatus || errorMsg || successMsg}
+                        disabled={waitMsg || errorMsg || successMsg}
                         onClick={handleClosePopupBox}
                     >
                         Close

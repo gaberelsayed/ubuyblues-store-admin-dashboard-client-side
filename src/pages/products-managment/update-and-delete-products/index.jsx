@@ -25,13 +25,13 @@ export default function UpdateAndDeleteProducts() {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
-    const [isErrorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState(false);
+    const [errorMsgOnLoadingThePage, setErrorMsgOnLoadingThePage] = useState("");
 
     const [adminInfo, setAdminInfo] = useState({});
 
     const [allProductsInsideThePage, setAllProductsInsideThePage] = useState([]);
 
-    const [isFilteringProductsStatus, setIsFilteringProductsStatus] = useState(false);
+    const [isGetProducts, setIsGetProducts] = useState(false);
 
     const [allCategories, setAllCategories] = useState([]);
 
@@ -103,24 +103,20 @@ export default function UpdateAndDeleteProducts() {
                     }
                 })
                 .catch(async (err) => {
-                    if (err?.message === "Network Error") {
-                        setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
-                    }
                     if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     }
                     else {
                         setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
+                        setErrorMsgOnLoadingThePage(err?.message === "Network Error" ? "Network Error" : "Sorry, Something Went Wrong, Please Try Again !");
                     }
                 });
         } else router.replace("/login");
     }, []);
 
     const getPreviousPage = async () => {
-        setIsFilteringProductsStatus(true);
+        setIsGetProducts(true);
         const newCurrentPage = currentPage - 1;
         const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data.products
         tempAllProductsInsideThePage.forEach((product) => {
@@ -130,11 +126,11 @@ export default function UpdateAndDeleteProducts() {
         });
         setAllProductsInsideThePage(tempAllProductsInsideThePage);
         setCurrentPage(newCurrentPage);
-        setIsFilteringProductsStatus(false);
+        setIsGetProducts(false);
     }
 
     const getNextPage = async () => {
-        setIsFilteringProductsStatus(true);
+        setIsGetProducts(true);
         const newCurrentPage = currentPage + 1;
         const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data.products
         tempAllProductsInsideThePage.forEach((product) => {
@@ -144,11 +140,11 @@ export default function UpdateAndDeleteProducts() {
         });
         setAllProductsInsideThePage(tempAllProductsInsideThePage);
         setCurrentPage(newCurrentPage);
-        setIsFilteringProductsStatus(false);
+        setIsGetProducts(false);
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsFilteringProductsStatus(true);
+        setIsGetProducts(true);
         const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data.products
         tempAllProductsInsideThePage.forEach((product) => {
             const filteredCountryListForProduct = allCountries.filter((country) => !product.countries.includes(country));
@@ -157,7 +153,7 @@ export default function UpdateAndDeleteProducts() {
         });
         setAllProductsInsideThePage(tempAllProductsInsideThePage);
         setCurrentPage(pageNumber);
-        setIsFilteringProductsStatus(false);
+        setIsGetProducts(false);
     }
 
     const getFilteringString = (filters) => {
@@ -170,33 +166,35 @@ export default function UpdateAndDeleteProducts() {
 
     const filterProductsByCategory = async () => {
         try {
-            setIsFilteringProductsStatus(true);
+            setIsGetProducts(true);
             setCurrentPage(1);
             let filteringString = getFilteringString(filters);
             const result = await getProductsCount(filteringString);
             if (result.data > 0) {
                 setAllProductsInsideThePage((await getAllProductsInsideThePage(1, pageSize, filteringString)).data.products);
                 setTotalPagesCount(Math.ceil(result.data / pageSize));
-                setIsFilteringProductsStatus(false);
+                setIsGetProducts(false);
             } else {
                 setAllProductsInsideThePage([]);
                 setTotalPagesCount(0);
-                setIsFilteringProductsStatus(false);
+                setIsGetProducts(false);
             }
         }
         catch (err) {
             if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
-                return;
             }
-            setIsFilteringProductsStatus(false);
-            setCurrentPage(-1);
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setIsGetProducts(false);
+                setCurrentPage(-1);
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
@@ -298,15 +296,16 @@ export default function UpdateAndDeleteProducts() {
             if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
-                return;
             }
-            setWaitChangeProductImageMsg("");
-            setErrorChangeProductImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorChangeProductImageMsg("");
-                setSelectedProducImageIndex(-1);
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitChangeProductImageMsg("");
+                setErrorChangeProductImageMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorChangeProductImageMsg("");
+                    setSelectedProducImageIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
@@ -392,7 +391,7 @@ export default function UpdateAndDeleteProducts() {
             setFormValidationErrors(errorsObject);
             setSelectedProductIndex(productIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting Updating ...");
+                setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/products/${allProductsInsideThePage[productIndex]._id}`, {
                     name: allProductsInsideThePage[productIndex].name,
                     price: allProductsInsideThePage[productIndex].price,
@@ -420,7 +419,6 @@ export default function UpdateAndDeleteProducts() {
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
-                    setWaitMsg("");
                     setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
                     let errorTimeout = setTimeout(() => {
                         setErrorMsg("");
@@ -434,21 +432,22 @@ export default function UpdateAndDeleteProducts() {
             if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
-                return;
             }
-            setWaitMsg("");
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                setSelectedProductIndex(-1);
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedProductIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
     const deleteProduct = async (productIndex) => {
         try {
-            setWaitMsg("Please Waiting Deleting ...");
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedProductIndex(productIndex);
             const result = (await axios.delete(`${process.env.BASE_API_URL}/products/${allProductsInsideThePage[productIndex]._id}`, {
                 headers: {
@@ -461,7 +460,7 @@ export default function UpdateAndDeleteProducts() {
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedProductIndex(-1);
-                    setIsFilteringProductsStatus(true);
+                    setIsGetProducts(true);
                     const result = await getProductsCount(getFilteringString(filters));
                     if (result.data > 0) {
                         setAllProductsInsideThePage((await getAllProductsInsideThePage(currentPage, pageSize, getFilteringString(filters))).data);
@@ -470,7 +469,7 @@ export default function UpdateAndDeleteProducts() {
                         setAllProductsInsideThePage([]);
                         setTotalPagesCount(0);
                     }
-                    setIsFilteringProductsStatus(false);
+                    setIsGetProducts(false);
                     clearTimeout(successTimeout);
                 }, 1500);
             } else {
@@ -486,15 +485,16 @@ export default function UpdateAndDeleteProducts() {
             if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
-                return;
             }
-            setWaitMsg("");
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                setSelectedProductIndex(-1);
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedProductIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
@@ -503,7 +503,7 @@ export default function UpdateAndDeleteProducts() {
             <Head>
                 <title>{process.env.storeName} Admin Dashboard - Update / Delete Products</title>
             </Head>
-            {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
+            {!isLoadingPage && !errorMsgOnLoadingThePage && <>
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-4">
                     <h1 className="fw-bold w-fit pb-2 mb-4">
@@ -528,20 +528,20 @@ export default function UpdateAndDeleteProducts() {
                                 </select>
                             </div>
                         </div>
-                        {!isFilteringProductsStatus && <button
+                        {!isGetProducts && <button
                             className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                             onClick={() => filterProductsByCategory()}
                         >
                             Filter
                         </button>}
-                        {isFilteringProductsStatus && <button
+                        {isGetProducts && <button
                             className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                             disabled
                         >
                             Filtering ...
                         </button>}
                     </section>
-                    {allProductsInsideThePage.length > 0 && !isFilteringProductsStatus && <div className="products-box admin-dashbboard-data-box w-100 pe-4">
+                    {allProductsInsideThePage.length > 0 && !isGetProducts && <div className="products-box admin-dashbboard-data-box w-100 pe-4">
                         <table className="products-table mb-4 managment-table admin-dashbboard-data-table bg-white">
                             <thead>
                                 <tr>
@@ -795,11 +795,11 @@ export default function UpdateAndDeleteProducts() {
                             </tbody>
                         </table>
                     </div>}
-                    {allProductsInsideThePage.length === 0 && !isFilteringProductsStatus && <p className="alert alert-danger w-100">Sorry, Can't Find Any Products !!</p>}
-                    {isFilteringProductsStatus && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
+                    {allProductsInsideThePage.length === 0 && !isGetProducts && <p className="alert alert-danger w-100">Sorry, Can't Find Any Products !!</p>}
+                    {isGetProducts && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
                         <span className="loader-table-data"></span>
                     </div>}
-                    {totalPagesCount > 1 && !isFilteringProductsStatus &&
+                    {totalPagesCount > 1 && !isGetProducts &&
                         <PaginationBar
                             totalPagesCount={totalPagesCount}
                             currentPage={currentPage}
@@ -810,8 +810,8 @@ export default function UpdateAndDeleteProducts() {
                     }
                 </div>
             </>}
-            {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}
-            {isErrorMsgOnLoadingThePage && <ErrorOnLoadingThePage />}
+            {isLoadingPage && !errorMsgOnLoadingThePage && <LoaderPage />}
+            {errorMsgOnLoadingThePage && <ErrorOnLoadingThePage errorMsg={errorMsgOnLoadingThePage} />}
         </div>
     );
 }

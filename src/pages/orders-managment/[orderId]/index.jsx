@@ -11,7 +11,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
-    const [isErrorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState(false);
+    const [errorMsgOnLoadingThePage, setErrorMsgOnLoadingThePage] = useState("");
 
     const [adminInfo, setAdminInfo] = useState({});
 
@@ -19,9 +19,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
 
     const [selectedOrderProductIndex, setSelectedOrderProductIndex] = useState(-1);
 
-    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-
-    const [isDeletingStatus, setIsDeletingStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -53,17 +51,13 @@ export default function OrderDetails({ orderIdAsProperty }) {
                     }
                 })
                 .catch(async (err) => {
-                    if (err?.message === "Network Error") {
-                        setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
-                    }
                     if (err?.response?.status === 401) {
                         localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                         await router.replace("/login");
                     }
                     else {
                         setIsLoadingPage(false);
-                        setIsErrorMsgOnLoadingThePage(true);
+                        setErrorMsgOnLoadingThePage(err?.message === "Network Error" ? "Network Error" : "Sorry, Something Went Wrong, Please Try Again !");
                     }
                 });
         } else router.replace("/login");
@@ -77,7 +71,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
 
     const updateOrderProductData = async (orderProductIndex) => {
         try {
-            setIsUpdatingStatus(true);
+            setWaitMsg("Please Wait To Updating ...");
             setSelectedOrderProductIndex(orderProductIndex);
             const result = (await axios.put(`${process.env.BASE_API_URL}/orders/products/update-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}`, {
                 quantity: orderDetails.products[orderProductIndex].quantity,
@@ -90,7 +84,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                 }
             })).data;
             if (!result.error) {
-                setIsUpdatingStatus(false);
+                setWaitMsg("");
                 setSuccessMsg("Updating Success !!");
                 let successTimeout = setTimeout(() => {
                     setSuccessMsg("");
@@ -98,27 +92,35 @@ export default function OrderDetails({ orderIdAsProperty }) {
                     clearTimeout(successTimeout);
                 }, 1500);
             } else {
-                setSelectedOrderProductIndex(-1);
+                setWaitMsg("");
+                setErrorMsg(result.msg);
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedOrderProductIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
             }
         }
         catch (err) {
             if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
-                return;
             }
-            setIsUpdatingStatus(false);
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedOrderProductIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
     const deleteProductFromOrder = async (orderProductIndex) => {
         try {
-            setIsDeletingStatus(true);
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedOrderProductIndex(orderProductIndex);
             const result = (await axios.delete(`${process.env.BASE_API_URL}/orders/products/delete-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}`, {
                 headers: {
@@ -126,7 +128,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                 }
             })).data;
             if (!result.error) {
-                setIsDeletingStatus(false);
+                setWaitMsg("");
                 setSuccessMsg("Deleting Success !!");
                 let successTimeout = setTimeout(() => {
                     setSuccessMsg("");
@@ -147,15 +149,16 @@ export default function OrderDetails({ orderIdAsProperty }) {
             if (err?.response?.status === 401) {
                 localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                 await router.replace("/login");
-                return;
             }
-            setIsDeletingStatus(false);
-            setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
-            let errorTimeout = setTimeout(() => {
-                setErrorMsg("");
-                setSelectedOrderProductIndex(-1);
-                clearTimeout(errorTimeout);
-            }, 1500);
+            else {
+                setWaitMsg("");
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedOrderProductIndex(-1);
+                    clearTimeout(errorTimeout);
+                }, 1500);
+            }
         }
     }
 
@@ -164,7 +167,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
             <Head>
                 <title>{process.env.storeName} Admin Dashboard - Order Details</title>
             </Head>
-            {!isLoadingPage && !isErrorMsgOnLoadingThePage && <>
+            {!isLoadingPage && !errorMsgOnLoadingThePage && <>
                 {/* Start Admin Dashboard Side Bar */}
                 <AdminPanelHeader isWebsiteOwner={adminInfo.isWebsiteOwner} isMerchant={adminInfo.isMerchant} />
                 {/* Start Admin Dashboard Side Bar */}
@@ -241,7 +244,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                                     >
                                                         Update
                                                     </button>}
-                                                    {isUpdatingStatus && selectedOrderProductIndex === orderProductIndex && <button
+                                                    {waitMsg && selectedOrderProductIndex === orderProductIndex && <button
                                                         className="btn btn-info d-block mx-auto mb-3 global-button"
                                                         disabled
                                                     >
@@ -253,7 +256,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                                     >
                                                         Delete
                                                     </button>}
-                                                    {isDeletingStatus && selectedOrderProductIndex === orderProductIndex && <button
+                                                    {waitMsg && selectedOrderProductIndex === orderProductIndex && <button
                                                         className="btn btn-danger d-block mx-auto mb-3 global-button"
                                                         disabled
                                                     >
@@ -351,8 +354,8 @@ export default function OrderDetails({ orderIdAsProperty }) {
                 </section>
                 {/* End Content Section */}
             </>}
-            {isLoadingPage && !isErrorMsgOnLoadingThePage && <LoaderPage />}
-            {isErrorMsgOnLoadingThePage && <ErrorOnLoadingThePage />}
+            {isLoadingPage && !errorMsgOnLoadingThePage && <LoaderPage />}
+            {errorMsgOnLoadingThePage && <ErrorOnLoadingThePage errorMsg={errorMsgOnLoadingThePage} />}
         </div>
     );
 }

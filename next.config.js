@@ -9,7 +9,8 @@ const nextConfig = {
         BASE_API_URL: process.env.NODE_ENV === "development" ? "http://localhost:5200" : "https://api.ubuyblues.com",
         WEBSITE_URL: process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://ubuyblues.com",
         adminTokenNameInLocalStorage: "u-b-a-t",
-        storeName: "Ubuyblues Store"
+        storeName: "Ubuyblues Store",
+        adminDashboardlanguageFieldNameInLocalStorage: "ubuyblues-store-admin-dashboard-language"
     },
     async headers() {
         return [

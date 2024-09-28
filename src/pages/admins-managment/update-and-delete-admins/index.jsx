@@ -48,7 +48,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const router = useRouter();
 
-    const pageSize = 1;
+    const pageSize = 10;
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);

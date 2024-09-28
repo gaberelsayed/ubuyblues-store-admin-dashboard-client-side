@@ -10,12 +10,14 @@ import PaginationBar from "@/components/PaginationBar";
 import { inputValuesValidation } from "../../../public/global_functions/validations";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { getAdminInfo, getDateFormated } from "../../../public/global_functions/popular";
+import NotFoundError from "@/components/NotFoundError";
+import TableLoader from "@/components/TableLoader";
 
 export default function OrdersManagment() {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
-    const [errorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState("");
+    const [errorMsgOnLoadingThePage, setErrorMsgOnLoadingThePage] = useState("");
 
     const [adminInfo, setAdminInfo] = useState({});
 
@@ -23,7 +25,7 @@ export default function OrdersManagment() {
 
     const [isSendEmailToTheCustomerList, setIsSendEmailToTheCustomerList] = useState([]);
 
-    const [isFilteringOrdersStatus, setIsFilteringOrdersStatus] = useState(false);
+    const [isGetOrders, setIsGetOrders] = useState(false);
 
     const [selectedOrderIndex, setSelectedOrderIndex] = useState(-1);
 
@@ -32,6 +34,8 @@ export default function OrdersManagment() {
     const [successMsg, setSuccessMsg] = useState("");
 
     const [errorMsg, setErrorMsg] = useState("");
+
+    const [errorMsgOnGetOrdersData, setErrorMsgOnGetOrdersData] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -112,7 +116,7 @@ export default function OrdersManagment() {
             })).data;
         }
         catch (err) {
-            throw Error(err);
+            throw err;
         }
     }
 
@@ -125,31 +129,67 @@ export default function OrdersManagment() {
             })).data;
         }
         catch (err) {
-            throw Error(err);
+            throw err;
         }
     }
 
     const getPreviousPage = async () => {
-        setIsFilteringOrdersStatus(true);
-        const newCurrentPage = currentPage - 1;
-        setAllOrdersInsideThePage((await getAllOrdersInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(newCurrentPage);
-        setIsFilteringOrdersStatus(false);
+        try {
+            setIsGetOrders(true);
+            setErrorMsgOnGetOrdersData("");
+            const newCurrentPage = currentPage - 1;
+            setAllOrdersInsideThePage((await getAllOrdersInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetOrders(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetOrdersData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getNextPage = async () => {
-        setIsFilteringOrdersStatus(true);
-        const newCurrentPage = currentPage + 1;
-        setAllOrdersInsideThePage((await getAllOrdersInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(newCurrentPage);
-        setIsFilteringOrdersStatus(false);
+        try {
+            setIsGetOrders(true);
+            setErrorMsgOnGetOrdersData("");
+            const newCurrentPage = currentPage + 1;
+            setAllOrdersInsideThePage((await getAllOrdersInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetOrders(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetOrdersData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsFilteringOrdersStatus(true);
-        setAllOrdersInsideThePage((await getAllOrdersInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(pageNumber);
-        setIsFilteringOrdersStatus(false);
+        try {
+            setIsGetOrders(true);
+            setErrorMsgOnGetOrdersData("");
+            setAllOrdersInsideThePage((await getAllOrdersInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(pageNumber);
+            setIsGetOrders(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetOrdersData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const filterOrders = async (filters) => {
@@ -169,18 +209,18 @@ export default function OrdersManagment() {
             // ]);
             const errorsObject = {};
             if (Object.keys(errorsObject).length == 0) {
-                setIsFilteringOrdersStatus(true);
+                setIsGetOrders(true);
                 setCurrentPage(1);
                 let filteringString = getFilteringString(filters);
                 const result = await getOrdersCount(filteringString);
                 if (result.data > 0) {
                     setAllOrdersInsideThePage((await getAllOrdersInsideThePage(1, pageSize, filteringString)).data);
                     setTotalPagesCount(Math.ceil(result.data / pageSize));
-                    setIsFilteringOrdersStatus(false);
+                    setIsGetOrders(false);
                 } else {
                     setAllOrdersInsideThePage([]);
                     setTotalPagesCount(0);
-                    setIsFilteringOrdersStatus(false);
+                    setIsGetOrders(false);
                 }
             }
         }
@@ -190,7 +230,7 @@ export default function OrdersManagment() {
                 await router.replace("/login");
             }
             else {
-                setIsFilteringOrdersStatus(false);
+                setIsGetOrders(false);
                 setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
                 let errorTimeout = setTimeout(() => {
                     setErrorMsg("");
@@ -293,11 +333,11 @@ export default function OrdersManagment() {
                     if (result.data > 0) {
                         setAllOrdersInsideThePage((await getAllOrdersInsideThePage(currentPage, pageSize, filteringString)).data);
                         setTotalPagesCount(Math.ceil(result.data / pageSize));
-                        setIsFilteringOrdersStatus(false);
+                        setIsGetOrders(false);
                     } else {
                         setAllOrdersInsideThePage([]);
                         setTotalPagesCount(0);
-                        setIsFilteringOrdersStatus(false);
+                        setIsGetOrders(false);
                     }
                     clearTimeout(successTimeout);
                 }, 3000);
@@ -389,20 +429,20 @@ export default function OrdersManagment() {
                                     />
                                 </div>
                             </div>
-                            {!isFilteringOrdersStatus && <button
+                            {!isGetOrders && <button
                                 className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                                 onClick={() => filterOrders(filters)}
                             >
                                 Filter
                             </button>}
-                            {isFilteringOrdersStatus && <button
+                            {isGetOrders && <button
                                 className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                                 disabled
                             >
                                 Filtering ...
                             </button>}
                         </section>
-                        {allOrdersInsideThePage.length > 0 && !isFilteringOrdersStatus && <section className="orders-data-box p-3 data-box admin-dashbboard-data-box">
+                        {allOrdersInsideThePage.length > 0 && !isGetOrders && <section className="orders-data-box p-3 data-box admin-dashbboard-data-box">
                             <table className="orders-data-table mb-4 managment-table bg-white admin-dashbboard-data-table">
                                 <thead>
                                     <tr>
@@ -519,11 +559,10 @@ export default function OrdersManagment() {
                                 </tbody>
                             </table>
                         </section>}
-                        {allOrdersInsideThePage.length === 0 && !isFilteringOrdersStatus && <p className="alert alert-danger">Sorry, Can't Find Any Orders !!</p>}
-                        {isFilteringOrdersStatus && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                            <span className="loader-table-data"></span>
-                        </div>}
-                        {totalPagesCount > 1 && !isFilteringOrdersStatus &&
+                        {allOrdersInsideThePage.length === 0 && !isGetOrders && <NotFoundError errorMsg="Sorry, Can't Find Any Orders !!" />}
+                        {isGetOrders && <TableLoader />}
+                        {errorMsgOnGetOrdersData && <NotFoundError errorMsg={errorMsgOnGetOrdersData} />}
+                        {totalPagesCount > 1 && !isGetOrders &&
                             <PaginationBar
                                 totalPagesCount={totalPagesCount}
                                 currentPage={currentPage}

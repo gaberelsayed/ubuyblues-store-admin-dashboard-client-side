@@ -11,6 +11,8 @@ import { inputValuesValidation } from "../../../public/global_functions/validati
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import ChangeStoreStatusBox from "@/components/ChangeStoreStatusBox";
 import { getAdminInfo, getStoresCount, getAllStoresInsideThePage } from "../../../public/global_functions/popular";
+import NotFoundError from "@/components/NotFoundError";
+import TableLoader from "@/components/TableLoader";
 
 export default function StoresManagment() {
 
@@ -31,6 +33,8 @@ export default function StoresManagment() {
     const [successMsg, setSuccessMsg] = useState("");
 
     const [errorMsg, setErrorMsg] = useState("");
+
+    const [errorMsgOnGetStoresData, setErrorMsgOnGetStoresData] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -96,26 +100,62 @@ export default function StoresManagment() {
     }, []);
 
     const getPreviousPage = async () => {
-        setIsGetStores(true);
-        const newCurrentPage = currentPage - 1;
-        setAllStoresInsideThePage((await getAllStoresInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetStores(false);
+        try {
+            setIsGetStores(true);
+            setErrorMsgOnGetStoresData("");
+            const newCurrentPage = currentPage - 1;
+            setAllStoresInsideThePage((await getAllStoresInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetStores(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetStoresData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getNextPage = async () => {
-        setIsGetStores(true);
-        const newCurrentPage = currentPage + 1;
-        setAllStoresInsideThePage((await getAllStoresInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetStores(false);
+        try {
+            setIsGetStores(true);
+            setErrorMsgOnGetStoresData("");
+            const newCurrentPage = currentPage + 1;
+            setAllStoresInsideThePage((await getAllStoresInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetStores(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetStoresData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsGetStores(true);
-        setAllStoresInsideThePage((await getAllStoresInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(pageNumber);
-        setIsGetStores(false);
+        try {
+            setIsGetStores(true);
+            setErrorMsgOnGetStoresData("");
+            setAllStoresInsideThePage((await getAllStoresInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(pageNumber);
+            setIsGetStores(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetStoresData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getFilteringString = (filters) => {
@@ -622,10 +662,9 @@ export default function StoresManagment() {
                                 </tbody>
                             </table>
                         </section>}
-                        {allStoresInsideThePage.length === 0 && !isGetStores && <p className="alert alert-danger">Sorry, Can't Find Any Stores !!</p>}
-                        {isGetStores && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                            <span className="loader-table-data"></span>
-                        </div>}
+                        {allStoresInsideThePage.length === 0 && !isGetStores && <NotFoundError errorMsg="Sorry, Can't Find Any Stores !!" />}
+                        {isGetStores && <TableLoader />}
+                        {errorMsgOnGetStoresData && <NotFoundError errorMsg={errorMsgOnGetStoresData} />}
                         {totalPagesCount > 1 && !isGetStores &&
                             <PaginationBar
                                 totalPagesCount={totalPagesCount}

@@ -8,12 +8,14 @@ import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { useRouter } from "next/router";
 import PaginationBar from "@/components/PaginationBar";
 import { getAdminInfo, getDateFormated } from "../../../public/global_functions/popular";
+import NotFoundError from "@/components/NotFoundError";
+import TableLoader from "@/components/TableLoader";
 
 export default function UsersManagment() {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
-    const [errorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState("");
+    const [errorMsgOnLoadingThePage, setErrorMsgOnLoadingThePage] = useState("");
 
     const [adminInfo, setAdminInfo] = useState({});
 
@@ -26,6 +28,8 @@ export default function UsersManagment() {
     const [selectedUserIndex, setSelectedUserIndex] = useState(-1);
 
     const [errorMsg, setErrorMsg] = useState("");
+
+    const [errorMsgOnGetUsersData, setErrorMsgOnGetUsersData] = useState("");
 
     const [successMsg, setSuccessMsg] = useState("");
 
@@ -120,26 +124,62 @@ export default function UsersManagment() {
     }
 
     const getPreviousPage = async () => {
-        setIsGetUsers(true);
-        const newCurrentPage = currentPage - 1;
-        setAllUsersInsideThePage((await getAllUsersInsideThePage(newCurrentPage, pageSize)).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetUsers(false);
+        try {
+            setIsGetUsers(true);
+            setErrorMsgOnGetUsersData("");
+            const newCurrentPage = currentPage - 1;
+            setAllUsersInsideThePage((await getAllUsersInsideThePage(newCurrentPage, pageSize)).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetUsers(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetUsersData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getNextPage = async () => {
-        setIsGetUsers(true);
-        const newCurrentPage = currentPage + 1;
-        setAllUsersInsideThePage((await getAllUsersInsideThePage(newCurrentPage, pageSize)).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetUsers(false);
+        try {
+            setIsGetUsers(true);
+            setErrorMsgOnGetUsersData("");
+            const newCurrentPage = currentPage + 1;
+            setAllUsersInsideThePage((await getAllUsersInsideThePage(newCurrentPage, pageSize)).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetUsers(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetUsersData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsGetUsers(true);
-        setAllUsersInsideThePage((await getAllUsersInsideThePage(pageNumber, pageSize)).data);
-        setCurrentPage(pageNumber);
-        setIsGetUsers(false);
+        try {
+            setIsGetUsers(true);
+            setErrorMsgOnGetUsersData("");
+            setAllUsersInsideThePage((await getAllUsersInsideThePage(pageNumber, pageSize)).data);
+            setCurrentPage(pageNumber);
+            setIsGetUsers(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetUsersData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const filterUsers = async (filters) => {
@@ -340,10 +380,9 @@ export default function UsersManagment() {
                                 </tbody>
                             </table>
                         </section>}
-                        {allUsersInsideThePage.length === 0 && !isGetUsers && <p className="alert alert-danger w-100">Sorry, Can't Find Any Users !!</p>}
-                        {isGetUsers && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                            <span className="loader-table-data"></span>
-                        </div>}
+                        {allUsersInsideThePage.length === 0 && !isGetUsers && <NotFoundError errorMsg="Sorry, Can't Find Any Users !!" />}
+                        {isGetUsers && <TableLoader />}
+                        {errorMsgOnGetUsersData && <NotFoundError errorMsg={errorMsgOnGetUsersData} />}
                         {totalPagesCount > 1 && !isGetUsers &&
                             <PaginationBar
                                 totalPagesCount={totalPagesCount}

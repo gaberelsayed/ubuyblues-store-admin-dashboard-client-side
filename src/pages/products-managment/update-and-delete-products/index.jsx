@@ -20,6 +20,8 @@ import {
 import Link from "next/link";
 import { countries } from "countries-list";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import NotFoundError from "@/components/NotFoundError";
+import TableLoader from "@/components/TableLoader";
 
 export default function UpdateAndDeleteProducts() {
 
@@ -35,7 +37,7 @@ export default function UpdateAndDeleteProducts() {
 
     const [allCategories, setAllCategories] = useState([]);
 
-    const [waitMsg, setWaitMsg] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [selectedProducImageIndex, setSelectedProducImageIndex] = useState(-1);
 
@@ -46,6 +48,8 @@ export default function UpdateAndDeleteProducts() {
     const [errorMsg, setErrorMsg] = useState("");
 
     const [errorChangeProductImageMsg, setErrorChangeProductImageMsg] = useState("");
+
+    const [errorMsgOnGetProductsData, setErrorMsgOnGetProductsData] = useState("");
 
     const [successMsg, setSuccessMsg] = useState("");
 
@@ -116,44 +120,80 @@ export default function UpdateAndDeleteProducts() {
     }, []);
 
     const getPreviousPage = async () => {
-        setIsGetProducts(true);
-        const newCurrentPage = currentPage - 1;
-        const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data.products
-        tempAllProductsInsideThePage.forEach((product) => {
-            const filteredCountryListForProduct = allCountries.filter((country) => !product.countries.includes(country));
-            product.filteredCountryList = filteredCountryListForProduct;
-            product.allCountriesWithoutOriginalCountries = filteredCountryListForProduct;
-        });
-        setAllProductsInsideThePage(tempAllProductsInsideThePage);
-        setCurrentPage(newCurrentPage);
-        setIsGetProducts(false);
+        try {
+            setIsGetProducts(true);
+            setErrorMsgOnGetProductsData("");
+            const newCurrentPage = currentPage - 1;
+            const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data.products
+            tempAllProductsInsideThePage.forEach((product) => {
+                const filteredCountryListForProduct = allCountries.filter((country) => !product.countries.includes(country));
+                product.filteredCountryList = filteredCountryListForProduct;
+                product.allCountriesWithoutOriginalCountries = filteredCountryListForProduct;
+            });
+            setAllProductsInsideThePage(tempAllProductsInsideThePage);
+            setCurrentPage(newCurrentPage);
+            setIsGetProducts(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetProductsData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getNextPage = async () => {
-        setIsGetProducts(true);
-        const newCurrentPage = currentPage + 1;
-        const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data.products
-        tempAllProductsInsideThePage.forEach((product) => {
-            const filteredCountryListForProduct = allCountries.filter((country) => !product.countries.includes(country));
-            product.filteredCountryList = filteredCountryListForProduct;
-            product.allCountriesWithoutOriginalCountries = filteredCountryListForProduct;
-        });
-        setAllProductsInsideThePage(tempAllProductsInsideThePage);
-        setCurrentPage(newCurrentPage);
-        setIsGetProducts(false);
+        try {
+            setIsGetProducts(true);
+            setErrorMsgOnGetProductsData("");
+            const newCurrentPage = currentPage + 1;
+            const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data.products
+            tempAllProductsInsideThePage.forEach((product) => {
+                const filteredCountryListForProduct = allCountries.filter((country) => !product.countries.includes(country));
+                product.filteredCountryList = filteredCountryListForProduct;
+                product.allCountriesWithoutOriginalCountries = filteredCountryListForProduct;
+            });
+            setAllProductsInsideThePage(tempAllProductsInsideThePage);
+            setCurrentPage(newCurrentPage);
+            setIsGetProducts(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetProductsData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsGetProducts(true);
-        const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data.products
-        tempAllProductsInsideThePage.forEach((product) => {
-            const filteredCountryListForProduct = allCountries.filter((country) => !product.countries.includes(country));
-            product.filteredCountryList = filteredCountryListForProduct;
-            product.allCountriesWithoutOriginalCountries = filteredCountryListForProduct;
-        });
-        setAllProductsInsideThePage(tempAllProductsInsideThePage);
-        setCurrentPage(pageNumber);
-        setIsGetProducts(false);
+        try {
+            setIsGetProducts(true);
+            setErrorMsgOnGetProductsData("");
+            const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data.products
+            tempAllProductsInsideThePage.forEach((product) => {
+                const filteredCountryListForProduct = allCountries.filter((country) => !product.countries.includes(country));
+                product.filteredCountryList = filteredCountryListForProduct;
+                product.allCountriesWithoutOriginalCountries = filteredCountryListForProduct;
+            });
+            setAllProductsInsideThePage(tempAllProductsInsideThePage);
+            setCurrentPage(pageNumber);
+            setIsGetProducts(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetProductsData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getFilteringString = (filters) => {
@@ -608,16 +648,16 @@ export default function UpdateAndDeleteProducts() {
                                         </td>
                                         <td className="product-country-cell">
                                             <section className="product-country mb-4">
-                                            {product.countries.map((country) =>
-                                                <div className="row align-items-center mb-3" key={country}>
-                                                    <div className={product.countries.length > 1 ? "col-md-10" : "col-md-12"}>
-                                                        <h6 className="bg-info p-2 fw-bold m-0">{countries[country].name}</h6>
+                                                {product.countries.map((country) =>
+                                                    <div className="row align-items-center mb-3" key={country}>
+                                                        <div className={product.countries.length > 1 ? "col-md-10" : "col-md-12"}>
+                                                            <h6 className="bg-info p-2 fw-bold m-0">{countries[country].name}</h6>
+                                                        </div>
+                                                        {product.countries.length > 1 && <div className="col-md-2">
+                                                            <IoIosCloseCircleOutline className="remove-icon" onClick={() => handleRemoveCountryFromCountryList(productIndex, country)} />
+                                                        </div>}
                                                     </div>
-                                                    {product.countries.length > 1 && <div className="col-md-2">
-                                                        <IoIosCloseCircleOutline className="remove-icon" onClick={() => handleRemoveCountryFromCountryList(productIndex, country)} />
-                                                    </div>}
-                                                </div>
-                                            )}
+                                                )}
                                                 <hr />
                                                 <div className="select-country-box mb-4">
                                                     <input
@@ -795,10 +835,9 @@ export default function UpdateAndDeleteProducts() {
                             </tbody>
                         </table>
                     </div>}
-                    {allProductsInsideThePage.length === 0 && !isGetProducts && <p className="alert alert-danger w-100">Sorry, Can't Find Any Products !!</p>}
-                    {isGetProducts && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                        <span className="loader-table-data"></span>
-                    </div>}
+                    {allProductsInsideThePage.length === 0 && !isGetProducts && <NotFoundError errorMsg="Sorry, Can't Find Any Products !!" />}
+                    {isGetProducts && <TableLoader />}
+                    {errorMsgOnGetProductsData && <NotFoundError errorMsg={errorMsgOnGetProductsData} />}
                     {totalPagesCount > 1 && !isGetProducts &&
                         <PaginationBar
                             totalPagesCount={totalPagesCount}

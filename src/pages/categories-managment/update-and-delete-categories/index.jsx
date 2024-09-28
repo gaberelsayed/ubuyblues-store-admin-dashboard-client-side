@@ -10,6 +10,8 @@ import PaginationBar from "@/components/PaginationBar";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { getAdminInfo, getCategoriesCount, getAllCategoriesInsideThePage } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
+import NotFoundError from "@/components/NotFoundError";
+import TableLoader from "@/components/TableLoader";
 
 export default function UpdateAndDeleteCategories() {
 
@@ -23,13 +25,15 @@ export default function UpdateAndDeleteCategories() {
 
     const [allCategoriesInsideThePage, setAllCategoriesInsideThePage] = useState([]);
 
-    const [waitMsg, setWaitMsg] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(-1);
 
-    const [errorMsg, setErrorMsg] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
-    const [successMsg, setSuccessMsg] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
+
+    const [errorMsgOnGetCategoriesData, setErrorMsgOnGetCategoriesData] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -94,26 +98,62 @@ export default function UpdateAndDeleteCategories() {
     }
 
     const getPreviousPage = async () => {
-        setIsGetCategories(true);
-        const newCurrentPage = currentPage - 1;
-        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetCategories(false);
+        try {
+            setIsGetCategories(true);
+            setErrorMsgOnGetCategoriesData("");
+            const newCurrentPage = currentPage - 1;
+            setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetCategories(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetCategoriesData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getNextPage = async () => {
-        setIsGetCategories(true);
-        const newCurrentPage = currentPage + 1;
-        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetCategories(false);
+        try {
+            setIsGetCategories(true);
+            setErrorMsgOnGetCategoriesData("");
+            const newCurrentPage = currentPage + 1;
+            setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetCategories(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetCategoriesData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsGetCategories(true);
-        setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(pageNumber, pageSize)).data);
-        setCurrentPage(pageNumber);
-        setIsGetCategories(false);
+        try {
+            setIsGetCategories(true);
+            setErrorMsgOnGetCategoriesData("");
+            setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(pageNumber, pageSize)).data);
+            setCurrentPage(pageNumber);
+            setIsGetCategories(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetCategoriesData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const changeCategoryName = (categoryIndex, newValue) => {
@@ -294,10 +334,9 @@ export default function UpdateAndDeleteCategories() {
                             </tbody>
                         </table>
                     </section>}
-                    {allCategoriesInsideThePage.length === 0 && !isGetCategories && <p className="alert alert-danger w-100">Sorry, Can't Find Any Categories !!</p>}
-                    {isGetCategories && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                        <span className="loader-table-data"></span>
-                    </div>}
+                    {allCategoriesInsideThePage.length === 0 && !isGetCategories && <NotFoundError errorMsg="Sorry, Can't Find Any Categories !!" />}
+                    {isGetCategories && <TableLoader />}
+                    {errorMsgOnGetCategoriesData && <NotFoundError errorMsg={errorMsgOnGetCategoriesData} />}
                     {totalPagesCount > 1 && !isGetCategories &&
                         <PaginationBar
                             totalPagesCount={totalPagesCount}

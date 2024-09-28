@@ -10,6 +10,8 @@ import PaginationBar from "@/components/PaginationBar";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { getAdminInfo } from "../../../../public/global_functions/popular";
+import TableLoader from "@/components/TableLoader";
+import NotFoundError from "@/components/NotFoundError";
 
 export default function UpdateAndDeleteBrands() {
 
@@ -38,6 +40,8 @@ export default function UpdateAndDeleteBrands() {
     const [successMsg, setSuccessMsg] = useState("");
 
     const [errorMsg, setErrorMsg] = useState("");
+
+    const [errorMsgOnGetBrandsData, setErrorMsgOnGetBrandsData] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -119,26 +123,62 @@ export default function UpdateAndDeleteBrands() {
     }
 
     const getPreviousPage = async () => {
-        setIsGetBrands(true);
-        const newCurrentPage = currentPage - 1;
-        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetBrands(false);
+        try {
+            setIsGetBrands(true);
+            setErrorMsgOnGetBrandsData("");
+            const newCurrentPage = currentPage - 1;
+            setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetBrands(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetBrandsData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getNextPage = async () => {
-        setIsGetBrands(true);
-        const newCurrentPage = currentPage + 1;
-        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetBrands(false);
+        try {
+            setIsGetBrands(true);
+            setErrorMsgOnGetBrandsData("");
+            const newCurrentPage = currentPage + 1;
+            setAllBrandsInsideThePage((await getAllBrandsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetBrands(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetBrandsData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsGetBrands(true)
-        setAllBrandsInsideThePage((await getAllBrandsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(pageNumber);
-        setIsGetBrands(false);
+        try {
+            setIsGetBrands(true);
+            setErrorMsgOnGetBrandsData("");
+            setAllBrandsInsideThePage((await getAllBrandsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(pageNumber);
+            setIsGetBrands(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetBrandsData(err?.message === "Network Error" ? "Network Error When Get Brands Data" : "Sorry, Someting Went Wrong When Get Brands Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const changeBrandData = (brandIndex, fieldName, newValue) => {
@@ -418,10 +458,9 @@ export default function UpdateAndDeleteBrands() {
                             </tbody>
                         </table>
                     </section>}
-                    {allBrandsInsideThePage.length === 0 && !isGetBrands && <p className="alert alert-danger w-100">Sorry, Can't Find Any Brands !!</p>}
-                    {isGetBrands && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                        <span className="loader-table-data"></span>
-                    </div>}
+                    {allBrandsInsideThePage.length === 0 && !isGetBrands && <NotFoundError errorMsg="Sorry, Can't Find Any Brands !!" />}
+                    {isGetBrands && <TableLoader />}
+                    {errorMsgOnGetBrandsData && <NotFoundError errorMsg={errorMsgOnGetBrandsData} />}
                     {totalPagesCount > 1 && !isGetBrands &&
                         <PaginationBar
                             totalPagesCount={totalPagesCount}

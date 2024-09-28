@@ -10,6 +10,7 @@ import { inputValuesValidation } from "../../../../public/global_functions/valid
 import { getAdminInfo } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import NotFoundError from "@/components/NotFoundError";
+import TableLoader from "@/components/TableLoader";
 
 export default function UpdateAndDeleteAdmins() {
 
@@ -21,7 +22,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const [allAdminsInsideThePage, setAllAdminsInsideThePage] = useState([]);
 
-    const [iGetAdmins, setIsGetAdmins] = useState(false);
+    const [isGetAdmins, setIsGetAdmins] = useState(false);
 
     const [selectedAdminIndex, setSelectedAdminIndex] = useState(-1);
 
@@ -415,20 +416,20 @@ export default function UpdateAndDeleteAdmins() {
                                     />
                                 </div>
                             </div>
-                            {!iGetAdmins && <button
+                            {!isGetAdmins && <button
                                 className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                                 onClick={() => filterAdmins(filters)}
                             >
                                 Filter
                             </button>}
-                            {iGetAdmins && <button
+                            {isGetAdmins && <button
                                 className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
                                 disabled
                             >
                                 Filtering ...
                             </button>}
                         </section>
-                        {allAdminsInsideThePage.length > 0 && !iGetAdmins && !errorMsgOnGetAdminsData && <section className="admins-data-box p-3 data-box admin-dashbboard-data-box">
+                        {allAdminsInsideThePage.length > 0 && !isGetAdmins && !errorMsgOnGetAdminsData && <section className="admins-data-box p-3 data-box admin-dashbboard-data-box">
                             <table className="admins-data-table mb-4 managment-table bg-white admin-dashbboard-data-table">
                                 <thead>
                                     <tr>
@@ -531,12 +532,10 @@ export default function UpdateAndDeleteAdmins() {
                                 </tbody>
                             </table>
                         </section>}
-                        {allAdminsInsideThePage.length === 0 && !iGetAdmins && <p className="alert alert-danger">Sorry, Can't Find Any Stores !!</p>}
-                        {iGetAdmins && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
-                            <span className="loader-table-data"></span>
-                        </div>}
+                        {allAdminsInsideThePage.length === 0 && !isGetAdmins && <NotFoundError errorMsg="Sorry, Can't Find Any Admins !!" />}
+                        {isGetAdmins && <TableLoader />}
                         {errorMsgOnGetAdminsData && <NotFoundError errorMsg={errorMsgOnGetAdminsData} />}
-                        {totalPagesCount > 1 && !iGetAdmins &&
+                        {totalPagesCount > 1 && !isGetAdmins &&
                             <PaginationBar
                                 totalPagesCount={totalPagesCount}
                                 currentPage={currentPage}

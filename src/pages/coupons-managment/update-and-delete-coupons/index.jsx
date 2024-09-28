@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { getAdminInfo } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
+import NotFoundError from "@/components/NotFoundError";
 
 export default function UpdateAndDeleteCoupons() {
 
@@ -114,7 +115,7 @@ export default function UpdateAndDeleteCoupons() {
             setFormValidationErrors(errorsObject);
             setSelectedCouponIndex(couponIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting Updating ...");
+                setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/coupons/update-coupon-info/${allCoupons[couponIndex]._id}`, {
                     discountPercentage: Number(allCoupons[couponIndex].discountPercentage),
                 }, {
@@ -159,7 +160,7 @@ export default function UpdateAndDeleteCoupons() {
 
     const deleteCoupon = async (couponIndex) => {
         try {
-            setWaitMsg("Please Waiting Deleting ...");
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedCouponIndex(couponIndex);
             const result = (await axios.delete(`${process.env.BASE_API_URL}/coupons/${allCoupons[couponIndex]._id}`, {
                 headers: {
@@ -272,7 +273,7 @@ export default function UpdateAndDeleteCoupons() {
                             </tbody>
                         </table>
                     </section>}
-                    {allCoupons.length === 0 && <p className="alert alert-danger w-100">Sorry, Can't Find Any Coupons !!</p>}
+                    {allCoupons.length === 0 && <NotFoundError errorMsg="Sorry, Can't Find Any Coupons !!" />}
                 </div>
             </>}
             {isLoadingPage && !errorMsgOnLoadingThePage && <LoaderPage />}

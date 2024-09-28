@@ -129,7 +129,7 @@ export default function UpdateAndDeleteAds() {
             setFormValidationErrors(errorsObject);
             setSelectedAdIndex(adIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Wait Updating ...");
+                setWaitMsg("Please Wait To Updating ...");
                 let result;
                 if (advertisementType === "text") {
                     const result = (await axios.put(`${process.env.BASE_API_URL}/ads/update-ad-content/${allTextAds[adIndex]._id}`, {
@@ -189,7 +189,7 @@ export default function UpdateAndDeleteAds() {
 
     const deleteAd = async (adIndex) => {
         try {
-            setWaitMsg("Please Wait Deleting ...");
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedAdIndex(adIndex);
             const result = (await axios.delete(`${process.env.BASE_API_URL}/ads/${advertisementType === "text" ? allTextAds[adIndex]._id : allImageAds[adIndex]._id}`, {
                 headers: {
@@ -358,7 +358,7 @@ export default function UpdateAndDeleteAds() {
                                                 className="btn btn-success d-block mb-3 mx-auto global-button"
                                                 onClick={() => updateAd(adIndex)}
                                             >Change Image</button>}
-                                            {waitMsg === "Please Waiting Updating ..." && selectedAdIndex === adIndex && <button
+                                            {waitMsg === "Please Wait To Updating ..." && selectedAdIndex === adIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
@@ -376,7 +376,7 @@ export default function UpdateAndDeleteAds() {
                                                 className="btn btn-danger global-button"
                                                 onClick={() => deleteAd(adIndex)}
                                             >Delete</button>}
-                                            {waitMsg === "Please Waiting Deleting ..." && selectedAdIndex === adIndex && <button
+                                            {waitMsg === "Please Wait To Deleting ..." && selectedAdIndex === adIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}

@@ -118,6 +118,7 @@ export default function UpdateAndDeleteAdmins() {
     const getPreviousPage = async () => {
         try {
             setIsGetAdmins(true);
+            setErrorMsgOnGetAdminsData("");
             const newCurrentPage = currentPage - 1;
             setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
             setCurrentPage(newCurrentPage);
@@ -137,11 +138,11 @@ export default function UpdateAndDeleteAdmins() {
     const getNextPage = async () => {
         try {
             setIsGetAdmins(true);
+            setErrorMsgOnGetAdminsData("");
             const newCurrentPage = currentPage + 1;
             setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
             setCurrentPage(newCurrentPage);
             setIsGetAdmins(false);
-            throw Error("eee")
         }
         catch (err) {
             if (err?.response?.status === 401) {
@@ -157,6 +158,7 @@ export default function UpdateAndDeleteAdmins() {
     const getSpecificPage = async (pageNumber) => {
         try {
             setIsGetAdmins(true);
+            setErrorMsgOnGetAdminsData("");
             setAllAdminsInsideThePage((await getAllAdminsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
             setCurrentPage(pageNumber);
             setIsGetAdmins(false);

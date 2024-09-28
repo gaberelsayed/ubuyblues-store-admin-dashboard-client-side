@@ -275,8 +275,7 @@ export default function AddNewProduct() {
     const handleSearchOfCountry = (e) => {
         const searchedCountry = e.target.value;
         if (searchedCountry) {
-            const regex = new RegExp(searchedCountry, 'i');
-            setFilteredCountryList(filteredCountryList.filter((country) => regex.test(countries[country].name)));
+            setFilteredCountryList(filteredCountryList.filter((country) => countries[country].name.toLowerCase().startsWith(searchedCountry.toLowerCase())));
         } else {
             setFilteredCountryList(countryList);
         }

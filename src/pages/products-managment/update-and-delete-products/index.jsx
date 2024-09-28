@@ -258,9 +258,8 @@ export default function UpdateAndDeleteProducts() {
     const handleSearchOfCountry = (productIndex, e) => {
         const searchedCountry = e.target.value;
         if (searchedCountry) {
-            const regex = new RegExp(searchedCountry, 'i');
             const tempAllProductsInsideThePage = allProductsInsideThePage.map((product) => product);
-            tempAllProductsInsideThePage[productIndex].filteredCountryList = tempAllProductsInsideThePage[productIndex].filteredCountryList.filter((country) => regex.test(countries[country].name));
+            tempAllProductsInsideThePage[productIndex].filteredCountryList = tempAllProductsInsideThePage[productIndex].filteredCountryList.filter((country) => countries[country].name.toLowerCase().startsWith(searchedCountry.toLowerCase()));
             setAllProductsInsideThePage(tempAllProductsInsideThePage);
         } else {
             const tempAllProductsInsideThePage = allProductsInsideThePage.map((product) => product);

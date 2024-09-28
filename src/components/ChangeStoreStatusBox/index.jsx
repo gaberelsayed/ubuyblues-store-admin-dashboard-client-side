@@ -70,7 +70,14 @@ export default function ChangeStoreStatusBox({
                         handleClosePopupBox();
                         handleChangeStoreStatus("approving");
                         clearTimeout(successTimeout);
-                    });
+                    }, 3000);
+                }
+                else {
+                    setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorMsg("");
+                        clearTimeout(errorTimeout);
+                    }, 1500);
                 }
             }
         }
@@ -108,7 +115,14 @@ export default function ChangeStoreStatusBox({
                     handleClosePopupBox();
                     handleChangeStoreStatus("rejecting");
                     clearTimeout(successTimeout);
-                });
+                }, 3000);
+            }
+            else {
+                setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
+                }, 1500);
             }
         }
         catch (err) {
@@ -159,7 +173,14 @@ export default function ChangeStoreStatusBox({
                         handleClosePopupBox();
                         handleChangeStoreStatus("blocking");
                         clearTimeout(successTimeout);
-                    });
+                    }, 3000);
+                }
+                else {
+                    setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorMsg("");
+                        clearTimeout(errorTimeout);
+                    }, 1500);
                 }
             }
         }
@@ -197,7 +218,14 @@ export default function ChangeStoreStatusBox({
                     handleClosePopupBox();
                     handleChangeStoreStatus("approving");
                     clearTimeout(successTimeout);
-                });
+                }, 3000);
+            }
+            else {
+                setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
+                }, 1500);
             }
         }
         catch (err) {

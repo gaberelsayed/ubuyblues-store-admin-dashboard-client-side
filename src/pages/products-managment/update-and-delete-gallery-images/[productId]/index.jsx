@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { inputValuesValidation } from "../../../../../public/global_functions/validations";
 import { getAdminInfo } from "../../../../../public/global_functions/popular";
+import NotFoundError from "@/components/NotFoundError";
 
 export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
 
@@ -77,7 +78,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
             })).data;
         }
         catch (err) {
-            throw Error(err);
+            throw err;
         }
     }
 
@@ -108,7 +109,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
             setFormValidationErrors(errorsObject);
             setSelectedGalleryImageIndex(imageIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting Updating ...");
+                setWaitMsg("Please Wait To Updating ...");
                 let formData = new FormData();
                 formData.append("productGalleryImage", newProductGalleryImageFiles[imageIndex]);
                 const result = (await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${productIdAsProperty}?oldGalleryImagePath=${allGalleryImages[imageIndex]}`, formData, {
@@ -154,7 +155,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
 
     const deleteImageFromGallery = async (imageIndex) => {
         try {
-            setWaitMsg("Please Waiting Deleting ...");
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedGalleryImageIndex(imageIndex);
             const result = (await axios.delete(`${process.env.BASE_API_URL}/products/gallery-images/${productIdAsProperty}?galleryImagePath=${allGalleryImages[imageIndex]}`, {
                 headers: {
@@ -239,7 +240,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                                                 className="btn btn-success d-block mb-3 mx-auto global-button"
                                                 onClick={() => updateGalleryImage(imageIndex)}
                                             >Change Image</button>}
-                                            {waitMsg === "Please Waiting Updating ..." && selectedGalleryImageIndex === imageIndex && <button
+                                            {waitMsg === "Please Wait To Updating ..." && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
@@ -257,7 +258,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                                                 className="btn btn-danger global-button"
                                                 onClick={() => deleteImageFromGallery(imageIndex)}
                                             >Delete</button>}
-                                            {waitMsg === "Please Waiting Deleting ..." && selectedGalleryImageIndex === imageIndex && <button
+                                            {waitMsg === "Please Wait To Deleting ..." && selectedGalleryImageIndex === imageIndex && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                                 disabled
                                             >{waitMsg}</button>}
@@ -275,7 +276,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                             </tbody>
                         </table>
                     </section>}
-                    {allGalleryImages.length === 0 && <p className="alert alert-danger w-100">Sorry, Can't Find Any Gallery Images For This Product !!</p>}
+                    {allGalleryImages.length === 0 && <NotFoundError errorMsg="Sorry, Can't Find Any Gallery Images For This Product !!" />}
                 </div>
             </>}
             {isLoadingPage && !errorMsgOnLoadingThePage && <LoaderPage />}

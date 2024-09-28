@@ -91,7 +91,7 @@ export default function AdminLogin() {
                 setWaitMsg("Wait Logining ...");
                 const result = (await axios.get(`${process.env.BASE_API_URL}/admins/login?email=${email}&password=${password}`)).data;
                 if (result.error) {
-                    setWaitMsg("Wait Logining ...");
+                    setWaitMsg("");
                     setErrorMsg(result.msg);
                     if (Object.keys(result.data).length > 0) {
                         setBlockingDateAndReason(result.data);

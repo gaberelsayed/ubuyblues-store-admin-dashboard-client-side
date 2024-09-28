@@ -9,6 +9,7 @@ import PaginationBar from "@/components/PaginationBar";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { getAdminInfo } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
+import NotFoundError from "@/components/NotFoundError";
 
 export default function UpdateAndDeleteAdmins() {
 
@@ -30,6 +31,8 @@ export default function UpdateAndDeleteAdmins() {
 
     const [errorMsg, setErrorMsg] = useState("");
 
+    const [errorMsgOnGetAdminsData, setErrorMsgOnGetAdminsData] = useState("");
+
     const [currentPage, setCurrentPage] = useState(1);
 
     const [totalPagesCount, setTotalPagesCount] = useState(0);
@@ -45,7 +48,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const router = useRouter();
 
-    const pageSize = 10;
+    const pageSize = 1;
 
     useEffect(() => {
         const adminToken = localStorage.getItem(process.env.adminTokenNameInLocalStorage);
@@ -95,7 +98,7 @@ export default function UpdateAndDeleteAdmins() {
             })).data;
         }
         catch (err) {
-            throw Error(err);
+            throw err;
         }
     }
 
@@ -108,31 +111,65 @@ export default function UpdateAndDeleteAdmins() {
             })).data;
         }
         catch (err) {
-            throw Error(err);
+            throw err;
         }
     }
 
     const getPreviousPage = async () => {
-        setIsGetAdmins(true);
-        const newCurrentPage = currentPage - 1;
-        setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetAdmins(false);
+        try {
+            setIsGetAdmins(true);
+            const newCurrentPage = currentPage - 1;
+            setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetAdmins(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetAdminsData(err?.message === "Network Error" ? "Network Error When Get Admins Data" : "Sorry, Someting Went Wrong When Get Admins Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getNextPage = async () => {
-        setIsGetAdmins(true);
-        const newCurrentPage = currentPage + 1;
-        setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(newCurrentPage);
-        setIsGetAdmins(false);
+        try {
+            setIsGetAdmins(true);
+            const newCurrentPage = currentPage + 1;
+            setAllAdminsInsideThePage((await getAllAdminsInsideThePage(newCurrentPage, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(newCurrentPage);
+            setIsGetAdmins(false);
+            throw Error("eee")
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetAdminsData(err?.message === "Network Error" ? "Network Error When Get Admins Data" : "Sorry, Someting Went Wrong When Get Admins Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getSpecificPage = async (pageNumber) => {
-        setIsGetAdmins(true);
-        setAllAdminsInsideThePage((await getAllAdminsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
-        setCurrentPage(pageNumber);
-        setIsGetAdmins(false);
+        try {
+            setIsGetAdmins(true);
+            setAllAdminsInsideThePage((await getAllAdminsInsideThePage(pageNumber, pageSize, getFilteringString(filters))).data);
+            setCurrentPage(pageNumber);
+            setIsGetAdmins(false);
+        }
+        catch (err) {
+            if (err?.response?.status === 401) {
+                localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
+                await router.replace("/login");
+            }
+            else {
+                setErrorMsgOnGetAdminsData(err?.message === "Network Error" ? "Network Error When Get Admins Data" : "Sorry, Someting Went Wrong When Get Admins Data, Please Repeate The Process !!");
+            }
+        }
     }
 
     const getFilteringString = (filters) => {
@@ -389,7 +426,7 @@ export default function UpdateAndDeleteAdmins() {
                                 Filtering ...
                             </button>}
                         </section>
-                        {allAdminsInsideThePage.length > 0 && !iGetAdmins && <section className="admins-data-box p-3 data-box admin-dashbboard-data-box">
+                        {allAdminsInsideThePage.length > 0 && !iGetAdmins && !errorMsgOnGetAdminsData && <section className="admins-data-box p-3 data-box admin-dashbboard-data-box">
                             <table className="admins-data-table mb-4 managment-table bg-white admin-dashbboard-data-table">
                                 <thead>
                                     <tr>
@@ -496,6 +533,7 @@ export default function UpdateAndDeleteAdmins() {
                         {iGetAdmins && <div className="loader-table-box d-flex flex-column align-items-center justify-content-center">
                             <span className="loader-table-data"></span>
                         </div>}
+                        {errorMsgOnGetAdminsData && <NotFoundError errorMsg={errorMsgOnGetAdminsData} />}
                         {totalPagesCount > 1 && !iGetAdmins &&
                             <PaginationBar
                                 totalPagesCount={totalPagesCount}

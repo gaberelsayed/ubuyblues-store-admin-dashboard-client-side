@@ -9,6 +9,7 @@ import { getAdminInfo } from "../../../../public/global_functions/popular";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
 import { useRouter } from "next/router";
 import { HiOutlineBellAlert } from "react-icons/hi2";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 export default function AddNewAdmin() {
 
@@ -24,6 +25,8 @@ export default function AddNewAdmin() {
         email: "",
         password: "",
     });
+
+    const [isVisiblePassword, setIsVisiblePassword] = useState(false);
 
     const [waitMsg, setWaitMsg] = useState("");
 
@@ -220,13 +223,19 @@ export default function AddNewAdmin() {
                             </p>}
                         </section>
                         <section className="password mb-4">
-                            <input
-                                type="text"
-                                className={`form-control p-2 border-2 admin-password-field ${formValidationErrors["password"] ? "border-danger mb-3" : "mb-4"}`}
-                                placeholder="Please Enter Password"
-                                onChange={(e) => setNewAdminData({ ...newAdminData, password: e.target.value })}
-                                value={newAdminData.password}
-                            />
+                            <div className={`current-password-field-box ${formValidationErrors["password"] ? "error-in-field" : ""}`}>
+                                <input
+                                    type={isVisiblePassword ? "text" : "password"}
+                                    className={`p-2 form-control ${formValidationErrors["password"] ? "border-3 border-danger mb-3" : ""}`}
+                                    placeholder="Please Enter Password"
+                                    onChange={(e) => setNewAdminData({ ...newAdminData, password: e.target.value.trim() })}
+                                    value={newAdminData.password}
+                                />
+                                <div className="icon-box other-languages-mode">
+                                    {!isVisiblePassword && <AiOutlineEye className="eye-icon icon" onClick={() => setIsVisiblePassword(value => value = !value)} />}
+                                    {isVisiblePassword && <AiOutlineEyeInvisible className="invisible-eye-icon icon" onClick={() => setIsVisiblePassword(value => value = !value)} />}
+                                </div>
+                            </div>
                             {formValidationErrors["password"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                 <span>{formValidationErrors["password"]}</span>

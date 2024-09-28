@@ -617,11 +617,11 @@ export default function UpdateAndDeleteProducts() {
                                         <td className="product-price-cell">
                                             <section className="product-price mb-4">
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     placeholder="Enter New Product Price"
                                                     defaultValue={product.price}
                                                     className={`form-control d-block mx-auto p-2 border-2 product-price-field ${formValidationErrors["price"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeProductData(productIndex, "price", e.target.valueAsNumber)}
+                                                    onChange={(e) => changeProductData(productIndex, "price", e.target.value)}
                                                 ></input>
                                                 {formValidationErrors["price"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
@@ -634,11 +634,11 @@ export default function UpdateAndDeleteProducts() {
                                                 <h6 className="bg-info p-2 fw-bold">{product.quantity}</h6>
                                                 <hr />
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     placeholder="Enter New Product Quantity"
                                                     defaultValue={product.quantity}
                                                     className={`form-control d-block mx-auto p-2 border-2 product-quantity-field ${formValidationErrors["quantity"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeProductData(productIndex, "quantity", e.target.valueAsNumber)}
+                                                    onChange={(e) => changeProductData(productIndex, "quantity", e.target.value)}
                                                 ></input>
                                                 {formValidationErrors["quantity"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
@@ -704,11 +704,11 @@ export default function UpdateAndDeleteProducts() {
                                         <td className="product-price-discount-cell">
                                             <section className="product-price-discount mb-4">
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     placeholder="Enter New Discount Price"
                                                     defaultValue={product.discount}
                                                     className={`form-control d-block mx-auto p-2 border-2 product-price-discount ${formValidationErrors["discount"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-4"}`}
-                                                    onChange={(e) => changeProductData(productIndex, "discount", e.target.valueAsNumber)}
+                                                    onChange={(e) => changeProductData(productIndex, "discount", e.target.value)}
                                                 ></input>
                                                 {formValidationErrors["discount"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
@@ -733,11 +733,11 @@ export default function UpdateAndDeleteProducts() {
                                                     />
                                                     <section className="product-price-discount-in-offer-period mb-4">
                                                         <input
-                                                            type="number"
+                                                            type="text"
                                                             placeholder="Enter New Discount Price"
                                                             defaultValue={product.discountInOfferPeriod}
                                                             className={`form-control d-block mx-auto p-2 border-2 product-price-discount-in-offer-period-field ${formValidationErrors["discount"] && productIndex === selectedProductIndex ? "border-danger mb-3" : "mb-2"}`}
-                                                            onChange={(e) => changeProductData(productIndex, "discountInOfferPeriod", e.target.valueAsNumber)}
+                                                            onChange={(e) => changeProductData(productIndex, "discountInOfferPeriod", e.target.value)}
                                                         ></input>
                                                         {formValidationErrors["discountInOfferPeriod"] && productIndex === selectedProductIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                             <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>

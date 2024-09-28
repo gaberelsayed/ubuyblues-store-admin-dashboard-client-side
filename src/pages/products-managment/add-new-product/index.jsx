@@ -322,10 +322,10 @@ export default function AddNewProduct() {
                         </section>
                         <section className="price mb-4">
                             <input
-                                type="number"
+                                type="text"
                                 className={`form-control p-2 border-2 product-price-field ${formValidationErrors["price"] ? "border-danger mb-3" : "mb-4"}`}
                                 placeholder="Please Enter Product Price"
-                                onChange={(e) => setProductData({ ...productData, price: e.target.valueAsNumber ? e.target.valueAsNumber : "" })}
+                                onChange={(e) => setProductData({ ...productData, price: e.target.value.trim() })}
                                 value={productData.price}
                             />
                             {formValidationErrors["price"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
@@ -366,10 +366,10 @@ export default function AddNewProduct() {
                         </section>
                         <section className="discount mb-4">
                             <input
-                                type="number"
+                                type="text"
                                 className={`form-control p-2 border-2 product-price-discount-field ${formValidationErrors["discount"] ? "border-danger mb-3" : "mb-4"}`}
                                 placeholder="Please Enter Discount"
-                                onChange={(e) => setProductData({ ...productData, discount: (e.target.valueAsNumber || e.target.valueAsNumber === 0) ? e.target.valueAsNumber : "" })}
+                                onChange={(e) => setProductData({ ...productData, discount: (e.target.value || e.target.value == 0) ? e.target.value.trim() : "" })}
                                 value={productData.discount}
                             />
                             {formValidationErrors["discount"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
@@ -382,7 +382,7 @@ export default function AddNewProduct() {
                                 type="number"
                                 className={`form-control p-2 border-2 product-quantity-field ${formValidationErrors["quantity"] ? "border-danger mb-3" : "mb-4"}`}
                                 placeholder="Please Enter Quantity"
-                                onChange={(e) => setProductData({ ...productData, quantity: (e.target.valueAsNumber || e.target.valueAsNumber === 0) ? e.target.valueAsNumber : "" })}
+                                onChange={(e) => setProductData({ ...productData, quantity: (e.target.value || e.target.value === 0) ? e.target.value.trim() : "" })}
                                 value={productData.quantity}
                             />
                             {formValidationErrors["quantity"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">

@@ -193,10 +193,10 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                             <td>{orderProduct._id}</td>
                                             <td>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     className="form-control quantity"
                                                     defaultValue={orderProduct.quantity}
-                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "quantity", e.target.valueAsNumber)}
+                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "quantity", e.target.value.trim())}
                                                     disabled={orderDetails.isDeleted || orderDetails.checkoutStatus !== "Checkout Successfull"}
                                                 />
                                             </td>
@@ -205,25 +205,25 @@ export default function OrderDetails({ orderIdAsProperty }) {
                                                     type="text"
                                                     className="form-control name"
                                                     defaultValue={orderProduct.name}
-                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "name", e.target.value)}
+                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "name", e.target.value.trim())}
                                                     disabled={orderDetails.isDeleted || orderDetails.checkoutStatus !== "Checkout Successfull"}
                                                 />
                                             </td>
                                             <td>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     className="form-control unit-price"
                                                     defaultValue={orderProduct.unitPrice}
-                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "unitPrice", e.target.valueAsNumber)}
+                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "unitPrice", e.target.value.trim())}
                                                     disabled={orderDetails.isDeleted || orderDetails.checkoutStatus !== "Checkout Successfull"}
                                                 />
                                             </td>
                                             <td>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     className="form-control total-amount"
                                                     defaultValue={orderProduct.totalAmount}
-                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "totalAmount", e.target.valueAsNumber)}
+                                                    onChange={(e) => changeOrderProductData(orderProductIndex, "totalAmount", e.target.value.trim())}
                                                     disabled={orderDetails.isDeleted || orderDetails.checkoutStatus !== "Checkout Successfull"}
                                                 />
                                             </td>

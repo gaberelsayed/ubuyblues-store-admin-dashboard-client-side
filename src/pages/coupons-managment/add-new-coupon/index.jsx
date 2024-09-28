@@ -187,10 +187,10 @@ export default function AddNewCoupon() {
                         <section className="discount-percentage mb-4">
                             <h6 className="mb-3 fw-bold">Please Enter Percentage Discount</h6>
                             <input
-                                type="number"
+                                type="text"
                                 className={`form-control p-2 border-2 discount-percentage-field ${formValidationErrors["discountPercentage"] ? "border-danger mb-3" : "mb-4"}`}
                                 placeholder="Please Enter Discount Percentage"
-                                onChange={(e) => setCouponDetails({ ...couponDetails, discountPercentage: e.target.valueAsNumber })}
+                                onChange={(e) => setCouponDetails({ ...couponDetails, discountPercentage: e.target.value.trim() })}
                                 value={couponDetails.discountPercentage}
                             />
                             {formValidationErrors["discountPercentage"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">

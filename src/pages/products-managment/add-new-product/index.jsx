@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { countries } from "countries-list";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import NotFoundError from "@/components/NotFoundError";
 
 export default function AddNewProduct() {
 
@@ -219,7 +220,7 @@ export default function AddNewProduct() {
                 for (let galleryImage of productData.galleryImages) {
                     formData.append("galleryImages", galleryImage);
                 }
-                setWaitMsg("Please Waiting To Add New Product ...");
+                setWaitMsg("Please Wait To Add New Product ...");
                 const result = (await axios.post(`${process.env.BASE_API_URL}/products/add-new-product`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -472,7 +473,7 @@ export default function AddNewProduct() {
                         >
                             {successMsg}
                         </button>}
-                    </form> : <p className="alert alert-danger w-75 mx-auto">Sorry, Not Found Any Products !!, Please Enter At Least One Category ...</p>}
+                    </form> : <NotFoundError errorMsg="Sorry, Not Found Any Categories !!, Please Enter At Least One Category ..." />}
                 </div>
             </>}
             {isLoadingPage && !errorMsgOnLoadingThePage && <LoaderPage />}

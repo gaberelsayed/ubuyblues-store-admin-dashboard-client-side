@@ -88,7 +88,7 @@ export default function AdminLogin() {
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Wait Logining ...");
+                setWaitMsg("Please Wait To Logining ...");
                 const result = (await axios.get(`${process.env.BASE_API_URL}/admins/login?email=${email}&password=${password}`)).data;
                 if (result.error) {
                     setWaitMsg("");

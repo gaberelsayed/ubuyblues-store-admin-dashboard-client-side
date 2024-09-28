@@ -14,7 +14,7 @@ export default function AddNewCategory() {
 
     const [isLoadingPage, setIsLoadingPage] = useState(true);
 
-    const [errorMsgOnLoadingThePage, setIsErrorMsgOnLoadingThePage] = useState("");
+    const [errorMsgOnLoadingThePage, setErrorMsgOnLoadingThePage] = useState("");
 
     const [adminInfo, setAdminInfo] = useState({});
 

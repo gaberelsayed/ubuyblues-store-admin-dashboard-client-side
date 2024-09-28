@@ -209,7 +209,7 @@ export default function UpdateAndDeleteBrands() {
             setSelectedBrandImageIndex(brandIndex);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitChangeBrandImageMsg("Please Waiting Change Image ...");
+                setWaitChangeBrandImageMsg("Please Wait To Change Image ...");
                 let formData = new FormData();
                 formData.append("brandImage", allBrandsInsideThePage[brandIndex].image);
                 const result = (await axios.put(`${process.env.BASE_API_URL}/brands/change-brand-image/${allBrandsInsideThePage[brandIndex]._id}`, formData, {
@@ -225,6 +225,14 @@ export default function UpdateAndDeleteBrands() {
                         setSelectedBrandImageIndex(-1);
                         setAllBrandsInsideThePage((await getAllBrandsInsideThePage(currentPage, pageSize, getFilteringString(filters))).data);
                         clearTimeout(successTimeout);
+                    }, 1500);
+                } else {
+                    setWaitChangeBrandImageMsg(false);
+                    setErrorChangeBrandImageMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                    let errorTimeout = setTimeout(() => {
+                        setErrorChangeBrandImageMsg("");
+                        setSelectedBrandImageIndex(-1);
+                        clearTimeout(errorTimeout);
                     }, 1500);
                 }
             }
@@ -263,7 +271,7 @@ export default function UpdateAndDeleteBrands() {
             setFormValidationErrors(errorsObject);
             setSelectedBrandIndex(brandIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting Updating ...");
+                setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
                     newBrandTitle: allBrandsInsideThePage[brandIndex].title,
                 }, {
@@ -308,7 +316,7 @@ export default function UpdateAndDeleteBrands() {
 
     const deleteBrand = async (brandIndex) => {
         try {
-            setWaitMsg("Please Waiting Deleting ...");
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedBrandIndex(brandIndex);
             const result = (await axios.delete(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
                 headers: {

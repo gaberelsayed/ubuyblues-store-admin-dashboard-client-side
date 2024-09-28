@@ -85,7 +85,7 @@ export default function AddNewProductGalleryImage({ productIdAsProperty }) {
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Waiting Add New Image To Product Gallery ...");
+                setWaitMsg("Please Wait Add New Image To Product Gallery ...");
                 let formData = new FormData();
                 for (let galleryImageFile of newGalleryImageFiles) {
                     formData.append("productGalleryImage", galleryImageFile);

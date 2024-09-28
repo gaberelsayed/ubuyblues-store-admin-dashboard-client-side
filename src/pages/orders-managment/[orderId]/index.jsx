@@ -83,16 +83,15 @@ export default function OrderDetails({ orderIdAsProperty }) {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
             })).data;
+            setWaitMsg("");
             if (!result.error) {
-                setWaitMsg("");
-                setSuccessMsg("Updating Success !!");
+                setSuccessMsg("Updating Successfull !!");
                 let successTimeout = setTimeout(() => {
                     setSuccessMsg("");
                     setSelectedOrderProductIndex(-1);
                     clearTimeout(successTimeout);
                 }, 1500);
             } else {
-                setWaitMsg("");
                 setErrorMsg(result.msg);
                 let errorTimeout = setTimeout(() => {
                     setErrorMsg("");
@@ -127,9 +126,9 @@ export default function OrderDetails({ orderIdAsProperty }) {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }
             })).data;
+            setWaitMsg("");
             if (!result.error) {
-                setWaitMsg("");
-                setSuccessMsg("Deleting Success !!");
+                setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(() => {
                     setSuccessMsg("");
                     setSelectedOrderProductIndex(-1);

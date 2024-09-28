@@ -128,7 +128,7 @@ export default function ChangeBussinessEmailPassword() {
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting To Change ...");
+                setWaitMsg("Please Wait To Change ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/global-passwords/change-bussiness-email-password?email=${email}&password=${currentPassword}&newPassword=${newPassword}`, undefined, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),

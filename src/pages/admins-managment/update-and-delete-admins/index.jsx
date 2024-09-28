@@ -266,7 +266,7 @@ export default function UpdateAndDeleteAdmins() {
             setFormValidationErrors(errorsObject);
             setSelectedAdminIndex(adminIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting Updating ...");
+                setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/admins/update-admin-info/${allAdminsInsideThePage[adminIndex]._id}`, {
                     firstName: allAdminsInsideThePage[adminIndex].firstName,
                     lastName: allAdminsInsideThePage[adminIndex].lastName,
@@ -285,7 +285,7 @@ export default function UpdateAndDeleteAdmins() {
                         clearTimeout(successTimeout);
                     }, 3000);
                 } else {
-                    setErrorMsg("");
+                    setErrorMsg("Sorry, Someting Went Wrong, Please Repeate The Process !!");
                     let errorTimeout = setTimeout(() => {
                         setErrorMsg("");
                         setSelectedAdminIndex(-1);
@@ -313,7 +313,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const deleteAdmin = async (adminIndex) => {
         try {
-            setWaitMsg("Please Waiting Deleting ...");
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedAdminIndex(adminIndex);
             let result = (await axios.delete(`${process.env.BASE_API_URL}/admins/delete-admin/${allAdminsInsideThePage[adminIndex]._id}`, {
                 headers: {
@@ -322,7 +322,7 @@ export default function UpdateAndDeleteAdmins() {
             })).data;
             setWaitMsg("");
             if (!result.error) {
-                setSuccessMsg("Updating Successfull !!");
+                setSuccessMsg("Deleting Successfull !!");
                 let successTimeout = setTimeout(async () => {
                     setSuccessMsg("");
                     setSelectedAdminIndex(-1);

@@ -68,7 +68,7 @@ export default function ShowAndHideSections() {
 
     const changeSectionsStatus = async () => {
         try {
-            setWaitMsg("Please Wait To Change ...");
+            setWaitMsg("Please Wait To Change Sections Status ...");
             const result = (await axios.put(`${process.env.BASE_API_URL}/appeared-sections/update-sections-status`, {
                 sectionsStatus: allSections.map((section) => ({ _id: section._id, isAppeared: section.isAppeared })),
             }, {
@@ -82,6 +82,13 @@ export default function ShowAndHideSections() {
                 let successTimeout = setTimeout(() => {
                     setSuccessMsg("");
                     clearTimeout(successTimeout);
+                }, 1500);
+            }
+            else {
+                setErrorMsg(result.msg);
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    clearTimeout(errorTimeout);
                 }, 1500);
             }
         }

@@ -269,7 +269,7 @@ export default function OrdersManagment() {
             setFormValidationErrors(errorsObject);
             setSelectedOrderIndex(orderIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting Updating ...");
+                setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.post(`${process.env.BASE_API_URL}/orders/update-order/${allOrdersInsideThePage[orderIndex]._id}${isSendEmailToTheCustomerList[orderIndex] && allOrdersInsideThePage[orderIndex].status !== "pending" ? "?isSendEmailToTheCustomer=true" : ""}`, {
                     orderAmount: allOrdersInsideThePage[orderIndex].orderAmount,
                     status: allOrdersInsideThePage[orderIndex].status,
@@ -315,7 +315,7 @@ export default function OrdersManagment() {
 
     const deleteOrder = async (orderIndex) => {
         try {
-            setWaitMsg("Please Waiting Deleting ...");
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedOrderIndex(orderIndex);
             const result = (await axios.delete(`${process.env.BASE_API_URL}/orders/delete-order/${allOrdersInsideThePage[orderIndex]._id}`, {
                 headers: {
@@ -340,6 +340,13 @@ export default function OrdersManagment() {
                         setIsGetOrders(false);
                     }
                     clearTimeout(successTimeout);
+                }, 3000);
+            } else {
+                setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
+                let errorTimeout = setTimeout(() => {
+                    setErrorMsg("");
+                    setSelectedOrderIndex(-1);
+                    clearTimeout(errorTimeout);
                 }, 3000);
             }
         }

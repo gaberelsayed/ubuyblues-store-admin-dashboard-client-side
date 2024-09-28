@@ -9,6 +9,7 @@ import { inputValuesValidation } from "../../../../public/global_functions/valid
 import { getAdminInfo } from "../../../../public/global_functions/popular";
 import { getDateFormated, getStoreDetails } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
+import NotFoundError from "@/components/NotFoundError";
 
 export default function StoreDetails({ storeId }) {
 
@@ -22,7 +23,7 @@ export default function StoreDetails({ storeId }) {
 
     const [storeDetails, setStoreDetails] = useState({});
 
-    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+    const [waitMsg, setWaitMsg] = useState("");
 
     const [isWaitChangeStoreImage, setIsWaitChangeStoreImage] = useState(false);
 
@@ -140,7 +141,7 @@ export default function StoreDetails({ storeId }) {
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
-                setIsUpdatingStatus(true);
+                setWaitMsg("Please Wait To Updating Store Data ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${storeId}`, {
                     name: storeDetails.name,
                     ownerFirstName: storeDetails.ownerFirstName,
@@ -154,7 +155,7 @@ export default function StoreDetails({ storeId }) {
                     }
                 })).data;
                 if (!result.error) {
-                    setIsUpdatingStatus(false);
+                    setWaitMsg("");
                     setSuccessMsg(result.msg);
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
@@ -175,7 +176,7 @@ export default function StoreDetails({ storeId }) {
                 await router.replace("/login");
             }
             else {
-                setIsUpdatingStatus(false);
+                setWaitMsg("");
                 setErrorMsg(err?.message === "Network Error" ? "Network Error" : "Sorry, Someting Went Wrong, Please Repeate The Process !!");
                 let errorTimeout = setTimeout(() => {
                     setErrorMsg("");
@@ -459,11 +460,11 @@ export default function StoreDetails({ storeId }) {
                                     <tr>
                                         <th>Actions</th>
                                         <td>
-                                            {!isUpdatingStatus && !errorMsg && !successMsg && <button
+                                            {!waitMsg && !errorMsg && !successMsg && <button
                                                 className="btn btn-success d-block mb-3 mx-auto global-button"
                                                 onClick={() => updateStoreData(storeId)}
                                             >Update</button>}
-                                            {isUpdatingStatus && <button
+                                            {waitMsg && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
                                             >Please Waiting</button>}
                                             {successMsg && <button
@@ -704,13 +705,13 @@ export default function StoreDetails({ storeId }) {
                                     </tr>
                                     <tr>
                                         <td>
-                                            {!isUpdatingStatus && !errorMsg && !successMsg && <button
+                                            {!waitMsg && !errorMsg && !successMsg && <button
                                                 className="btn btn-success d-block mb-3 mx-auto global-button"
                                                 onClick={() => updateStoreData(storeId)}
                                             >Update</button>}
-                                            {isUpdatingStatus && <button
+                                            {waitMsg && <button
                                                 className="btn btn-info d-block mb-3 mx-auto global-button"
-                                            >Please Waiting</button>}
+                                            >{waitMsg}</button>}
                                             {successMsg && <button
                                                 className="btn btn-success d-block mx-auto global-button"
                                                 disabled
@@ -723,7 +724,7 @@ export default function StoreDetails({ storeId }) {
                                     </tr>
                                 </tbody>
                             </table>}
-                        </div> : <p className="alert alert-danger store-not-found-error">Sorry, This Store Is Not Found !!</p>}
+                        </div> : <NotFoundError errorMsg="Sorry, This Store Is Not Found !!" />}
                     </div>
                 </section>
                 {/* End Content Section */}

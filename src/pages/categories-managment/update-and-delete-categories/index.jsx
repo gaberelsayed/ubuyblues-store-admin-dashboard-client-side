@@ -180,7 +180,7 @@ export default function UpdateAndDeleteCategories() {
             setFormValidationErrors(errorsObject);
             setSelectedCategoryIndex(categoryIndex);
             if (Object.keys(errorsObject).length == 0) {
-                setWaitMsg("Please Waiting Updating ...");
+                setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
                     newCategoryName: allCategoriesInsideThePage[categoryIndex].name,
                 }, {
@@ -225,7 +225,7 @@ export default function UpdateAndDeleteCategories() {
 
     const deleteCategory = async (categoryIndex) => {
         try {
-            setWaitMsg("Please Waiting Deleting ...");
+            setWaitMsg("Please Wait To Deleting ...");
             setSelectedCategoryIndex(categoryIndex);
             const result = (await axios.delete(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
                 headers: {

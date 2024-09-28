@@ -21,7 +21,7 @@ function isValidMobilePhone(mobilePhone, countryCode) {
 
 // تعريف دالة للتحقق من الاسم هل هو اسم صالح أم لا )
 function isValidName(name) {
-    return name.match(/^([\u0600-\u06FF\s]+|[a-zA-Z\s]+)$/);
+    return /^([\u0600-\u06FF\s]+|[a-zA-Z\s]+)$/.test(name);
 }
 
 // تعريف دالة للتحقق من قيم المدخلات

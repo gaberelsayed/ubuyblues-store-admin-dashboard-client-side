@@ -185,7 +185,8 @@ export default function UpdateAndDeleteCategories() {
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
-                    newCategoryName: allCategoriesInsideThePage[categoryIndex].name,
+                    name: allCategoriesInsideThePage[categoryIndex].name,
+                    parent: allCategoriesInsideThePage[categoryIndex].parent,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),

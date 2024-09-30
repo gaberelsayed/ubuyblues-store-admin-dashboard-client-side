@@ -8,7 +8,7 @@ import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
-import { getAdminInfo } from "../../../../public/global_functions/popular";
+import { getAdminInfo, getAllCategories } from "../../../../public/global_functions/popular";
 
 export default function AddNewCategory() {
 
@@ -18,13 +18,21 @@ export default function AddNewCategory() {
 
     const [adminInfo, setAdminInfo] = useState({});
 
+    const [allCategories, setAllCategories] = useState([]);
+
     const [categoryName, setCategoryName] = useState("");
+
+    const [selectedCategoryParentId, setSelectedCategoryParentId] = useState("");
 
     const [waitMsg, setWaitMsg] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState("");
 
     const [successMsg, setSuccessMsg] = useState("");
+
+    const [filters, setFilters] = useState({
+        storeId: "",
+    });
 
     const [formValidationErrors, setFormValidationErrors] = useState({});
 
@@ -40,6 +48,9 @@ export default function AddNewCategory() {
                         await router.replace("/login");
                     } else {
                         const adminDetails = result.data;
+                        const tempFilters = { storeId: adminDetails.storeId };
+                        setFilters(tempFilters);
+                        setAllCategories((await getAllCategories(getFilteringString(tempFilters))).data);
                         if (adminDetails.isBlocked) {
                             localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                             await router.replace("/login");
@@ -62,6 +73,13 @@ export default function AddNewCategory() {
         } else router.replace("/login");
     }, []);
 
+    const getFilteringString = (filters) => {
+        let filteringString = "";
+        if (filters.storeId) filteringString += `storeId=${filters.storeId}&`;
+        if (filteringString) filteringString = filteringString.substring(0, filteringString.length - 1);
+        return filteringString;
+    }
+
     const addNewCategory = async (e) => {
         try {
             e.preventDefault();
@@ -81,8 +99,8 @@ export default function AddNewCategory() {
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting To Add New Category ...");
                 const result = (await axios.post(`${process.env.BASE_API_URL}/categories/add-new-category`, {
-                    categoryName,
-                    storeId: adminInfo.storeId,
+                    name: categoryName,
+                    parent: selectedCategoryParentId,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -94,6 +112,7 @@ export default function AddNewCategory() {
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
                         setCategoryName("");
+                        setAllCategories([ ...allCategories, result.data ]);
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
@@ -132,7 +151,7 @@ export default function AddNewCategory() {
                 <div className="page-content d-flex justify-content-center align-items-center flex-column p-4">
                     <h1 className="fw-bold w-fit pb-2 mb-3">
                         <PiHandWavingThin className="me-2" />
-                        Hi, Mr { adminInfo.firstName + " " + adminInfo.lastName } In Your Add New Category Page
+                        Hi, Mr {adminInfo.firstName + " " + adminInfo.lastName} In Your Add New Category Page
                     </h1>
                     <form className="add-new-category-form admin-dashbboard-form" onSubmit={addNewCategory}>
                         <section className="category-name mb-4">
@@ -147,6 +166,19 @@ export default function AddNewCategory() {
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                 <span>{formValidationErrors["categoryName"]}</span>
                             </p>}
+                        </section>
+                        <section className="category-parent mb-4">
+                            <h6 className="fw-bold mb-3">Please Select Category Parent</h6>
+                            <select
+                                className="category-parent-select form-select mb-4"
+                                onChange={(e) => setSelectedCategoryParentId(e.target.value)}
+                            >
+                                <option defaultValue="" hidden>Please Select Your Category</option>
+                                <option value="">No Parent</option>
+                                {allCategories.map((category) => (
+                                    <option value={category._id} key={category._id}>{category.name}</option>
+                                ))}
+                            </select>
                         </section>
                         {!waitMsg && !successMsg && !errorMsg && <button
                             type="submit"

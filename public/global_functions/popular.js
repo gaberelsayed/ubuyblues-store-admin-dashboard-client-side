@@ -66,6 +66,15 @@ const getAllCategories = async (filters) => {
     }
 }
 
+const getAllCategoriesWithHierarechy = async (filters) => {
+    try {
+        return (await axios.get(`${process.env.BASE_API_URL}/categories/all-categories-with-hierarechy?${filters ? filters : ""}`)).data;
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
 const getStoresCount = async (filters) => {
     try {
         return (await axios.get(`${process.env.BASE_API_URL}/stores/stores-count?${filters ? filters : ""}`)).data;
@@ -175,6 +184,7 @@ export {
     getCategoriesCount,
     getAllCategoriesInsideThePage,
     getAllCategories,
+    getAllCategoriesWithHierarechy,
     getStoresCount,
     getAllStoresInsideThePage,
     calcTotalPrices,

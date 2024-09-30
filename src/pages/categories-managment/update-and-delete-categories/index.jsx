@@ -8,7 +8,7 @@ import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { useRouter } from "next/router";
 import PaginationBar from "@/components/PaginationBar";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
-import { getAdminInfo, getCategoriesCount, getAllCategoriesInsideThePage } from "../../../../public/global_functions/popular";
+import { getAdminInfo, getCategoriesCount, getAllCategoriesInsideThePage, getAllCategories } from "../../../../public/global_functions/popular";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import NotFoundError from "@/components/NotFoundError";
 import TableLoader from "@/components/TableLoader";
@@ -22,6 +22,8 @@ export default function UpdateAndDeleteCategories() {
     const [adminInfo, setAdminInfo] = useState({});
 
     const [isGetCategories, setIsGetCategories] = useState(false);
+
+    const [allCategories, setAllCategories] = useState([]);
 
     const [allCategoriesInsideThePage, setAllCategoriesInsideThePage] = useState([]);
 
@@ -65,12 +67,13 @@ export default function UpdateAndDeleteCategories() {
                         }
                         else {
                             setAdminInfo(adminDetails);
-                            const tempFilters = { ...filters, storeId: adminDetails.storeId };
+                            const tempFilters = { storeId: adminDetails.storeId };
                             setFilters(tempFilters);
                             const filtersAsQuery = getFiltersAsQuery(tempFilters);
                             result = await getCategoriesCount(filtersAsQuery);
                             if (result.data > 0) {
                                 setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize, filtersAsQuery)).data);
+                                setAllCategories((await getAllCategories(filtersAsQuery)).data);
                                 setTotalPagesCount(Math.ceil(result.data / pageSize));
                             }
                             setIsLoadingPage(false);
@@ -156,10 +159,10 @@ export default function UpdateAndDeleteCategories() {
         }
     }
 
-    const changeCategoryName = (categoryIndex, newValue) => {
+    const changeCategoryData = (categoryIndex, fieldName, newValue) => {
         setSelectedCategoryIndex(-1);
         let categoriesTemp = allCategoriesInsideThePage;
-        categoriesTemp[categoryIndex].name = newValue;
+        categoriesTemp[categoryIndex][fieldName] = newValue;
         setAllCategoriesInsideThePage(categoriesTemp);
     }
 
@@ -284,6 +287,7 @@ export default function UpdateAndDeleteCategories() {
                             <thead>
                                 <tr>
                                     <th>Name</th>
+                                    <th>Parent</th>
                                     <th>Process</th>
                                 </tr>
                             </thead>
@@ -296,12 +300,27 @@ export default function UpdateAndDeleteCategories() {
                                                     type="text"
                                                     className={`form-control d-block mx-auto p-2 border-2 brand-title-field ${formValidationErrors["categoryName"] && categoryIndex === selectedCategoryIndex ? "border-danger mb-3" : "mb-4"}`}
                                                     defaultValue={category.name}
-                                                    onChange={(e) => changeCategoryName(categoryIndex, e.target.value.trim())}
+                                                    onChange={(e) => changeCategoryData(categoryIndex, "name", e.target.value.trim())}
                                                 ></input>
                                                 {formValidationErrors["categoryName"] && categoryIndex === selectedCategoryIndex && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                                     <span>{formValidationErrors["categoryName"]}</span>
                                                 </p>}
+                                            </section>
+                                        </td>
+                                        <td className="category-parent-cell">
+                                            {allCategories[categoryIndex].parent?.name ? <h6 className="bg-info p-2 fw-bold mb-4">{allCategories[categoryIndex].parent.name}</h6> : <h6 className="bg-danger p-2 mb-4 text-white">No Parent</h6>}
+                                            <section className="category-parent">
+                                                <select
+                                                    className="category-parent-select form-select mb-4"
+                                                    onChange={(e) => changeCategoryData(categoryIndex, "parent", e.target.value)}
+                                                >
+                                                    <option defaultValue="" hidden>Please Select New Parent Category</option>
+                                                    <option value="">No Parent</option>
+                                                    {allCategories.map((category) => (
+                                                        <option value={category._id} key={category._id}>{category.name}</option>
+                                                    ))}
+                                                </select>
                                             </section>
                                         </td>
                                         <td className="update-cell">

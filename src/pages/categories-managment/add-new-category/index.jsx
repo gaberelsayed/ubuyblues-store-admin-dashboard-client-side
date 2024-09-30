@@ -173,7 +173,7 @@ export default function AddNewCategory() {
                                 className="category-parent-select form-select mb-4"
                                 onChange={(e) => setSelectedCategoryParentId(e.target.value)}
                             >
-                                <option defaultValue="" hidden>Please Select Your Category</option>
+                                <option defaultValue="" hidden>Please Select Category Parent</option>
                                 <option value="">No Parent</option>
                                 {allCategories.map((category) => (
                                     <option value={category._id} key={category._id}>{category.name}</option>

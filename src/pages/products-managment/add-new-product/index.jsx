@@ -390,14 +390,14 @@ export default function AddNewProduct() {
                             </p>}
                         </section>
                         <h6 className="mb-3 fw-bold">Please Select Countries</h6>
-                        <div className="select-country-box mb-4">
+                        <div className="select-country-box select-box mb-4">
                             <input
                                 type="text"
                                 className="search-box form-control p-2 border-2 mb-4"
                                 placeholder="Please Enter Your Country Name Or Part Of This"
                                 onChange={handleSearchOfCountry}
                             />
-                            <ul className="countries-list bg-white border border-dark">
+                            <ul className="countries-list options-list bg-white border border-dark">
                                 {filteredCountryList.length > 0 ? filteredCountryList.map((countryCode) => (
                                     <li key={countryCode} onClick={() => handleSelectCountry(countryCode)}>{countries[countryCode].name}</li>
                                 )) : <li>Sorry, Can't Find Any Counties Match This Name !!</li>}

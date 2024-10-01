@@ -22,7 +22,9 @@ export default function AddNewCategory() {
 
     const [categoryName, setCategoryName] = useState("");
 
-    const [selectedCategoryParentId, setSelectedCategoryParentId] = useState("");
+    const [filteredCategories, setFilteredCategories] = useState([]);
+
+    const [selectedCategory, setSelectedCategoryParent] = useState("");
 
     const [waitMsg, setWaitMsg] = useState(false);
 
@@ -50,7 +52,9 @@ export default function AddNewCategory() {
                         const adminDetails = result.data;
                         const tempFilters = { storeId: adminDetails.storeId };
                         setFilters(tempFilters);
-                        setAllCategories((await getAllCategories(getFilteringString(tempFilters))).data);
+                        const tempAllCategories = (await getAllCategories(getFilteringString(tempFilters))).data;
+                        setAllCategories(tempAllCategories);
+                        setFilteredCategories(tempAllCategories);
                         if (adminDetails.isBlocked) {
                             localStorage.removeItem(process.env.adminTokenNameInLocalStorage);
                             await router.replace("/login");
@@ -80,6 +84,19 @@ export default function AddNewCategory() {
         return filteringString;
     }
 
+    const handleSearchOfCategoryParent = (e) => {
+        const searchedCountry = e.target.value;
+        if (searchedCountry) {
+            setFilteredCategories(filteredCategories.filter((category) => category.name.toLowerCase().startsWith(searchedCountry.toLowerCase())));
+        } else {
+            setFilteredCategories(allCategories);
+        }
+    }
+
+    const handleSelectCategoryParent = (categoryParent) => {
+        setSelectedCategoryParent(categoryParent);
+    }
+
     const addNewCategory = async (e) => {
         try {
             e.preventDefault();
@@ -94,13 +111,22 @@ export default function AddNewCategory() {
                         },
                     },
                 },
+                {
+                    name: "categoryParent",
+                    value: selectedCategory,
+                    rules: {
+                        isRequired: {
+                            msg: "Sorry, This Field Can't Be Empty !!",
+                        },
+                    },
+                },
             ]);
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting To Add New Category ...");
                 const result = (await axios.post(`${process.env.BASE_API_URL}/categories/add-new-category`, {
                     name: categoryName,
-                    parent: selectedCategoryParentId,
+                    parent: selectedCategory._id,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -112,7 +138,7 @@ export default function AddNewCategory() {
                     let successTimeout = setTimeout(() => {
                         setSuccessMsg("");
                         setCategoryName("");
-                        setAllCategories([ ...allCategories, result.data ]);
+                        setAllCategories([...allCategories, result.data]);
                         clearTimeout(successTimeout);
                     }, 1500);
                 } else {
@@ -169,16 +195,24 @@ export default function AddNewCategory() {
                         </section>
                         <section className="category-parent mb-4">
                             <h6 className="fw-bold mb-3">Please Select Category Parent</h6>
-                            <select
-                                className="category-parent-select form-select mb-4"
-                                onChange={(e) => setSelectedCategoryParentId(e.target.value)}
-                            >
-                                <option defaultValue="" hidden>Please Select Category Parent</option>
-                                <option value="">No Parent</option>
-                                {allCategories.map((category) => (
-                                    <option value={category._id} key={category._id}>{category.name}</option>
-                                ))}
-                            </select>
+                            {selectedCategory.name && <h6 className="bg-secondary p-3 mb-4 text-white border border-2 border-dark">{selectedCategory.name}</h6>}
+                            <div className="select-category-box select-box mb-4">
+                                <input
+                                    type="text"
+                                    className="search-box form-control p-2 border-2 mb-4"
+                                    placeholder="Please Enter Category Parent Name Or Part Of This"
+                                    onChange={handleSearchOfCategoryParent}
+                                />
+                                <ul className={`categories-list options-list bg-white border ${formValidationErrors["categoryParent"] ? "border-danger mb-4" : "border-dark"}`}>
+                                    {filteredCategories.length > 0 ? filteredCategories.map((category) => (
+                                        <li key={category} onClick={() => handleSelectCategoryParent(category)}>{category.name}</li>
+                                    )) : <li>Sorry, Can't Find Any Category Parent Match This Name !!</li>}
+                                </ul>
+                                {formValidationErrors["categoryParent"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                <span>{formValidationErrors["categoryParent"]}</span>
+                            </p>}
+                            </div>
                         </section>
                         {!waitMsg && !successMsg && !errorMsg && <button
                             type="submit"

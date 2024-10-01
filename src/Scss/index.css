@@ -485,18 +485,18 @@ input:focus, textarea:focus, select:focus, checkbox:focus {
   }
 }
 
-.select-country-box .countries-list {
+.select-box .options-list {
   height: 200px;
   overflow: auto;
 }
 
-.select-country-box .countries-list li {
+.select-box .options-list li {
   padding: 10px;
   font-size: 14px;
   cursor: pointer;
 }
 
-.select-country-box .countries-list li:hover {
+.select-box .options-list li:hover {
   background-color: #CCC;
 }
 

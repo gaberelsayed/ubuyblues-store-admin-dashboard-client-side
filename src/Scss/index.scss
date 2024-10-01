@@ -403,8 +403,8 @@ input, textarea, select, checkbox{
     }
 }
 
-.select-country-box{
-    .countries-list{
+.select-box{
+    .options-list{
         height: 200px;
         overflow: auto;
         li{
@@ -422,7 +422,6 @@ input, textarea, select, checkbox{
     cursor: pointer;
     font-size: 22px;
 }
-
 
 .table-loader-box{
     height: 200px;

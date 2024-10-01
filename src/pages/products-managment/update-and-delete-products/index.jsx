@@ -658,14 +658,14 @@ export default function UpdateAndDeleteProducts() {
                                                     </div>
                                                 )}
                                                 <hr />
-                                                <div className="select-country-box mb-4">
+                                                <div className="select-country-box select-box mb-4">
                                                     <input
                                                         type="text"
                                                         className="search-box form-control p-2 border-2 mb-4"
                                                         placeholder="Please Enter Your Country Name Or Part Of This"
                                                         onChange={(e) => handleSearchOfCountry(productIndex, e)}
                                                     />
-                                                    <ul className="countries-list bg-white border border-dark">
+                                                    <ul className="countries-list options-list bg-white border border-dark">
                                                         {product.filteredCountryList.length > 0 ? product.filteredCountryList.map((countryCode) => (
                                                             <li key={countryCode} onClick={() => handleSelectCountry(productIndex, countryCode)}>{countries[countryCode].name}</li>
                                                         )) : <li>Sorry, Can't Find Any Counties Match This Name !!</li>}

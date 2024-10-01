@@ -20,11 +20,11 @@ export default function AddNewCategory() {
 
     const [allCategories, setAllCategories] = useState([]);
 
-    const [categoryName, setCategoryName] = useState("");
-
     const [filteredCategories, setFilteredCategories] = useState([]);
 
-    const [selectedCategory, setSelectedCategoryParent] = useState("");
+    const [categoryName, setCategoryName] = useState("");
+
+    const [selectedCategoryParent, setSelectedCategoryParent] = useState("");
 
     const [waitMsg, setWaitMsg] = useState(false);
 
@@ -94,7 +94,7 @@ export default function AddNewCategory() {
     }
 
     const handleSelectCategoryParent = (categoryParent) => {
-        setSelectedCategoryParent(categoryParent);
+        setSelectedCategoryParent(categoryParent ? categoryParent : { name: "No Parent", _id: "" });
     }
 
     const addNewCategory = async (e) => {
@@ -113,7 +113,7 @@ export default function AddNewCategory() {
                 },
                 {
                     name: "categoryParent",
-                    value: selectedCategory,
+                    value: selectedCategoryParent,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -126,7 +126,7 @@ export default function AddNewCategory() {
                 setWaitMsg("Please Waiting To Add New Category ...");
                 const result = (await axios.post(`${process.env.BASE_API_URL}/categories/add-new-category`, {
                     name: categoryName,
-                    parent: selectedCategory._id,
+                    parent: selectedCategoryParent._id,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -195,7 +195,7 @@ export default function AddNewCategory() {
                         </section>
                         <section className="category-parent mb-4">
                             <h6 className="fw-bold mb-3">Please Select Category Parent</h6>
-                            {selectedCategory.name && <h6 className="bg-secondary p-3 mb-4 text-white border border-2 border-dark">{selectedCategory.name}</h6>}
+                            {selectedCategoryParent.name && <h6 className="bg-secondary p-3 mb-4 text-white border border-2 border-dark">Category Parent: {selectedCategoryParent.name}</h6>}
                             <div className="select-category-box select-box mb-4">
                                 <input
                                     type="text"
@@ -204,14 +204,17 @@ export default function AddNewCategory() {
                                     onChange={handleSearchOfCategoryParent}
                                 />
                                 <ul className={`categories-list options-list bg-white border ${formValidationErrors["categoryParent"] ? "border-danger mb-4" : "border-dark"}`}>
-                                    {filteredCategories.length > 0 ? filteredCategories.map((category) => (
-                                        <li key={category} onClick={() => handleSelectCategoryParent(category)}>{category.name}</li>
-                                    )) : <li>Sorry, Can't Find Any Category Parent Match This Name !!</li>}
+                                    {filteredCategories.length > 0 ? <>
+                                        <li onClick={() => handleSelectCategoryParent("")}>No Parent</li>
+                                        {filteredCategories.map((category) => (
+                                            <li key={category} onClick={() => handleSelectCategoryParent(category)}>{category.name}</li>
+                                        ))}
+                                    </> : <li>Sorry, Can't Find Any Category Parent Match This Name !!</li>}
                                 </ul>
                                 {formValidationErrors["categoryParent"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
-                                <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
-                                <span>{formValidationErrors["categoryParent"]}</span>
-                            </p>}
+                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                    <span>{formValidationErrors["categoryParent"]}</span>
+                                </p>}
                             </div>
                         </section>
                         {!waitMsg && !successMsg && !errorMsg && <button

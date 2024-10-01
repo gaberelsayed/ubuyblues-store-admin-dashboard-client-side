@@ -72,8 +72,15 @@ export default function UpdateAndDeleteCategories() {
                             const filtersAsQuery = getFiltersAsQuery(tempFilters);
                             result = await getCategoriesCount(filtersAsQuery);
                             if (result.data > 0) {
-                                setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(1, pageSize, filtersAsQuery)).data);
-                                setAllCategories((await getAllCategories(filtersAsQuery)).data);
+                                const tempAllCategories = (await getAllCategories(1, pageSize, filtersAsQuery)).data;
+                                const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(1, pageSize, filtersAsQuery)).data;
+                                tempAllCategoriesInsideThePage.forEach((categoryData) => {
+                                    const filteredCategories = tempAllCategories.filter((category) => category._id !== categoryData._id);
+                                    categoryData.filteredCategories = filteredCategories;
+                                    categoryData.allCategoriesWithoutOriginalCategory = filteredCategories;
+                                });
+                                setAllCategories(tempAllCategories);
+                                setAllCategoriesInsideThePage(tempAllCategoriesInsideThePage);
                                 setTotalPagesCount(Math.ceil(result.data / pageSize));
                             }
                             setIsLoadingPage(false);
@@ -105,7 +112,13 @@ export default function UpdateAndDeleteCategories() {
             setIsGetCategories(true);
             setErrorMsgOnGetCategoriesData("");
             const newCurrentPage = currentPage - 1;
-            setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
+            const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(filters))).data;
+            tempAllCategoriesInsideThePage.forEach((categoryData) => {
+                const filteredCategories = allCategories.filter((category) => category._id !== categoryData._id);
+                categoryData.filteredCategories = filteredCategories;
+                categoryData.allCategoriesWithoutOriginalCategory = filteredCategories;
+            });
+            setAllCategoriesInsideThePage(tempAllCategoriesInsideThePage);
             setCurrentPage(newCurrentPage);
             setIsGetCategories(false);
         }
@@ -125,7 +138,13 @@ export default function UpdateAndDeleteCategories() {
             setIsGetCategories(true);
             setErrorMsgOnGetCategoriesData("");
             const newCurrentPage = currentPage + 1;
-            setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(newCurrentPage, pageSize)).data);
+            const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(filters))).data;
+            tempAllCategoriesInsideThePage.forEach((categoryData) => {
+                const filteredCategories = allCategories.filter((category) => category._id !== categoryData._id);
+                categoryData.filteredCategories = filteredCategories;
+                categoryData.allCategoriesWithoutOriginalCategory = filteredCategories;
+            });
+            setAllCategoriesInsideThePage(tempAllCategoriesInsideThePage);
             setCurrentPage(newCurrentPage);
             setIsGetCategories(false);
         }
@@ -144,7 +163,13 @@ export default function UpdateAndDeleteCategories() {
         try {
             setIsGetCategories(true);
             setErrorMsgOnGetCategoriesData("");
-            setAllCategoriesInsideThePage((await getAllCategoriesInsideThePage(pageNumber, pageSize)).data);
+            const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(filters))).data;
+            tempAllCategoriesInsideThePage.forEach((categoryData) => {
+                const filteredCategories = allCategories.filter((category) => category._id !== categoryData._id);
+                categoryData.filteredCategories = filteredCategories;
+                categoryData.allCategoriesWithoutOriginalCategory = filteredCategories;
+            });
+            setAllCategoriesInsideThePage(tempAllCategoriesInsideThePage);
             setCurrentPage(pageNumber);
             setIsGetCategories(false);
         }
@@ -164,6 +189,23 @@ export default function UpdateAndDeleteCategories() {
         let categoriesTemp = allCategoriesInsideThePage;
         categoriesTemp[categoryIndex][fieldName] = newValue;
         setAllCategoriesInsideThePage(categoriesTemp);
+    }
+
+    const handleSearchOfCategoryParent = (categoryIndex, categoryParent) => {
+        const tempAllCategoriesInsideThePage = allCategoriesInsideThePage.map((category) => category);
+        if (categoryParent) {
+            tempAllCategoriesInsideThePage[categoryIndex].filteredCategories = tempAllCategoriesInsideThePage[categoryIndex].filteredCategories.filter((category) => category.name.toLowerCase().startsWith(categoryParent.toLowerCase()));
+            setAllCategoriesInsideThePage(tempAllCategoriesInsideThePage);
+        } else {
+            tempAllCategoriesInsideThePage[categoryIndex].filteredCategories = tempAllCategoriesInsideThePage[categoryIndex].allCategoriesWithoutOriginalCategory;
+            setAllCategoriesInsideThePage(tempAllCategoriesInsideThePage);
+        }
+    }
+
+    const handleSelectCategoryParent = (categoryIndex, categoryParent) => {
+        let tempAllCategoriesInsideThePage = allCategoriesInsideThePage.map((category) => category);
+        tempAllCategoriesInsideThePage[categoryIndex].parent = categoryParent?.name ? categoryParent : { name: "No Parent", _id: "" };
+        setAllCategoriesInsideThePage(tempAllCategoriesInsideThePage);
     }
 
     const updateCategory = async (categoryIndex) => {
@@ -186,7 +228,7 @@ export default function UpdateAndDeleteCategories() {
                 setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
                     name: allCategoriesInsideThePage[categoryIndex].name,
-                    parent: allCategoriesInsideThePage[categoryIndex].parent,
+                    parent: allCategoriesInsideThePage[categoryIndex].parent.name !== "No Parent" ? allCategoriesInsideThePage[categoryIndex].parent._id : null,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -310,19 +352,27 @@ export default function UpdateAndDeleteCategories() {
                                             </section>
                                         </td>
                                         <td className="category-parent-cell">
-                                            {allCategories[categoryIndex].parent?.name ? <h6 className="bg-info p-2 fw-bold mb-4">{allCategories[categoryIndex].parent.name}</h6> : <h6 className="bg-danger p-2 mb-4 text-white">No Parent</h6>}
-                                            <section className="category-parent">
-                                                <select
-                                                    className="category-parent-select form-select mb-4"
-                                                    onChange={(e) => changeCategoryData(categoryIndex, "parent", e.target.value)}
-                                                >
-                                                    <option defaultValue="" hidden>Please Select New Parent Category</option>
-                                                    <option value="">No Parent</option>
-                                                    {allCategories.map((category) => (
-                                                        <option value={category._id} key={category._id}>{category.name}</option>
-                                                    ))}
-                                                </select>
-                                            </section>
+                                            {allCategoriesInsideThePage[categoryIndex].parent?._id ? <h6 className="bg-info p-2 fw-bold mb-4">{allCategoriesInsideThePage[categoryIndex].parent.name}</h6> : <h6 className="bg-danger p-2 mb-4 text-white">No Parent</h6>}
+                                            <div className="select-category-box select-box mb-4">
+                                                <input
+                                                    type="text"
+                                                    className="search-box form-control p-2 border-2 mb-4"
+                                                    placeholder="Please Enter Category Parent Name Or Part Of This"
+                                                    onChange={(e) => handleSearchOfCategoryParent(categoryIndex, e.target.value)}
+                                                />
+                                                <ul className={`categories-list options-list bg-white border ${formValidationErrors["categoryParent"] ? "border-danger mb-4" : "border-dark"}`}>
+                                                    {category.filteredCategories.length > 0 ? <>
+                                                        <li onClick={() => handleSelectCategoryParent(categoryIndex, {})}>No Parent</li>
+                                                        {category.filteredCategories.map((category) => (
+                                                            <li key={category} onClick={() => handleSelectCategoryParent(categoryIndex, category)}>{category.name}</li>
+                                                        ))}
+                                                    </> : <li>Sorry, Can't Find Any Category Parent Match This Name !!</li>}
+                                                </ul>
+                                                {formValidationErrors["categoryParent"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
+                                                    <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
+                                                    <span>{formValidationErrors["categoryParent"]}</span>
+                                                </p>}
+                                            </div>
                                         </td>
                                         <td className="update-cell">
                                             {selectedCategoryIndex !== categoryIndex && <>

@@ -685,7 +685,7 @@ export default function UpdateAndDeleteProducts() {
                                                 categories={allCategories}
                                                 handleSelectCategory={
                                                     (categoryId, isChecked) => {
-                                                        changeProductData(productIndex, "categories", isChecked ? [ ...allProductsInsideThePage[productIndex].categories, categoryId ] : allProductsInsideThePage[productIndex].filter((id) => id !== categoryId));
+                                                        changeProductData(productIndex, "categories", isChecked ? [ ...allProductsInsideThePage[productIndex].categories, categoryId ] : allProductsInsideThePage[productIndex].categories.filter((id) => id !== categoryId));
                                                     }
                                                 }
                                                 selectedCategories={product.categories}

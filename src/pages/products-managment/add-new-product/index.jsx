@@ -6,12 +6,13 @@ import LoaderPage from "@/components/LoaderPage";
 import ErrorOnLoadingThePage from "@/components/ErrorOnLoadingThePage";
 import AdminPanelHeader from "@/components/AdminPanelHeader";
 import { inputValuesValidation } from "../../../../public/global_functions/validations";
-import { getAdminInfo, getAllCategories } from "../../../../public/global_functions/popular";
+import { getAdminInfo, getAllCategoriesWithHierarechy } from "../../../../public/global_functions/popular";
 import { useRouter } from "next/router";
 import { HiOutlineBellAlert } from "react-icons/hi2";
 import { countries } from "countries-list";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import NotFoundError from "@/components/NotFoundError";
+import CategoriesTree from "@/components/CategoryTree";
 
 export default function AddNewProduct() {
 
@@ -23,12 +24,14 @@ export default function AddNewProduct() {
 
     const [allCategories, setAllCategories] = useState([]);
 
+    const [selectedCategories, setSelectedCategories] = useState([]);
+
     const [productData, setProductData] = useState({
         name: "",
         price: "",
         description: "",
         category: "",
-        categoryId: "",
+        categories: [],
         discount: "",
         quantity: "",
         image: null,
@@ -78,7 +81,7 @@ export default function AddNewProduct() {
                             setAdminInfo(adminDetails);
                             const tempFilters = { ...filters, storeId: adminDetails.storeId };
                             setFilters(tempFilters);
-                            setAllCategories((await getAllCategories(getFilteringString(tempFilters))).data);
+                            setAllCategories((await getAllCategoriesWithHierarechy(getFilteringString(tempFilters))).data);
                             setIsLoadingPage(false);
                         }
                     }
@@ -136,8 +139,8 @@ export default function AddNewProduct() {
                     },
                 },
                 {
-                    name: "category",
-                    value: productData.category,
+                    name: "categories",
+                    value: selectedCategories,
                     rules: {
                         isRequired: {
                             msg: "Sorry, This Field Can't Be Empty !!",
@@ -210,10 +213,12 @@ export default function AddNewProduct() {
                 formData.append("name", productData.name);
                 formData.append("price", productData.price);
                 formData.append("description", productData.description);
-                formData.append("categoryId", productData.categoryId);
+                for (let category of selectedCategories) {
+                    formData.append("categories", category);
+                }
                 formData.append("discount", productData.discount);
                 formData.append("quantity", productData.quantity);
-                for(let country of selectedCountriesList) {
+                for (let country of selectedCountriesList) {
                     formData.append("countries", country);
                 }
                 formData.append("productImage", productData.image);
@@ -270,6 +275,11 @@ export default function AddNewProduct() {
                 }, 1500);
             }
         }
+    }
+
+    const handleSelectCategory = (categoryId, isChecked) => {
+        console.log(isChecked ? [ ...selectedCategories, categoryId ] : selectedCategories.filter((id) => id !== categoryId))
+        setSelectedCategories(isChecked ? [ ...selectedCategories, categoryId ] : selectedCategories.filter((id) => id !== categoryId));
     }
 
     const handleSearchOfCountry = (e) => {
@@ -345,19 +355,13 @@ export default function AddNewProduct() {
                                 <span>{formValidationErrors["description"]}</span>
                             </p>}
                         </section>
-                        <section className="category mb-4">
-                            <select
-                                className={`category-select form-select p-2 border-2 category-field ${formValidationErrors["category"] ? "border-danger mb-3" : "mb-4"}`}
-                                onChange={(e) => {
-                                    const categoryNameAndCategoryId = e.target.value.split("-categoryId=");
-                                    setProductData({ ...productData, category: categoryNameAndCategoryId[0], categoryId: categoryNameAndCategoryId[1] })
-                                }}
-                            >
-                                <option defaultValue="" hidden>Please Select Your Category</option>
-                                {allCategories.map((category) => (
-                                    <option value={`${category.name}-categoryId=${category._id}`} key={category._id}>{category.name}</option>
-                                ))}
-                            </select>
+                        <section className="category mb-4 overflow-auto">
+                            <h6 className="mb-3 fw-bold">Please Select Categories</h6>
+                            <CategoriesTree
+                                categories={allCategories}
+                                handleSelectCategory={handleSelectCategory}
+                                selectedCategories={selectedCategories}
+                            />
                             {formValidationErrors["category"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                 <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                 <span>{formValidationErrors["category"]}</span>

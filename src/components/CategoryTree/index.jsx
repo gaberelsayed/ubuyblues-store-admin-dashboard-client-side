@@ -23,7 +23,7 @@ export default function CategoriesTree({ categories, selectedCategories, handleS
                             { category.name }
                         </label>
                     </div>
-                    {category.subcategories.length > 0 && <CategoriesTree
+                    {category?.subcategories.length > 0 && <CategoriesTree
                         categories={category.subcategories}
                         handleSelectCategory={handleSelectCategory}
                         depth={depth + 1}

@@ -15,13 +15,14 @@ import {
     getAllProductsInsideThePage,
     getTimeAndDateByLocalTime,
     getDateInUTCFormat,
-    getAllCategories
+    getAllCategoriesWithHierarechy
 } from "../../../../public/global_functions/popular";
 import Link from "next/link";
 import { countries } from "countries-list";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import NotFoundError from "@/components/NotFoundError";
 import TableLoader from "@/components/TableLoader";
+import CategoriesTree from "@/components/CategoryTree";
 
 export default function UpdateAndDeleteProducts() {
 
@@ -90,7 +91,7 @@ export default function UpdateAndDeleteProducts() {
                             setAdminInfo(adminDetails);
                             const tempFilters = { ...filters, storeId: adminDetails.storeId };
                             setFilters(tempFilters);
-                            setAllCategories((await getAllCategories(getFilteringString(tempFilters))).data);
+                            setAllCategories((await getAllCategoriesWithHierarechy(getFilteringString(tempFilters))).data);
                             result = await getProductsCount(getFilteringString(tempFilters));
                             if (result.data > 0) {
                                 const tempAllProductsInsideThePage = (await getAllProductsInsideThePage(1, pageSize, getFilteringString(tempFilters))).data.products
@@ -244,14 +245,8 @@ export default function UpdateAndDeleteProducts() {
         if (fieldName === "startDiscountPeriod" || fieldName === "endDiscountPeriod") {
             tempNewValue = getDateInUTCFormat(newValue);
         }
-        let productsDataTemp = allProductsInsideThePage;
-        if (fieldName === "category") {
-            const categoryNameAndCategoryId = newValue.split("-");
-            productsDataTemp[productIndex][fieldName] = categoryNameAndCategoryId[0];
-            productsDataTemp[productIndex]["categoryId"] = categoryNameAndCategoryId[1];
-        } else {
-            productsDataTemp[productIndex][fieldName] = tempNewValue;
-        }
+        let productsDataTemp = allProductsInsideThePage.map(product => product);
+        productsDataTemp[productIndex][fieldName] = tempNewValue;
         setAllProductsInsideThePage(productsDataTemp);
     }
 
@@ -437,8 +432,7 @@ export default function UpdateAndDeleteProducts() {
                     countries: allProductsInsideThePage[productIndex].countries,
                     description: allProductsInsideThePage[productIndex].description,
                     discount: allProductsInsideThePage[productIndex].discount,
-                    category: allProductsInsideThePage[productIndex].category,
-                    categoryId: allProductsInsideThePage[productIndex].categoryId,
+                    categories: allProductsInsideThePage[productIndex].categories,
                     startDiscountPeriod: allProductsInsideThePage[productIndex].startDiscountPeriod,
                     endDiscountPeriod: allProductsInsideThePage[productIndex].endDiscountPeriod,
                     discountInOfferPeriod: allProductsInsideThePage[productIndex].discountInOfferPeriod,
@@ -568,7 +562,7 @@ export default function UpdateAndDeleteProducts() {
                         </div>
                         {!isGetProducts && <button
                             className="btn btn-success d-block w-25 mx-auto mt-2 global-button"
-                            onClick={() => filterProductsByCategory()}
+                            onClick={async () => await filterProductsByCategory()}
                         >
                             Filter
                         </button>}
@@ -687,17 +681,15 @@ export default function UpdateAndDeleteProducts() {
                                             </section>
                                         </td>
                                         <td className="product-category-cell">
-                                            <h6 className="bg-info p-2 fw-bold">{product.category}</h6>
-                                            <hr />
-                                            <select
-                                                className="product-category-select form-select mb-4"
-                                                onChange={(e) => changeProductData(productIndex, "category", e.target.value)}
-                                            >
-                                                <option defaultValue="" hidden>Please Select Your Category</option>
-                                                {allCategories.map((category) => (
-                                                    <option value={`${category.name}-${category._id}`} key={category._id}>{category.name}</option>
-                                                ))}
-                                            </select>
+                                            <CategoriesTree
+                                                categories={allCategories}
+                                                handleSelectCategory={
+                                                    (categoryId, isChecked) => {
+                                                        changeProductData(productIndex, "categories", isChecked ? [ ...allProductsInsideThePage[productIndex].categories, categoryId ] : allProductsInsideThePage[productIndex].filter((id) => id !== categoryId));
+                                                    }
+                                                }
+                                                selectedCategories={product.categories}
+                                            />
                                         </td>
                                         <td className="product-price-discount-cell">
                                             <section className="product-price-discount mb-4">

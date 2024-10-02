@@ -278,7 +278,6 @@ export default function AddNewProduct() {
     }
 
     const handleSelectCategory = (categoryId, isChecked) => {
-        console.log(isChecked ? [ ...selectedCategories, categoryId ] : selectedCategories.filter((id) => id !== categoryId))
         setSelectedCategories(isChecked ? [ ...selectedCategories, categoryId ] : selectedCategories.filter((id) => id !== categoryId));
     }
 

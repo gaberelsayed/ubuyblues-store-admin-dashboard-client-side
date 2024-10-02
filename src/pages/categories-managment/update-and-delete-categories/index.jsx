@@ -112,7 +112,7 @@ export default function UpdateAndDeleteCategories() {
             setIsGetCategories(true);
             setErrorMsgOnGetCategoriesData("");
             const newCurrentPage = currentPage - 1;
-            const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(filters))).data;
+            const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(newCurrentPage, pageSize, getFiltersAsQuery(filters))).data;
             tempAllCategoriesInsideThePage.forEach((categoryData) => {
                 const filteredCategories = allCategories.filter((category) => category._id !== categoryData._id);
                 categoryData.filteredCategories = filteredCategories;
@@ -138,7 +138,7 @@ export default function UpdateAndDeleteCategories() {
             setIsGetCategories(true);
             setErrorMsgOnGetCategoriesData("");
             const newCurrentPage = currentPage + 1;
-            const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(filters))).data;
+            const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(newCurrentPage, pageSize, getFiltersAsQuery(filters))).data;
             tempAllCategoriesInsideThePage.forEach((categoryData) => {
                 const filteredCategories = allCategories.filter((category) => category._id !== categoryData._id);
                 categoryData.filteredCategories = filteredCategories;
@@ -163,7 +163,7 @@ export default function UpdateAndDeleteCategories() {
         try {
             setIsGetCategories(true);
             setErrorMsgOnGetCategoriesData("");
-            const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(1, pageSize, getFiltersAsQuery(filters))).data;
+            const tempAllCategoriesInsideThePage = (await getAllCategoriesInsideThePage(pageNumber, pageSize, getFiltersAsQuery(filters))).data;
             tempAllCategoriesInsideThePage.forEach((categoryData) => {
                 const filteredCategories = allCategories.filter((category) => category._id !== categoryData._id);
                 categoryData.filteredCategories = filteredCategories;

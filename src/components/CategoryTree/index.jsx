@@ -25,6 +25,7 @@ export default function CategoriesTree({ categories, selectedCategories, handleS
                     </div>
                     {category?.subcategories.length > 0 && <CategoriesTree
                         categories={category.subcategories}
+                        selectedCategories={selectedCategories}
                         handleSelectCategory={handleSelectCategory}
                         depth={depth + 1}
                     />}

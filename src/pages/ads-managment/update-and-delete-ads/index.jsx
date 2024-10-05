@@ -34,6 +34,10 @@ export default function UpdateAndDeleteAds() {
 
     const [successMsg, setSuccessMsg] = useState("");
 
+    const [filters, setFilters] = useState({
+        storeId: "",
+    });
+
     const [formValidationErrors, setFormValidationErrors] = useState({});
 
     const router = useRouter();
@@ -54,7 +58,10 @@ export default function UpdateAndDeleteAds() {
                         }
                         else {
                             setAdminInfo(adminDetails);
-                            const allAds = (await getAllAds()).data;
+                            const tempFilters = { storeId: adminDetails.storeId };
+                            setFilters(tempFilters);
+                            const filtersAsQuery = getFiltersAsQuery(tempFilters);
+                            const allAds = (await getAllAds(filtersAsQuery)).data;
                             allAds.forEach((ad) => {
                                 if (ad.type === "text") allTextAds.push(ad);
                                 else allImageAds.push(ad);
@@ -76,9 +83,16 @@ export default function UpdateAndDeleteAds() {
         } else router.replace("/login");
     }, []);
 
-    const getAllAds = async () => {
+    const getFiltersAsQuery = (filters) => {
+        let filteringString = "";
+        if (filters.storeId) filteringString += `storeId=${filters.storeId}&`;
+        if (filteringString) filteringString = filteringString.substring(0, filteringString.length - 1);
+        return filteringString;
+    }
+
+    const getAllAds = async (filters) => {
         try{
-            return (await axios.get(`${process.env.BASE_API_URL}/ads/all-ads`)).data;
+            return (await axios.get(`${process.env.BASE_API_URL}/ads/all-ads?${filters ? filters : ""}`)).data;
         }
         catch(err){
             throw err;

@@ -11,7 +11,7 @@ const nextConfig = {
         adminTokenNameInLocalStorage: "u-b-a-t",
         storeName: "Ubuyblues Store",
         adminDashboardlanguageFieldNameInLocalStorage: "ubuyblues-store-admin-dashboard-language",
-        adminDashboardSelectedCountry: "ubuyblues-store-admin-dashboard-country",
+        selectedCountryByAdmin: "ubuyblues-store-admin-dashboard-country",
         defaultLanguage: "en"
     },
     async headers() {

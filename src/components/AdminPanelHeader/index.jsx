@@ -28,7 +28,7 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
         try {
             switch (country) {
                 case "kuwait": {
-                    localStorage.setItem(process.env.adminDashboardSelectedCountry, country);
+                    localStorage.setItem(process.env.selectedCountryByAdmin, country);
                     await router.replace({
                         pathname: router.pathname,
                         query: {
@@ -39,7 +39,7 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
                     return;
                 }
                 case "germany": {
-                    localStorage.setItem(process.env.adminDashboardSelectedCountry, country);
+                    localStorage.setItem(process.env.selectedCountryByAdmin, country);
                     await router.replace({
                         pathname: router.pathname,
                         query: {
@@ -50,7 +50,7 @@ export default function AdminPanelHeader({ isWebsiteOwner = false, isMerchant = 
                     return;
                 }
                 case "turkey": {
-                    localStorage.setItem(process.env.adminDashboardSelectedCountry, country);
+                    localStorage.setItem(process.env.selectedCountryByAdmin, country);
                     await router.replace({
                         pathname: router.pathname,
                         query: {

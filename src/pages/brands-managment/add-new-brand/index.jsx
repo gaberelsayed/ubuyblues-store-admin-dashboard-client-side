@@ -100,7 +100,7 @@ export default function AddNewBrand() {
                 let formData = new FormData();
                 formData.append("brandImg", brandImage);
                 formData.append("title", brandTitle);
-                const result =( await axios.post(`${process.env.BASE_API_URL}/brands/add-new-brand`, formData, {
+                const result =( await axios.post(`${process.env.BASE_API_URL}/brands/add-new-brand?language=${process.env.defaultLanguage}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }

@@ -226,7 +226,7 @@ export default function AddNewProduct() {
                     formData.append("galleryImages", galleryImage);
                 }
                 setWaitMsg("Please Wait To Add New Product ...");
-                const result = (await axios.post(`${process.env.BASE_API_URL}/products/add-new-product`, formData, {
+                const result = (await axios.post(`${process.env.BASE_API_URL}/products/add-new-product?language=${process.env.defaultLanguage}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }

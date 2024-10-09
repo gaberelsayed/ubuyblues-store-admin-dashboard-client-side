@@ -106,7 +106,7 @@ export default function UpdateAndDeleteBrands() {
 
     const getBrandsCount = async (filters) => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/brands/brands-count?${filters ? filters : ""}`)).data;
+            return (await axios.get(`${process.env.BASE_API_URL}/brands/brands-count?language=${process.env.defaultLanguage}&${filters ? filters : ""}`)).data;
         }
         catch (err) {
             throw err;
@@ -115,7 +115,7 @@ export default function UpdateAndDeleteBrands() {
 
     const getAllBrandsInsideThePage = async (pageNumber, pageSize, filters) => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/brands/all-brands-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`)).data;
+            return (await axios.get(`${process.env.BASE_API_URL}/brands/all-brands-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&language=${process.env.defaultLanguage}&${filters ? filters : ""}`)).data;
         }
         catch (err) {
             throw err;
@@ -212,7 +212,7 @@ export default function UpdateAndDeleteBrands() {
                 setWaitChangeBrandImageMsg("Please Wait To Change Image ...");
                 let formData = new FormData();
                 formData.append("brandImage", allBrandsInsideThePage[brandIndex].image);
-                const result = (await axios.put(`${process.env.BASE_API_URL}/brands/change-brand-image/${allBrandsInsideThePage[brandIndex]._id}`, formData, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/brands/change-brand-image/${allBrandsInsideThePage[brandIndex]._id}?language=${process.env.defaultLanguage}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
@@ -272,7 +272,7 @@ export default function UpdateAndDeleteBrands() {
             setSelectedBrandIndex(brandIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Wait To Updating ...");
-                const result = (await axios.put(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}?language=${process.env.defaultLanguage}`, {
                     newBrandTitle: allBrandsInsideThePage[brandIndex].title,
                 }, {
                     headers: {
@@ -318,7 +318,7 @@ export default function UpdateAndDeleteBrands() {
         try {
             setWaitMsg("Please Wait To Deleting ...");
             setSelectedBrandIndex(brandIndex);
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/brands/${allBrandsInsideThePage[brandIndex]._id}?language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

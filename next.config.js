@@ -10,7 +10,9 @@ const nextConfig = {
         WEBSITE_URL: process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://ubuyblues.com",
         adminTokenNameInLocalStorage: "u-b-a-t",
         storeName: "Ubuyblues Store",
-        adminDashboardlanguageFieldNameInLocalStorage: "ubuyblues-store-admin-dashboard-language"
+        adminDashboardlanguageFieldNameInLocalStorage: "ubuyblues-store-admin-dashboard-language",
+        adminDashboardSelectedCountry: "ubuyblues-store-admin-dashboard-country",
+        defaultLanguage: "en"
     },
     async headers() {
         return [

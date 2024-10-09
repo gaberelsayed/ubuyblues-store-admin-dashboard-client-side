@@ -249,7 +249,7 @@ export default function StoresManagment() {
             setSelectedStoreIndex(storeIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Wait To Updating ...");
-                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${allStoresInsideThePage[storeIndex]._id}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${allStoresInsideThePage[storeIndex]._id}?language=${process.env.defaultLanguage}`, {
                     name: allStoresInsideThePage[storeIndex].name,
                     ownerEmail: allStoresInsideThePage[storeIndex].ownerEmail,
                     productsType: allStoresInsideThePage[storeIndex].productsType,
@@ -296,7 +296,7 @@ export default function StoresManagment() {
         try {
             setWaitMsg("Please Wait To Deleting ...");
             setSelectedStoreIndex(storeIndex);
-            let result = (await axios.delete(`${process.env.BASE_API_URL}/stores/delete-store/${allStoresInsideThePage[storeIndex]._id}`, {
+            let result = (await axios.delete(`${process.env.BASE_API_URL}/stores/delete-store/${allStoresInsideThePage[storeIndex]._id}?language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

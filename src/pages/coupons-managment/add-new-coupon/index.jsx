@@ -107,7 +107,7 @@ export default function AddNewCoupon() {
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting To Add New Coupon ...");
-                const result = (await axios.post(`${process.env.BASE_API_URL}/coupons/add-new-coupon`, couponDetails, {
+                const result = (await axios.post(`${process.env.BASE_API_URL}/coupons/add-new-coupon?language=${process.env.defaultLanguage}`, couponDetails, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }

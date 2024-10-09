@@ -55,7 +55,7 @@ export default function ChangeStoreStatusBox({
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting ...");
-                const result = (await axios.post(`${process.env.BASE_API_URL}/stores/approve-store/${storeId}?password=${adminPassword}`, undefined,
+                const result = (await axios.post(`${process.env.BASE_API_URL}/stores/approve-store/${storeId}?password=${adminPassword}&language=${process.env.defaultLanguage}`, undefined,
                     {
                         headers: {
                             Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -100,7 +100,7 @@ export default function ChangeStoreStatusBox({
     const rejectStoreCreate = async (storeId) => {
         try {
             setWaitMsg("Please Waiting ...");
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/stores/reject-store/${storeId}`,
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/stores/reject-store/${storeId}?language=${process.env.defaultLanguage}`,
                 {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -158,7 +158,7 @@ export default function ChangeStoreStatusBox({
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Waiting ...");
-                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/blocking-store/${storeId}?blockingReason=${changeStatusReason}`, undefined,
+                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/blocking-store/${storeId}?blockingReason=${changeStatusReason}&language=${process.env.defaultLanguage}`, undefined,
                     {
                         headers: {
                             Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
@@ -203,7 +203,7 @@ export default function ChangeStoreStatusBox({
     const cancelBlockingStore = async (storeId) => {
         try {
             setWaitMsg("Please Waiting ...");
-            const result = (await axios.put(`${process.env.BASE_API_URL}/stores/cancel-blocking/${storeId}`, undefined,
+            const result = (await axios.put(`${process.env.BASE_API_URL}/stores/cancel-blocking/${storeId}?language=${process.env.defaultLanguage}`, undefined,
                 {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),

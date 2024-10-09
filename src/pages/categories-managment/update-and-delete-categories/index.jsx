@@ -226,7 +226,7 @@ export default function UpdateAndDeleteCategories() {
             setSelectedCategoryIndex(categoryIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Wait To Updating ...");
-                const result = (await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}?language=${process.env.defaultLanguage}`, {
                     name: allCategoriesInsideThePage[categoryIndex].name,
                     parent: allCategoriesInsideThePage[categoryIndex].parent.name !== "No Parent" ? allCategoriesInsideThePage[categoryIndex].parent._id : null,
                 }, {
@@ -273,7 +273,7 @@ export default function UpdateAndDeleteCategories() {
         try {
             setWaitMsg("Please Wait To Deleting ...");
             setSelectedCategoryIndex(categoryIndex);
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}?language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

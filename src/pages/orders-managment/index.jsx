@@ -109,7 +109,7 @@ export default function OrdersManagment() {
 
     const getOrdersCount = async (filters) => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/orders/orders-count?${filters ? filters : ""}`, {
+            return (await axios.get(`${process.env.BASE_API_URL}/orders/orders-count?language=${process.env.defaultLanguage}&${filters ? filters : ""}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
                 }
@@ -122,7 +122,7 @@ export default function OrdersManagment() {
 
     const getAllOrdersInsideThePage = async (pageNumber, pageSize, filters) => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/orders/all-orders-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`, {
+            return (await axios.get(`${process.env.BASE_API_URL}/orders/all-orders-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&language=${process.env.defaultLanguage}&${filters ? filters : ""}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
                 }
@@ -270,7 +270,7 @@ export default function OrdersManagment() {
             setSelectedOrderIndex(orderIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Wait To Updating ...");
-                const result = (await axios.post(`${process.env.BASE_API_URL}/orders/update-order/${allOrdersInsideThePage[orderIndex]._id}${isSendEmailToTheCustomerList[orderIndex] && allOrdersInsideThePage[orderIndex].status !== "pending" ? "?isSendEmailToTheCustomer=true" : ""}`, {
+                const result = (await axios.post(`${process.env.BASE_API_URL}/orders/update-order/${allOrdersInsideThePage[orderIndex]._id}?language=${process.env.defaultLanguage}${isSendEmailToTheCustomerList[orderIndex] && allOrdersInsideThePage[orderIndex].status !== "pending" ? "&isSendEmailToTheCustomer=true" : ""}`, {
                     orderAmount: allOrdersInsideThePage[orderIndex].orderAmount,
                     status: allOrdersInsideThePage[orderIndex].status,
                 }, {
@@ -317,7 +317,7 @@ export default function OrdersManagment() {
         try {
             setWaitMsg("Please Wait To Deleting ...");
             setSelectedOrderIndex(orderIndex);
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/orders/delete-order/${allOrdersInsideThePage[orderIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/orders/delete-order/${allOrdersInsideThePage[orderIndex]._id}?language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

@@ -92,7 +92,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const getAdminsCount = async (filters) => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/admins/admins-count?${filters ? filters : ""}`, {
+            return (await axios.get(`${process.env.BASE_API_URL}/admins/admins-count?language=${process.env.defaultLanguage}&${filters ? filters : ""}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
                 }
@@ -105,7 +105,7 @@ export default function UpdateAndDeleteAdmins() {
 
     const getAllAdminsInsideThePage = async (pageNumber, pageSize, filters) => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/admins/all-admins-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&${filters ? filters : ""}`, {
+            return (await axios.get(`${process.env.BASE_API_URL}/admins/all-admins-inside-the-page?pageNumber=${pageNumber}&pageSize=${pageSize}&language=${process.env.defaultLanguage}&${filters ? filters : ""}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
                 }
@@ -267,7 +267,7 @@ export default function UpdateAndDeleteAdmins() {
             setSelectedAdminIndex(adminIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Wait To Updating ...");
-                const result = (await axios.put(`${process.env.BASE_API_URL}/admins/update-admin-info/${allAdminsInsideThePage[adminIndex]._id}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/admins/update-admin-info/${allAdminsInsideThePage[adminIndex]._id}?language=${process.env.defaultLanguage}`, {
                     firstName: allAdminsInsideThePage[adminIndex].firstName,
                     lastName: allAdminsInsideThePage[adminIndex].lastName,
                     email: allAdminsInsideThePage[adminIndex].email,
@@ -315,7 +315,7 @@ export default function UpdateAndDeleteAdmins() {
         try {
             setWaitMsg("Please Wait To Deleting ...");
             setSelectedAdminIndex(adminIndex);
-            let result = (await axios.delete(`${process.env.BASE_API_URL}/admins/delete-admin/${allAdminsInsideThePage[adminIndex]._id}`, {
+            let result = (await axios.delete(`${process.env.BASE_API_URL}/admins/delete-admin/${allAdminsInsideThePage[adminIndex]._id}?language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

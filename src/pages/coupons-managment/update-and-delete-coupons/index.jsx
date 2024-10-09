@@ -69,7 +69,7 @@ export default function UpdateAndDeleteCoupons() {
 
     const getAllCoupons = async () => {
         try{
-            return (await axios.get(`${process.env.BASE_API_URL}/coupons/all-coupons`, {
+            return (await axios.get(`${process.env.BASE_API_URL}/coupons/all-coupons?language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
                 }
@@ -116,7 +116,7 @@ export default function UpdateAndDeleteCoupons() {
             setSelectedCouponIndex(couponIndex);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Wait To Updating ...");
-                const result = (await axios.put(`${process.env.BASE_API_URL}/coupons/update-coupon-info/${allCoupons[couponIndex]._id}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/coupons/update-coupon-info/${allCoupons[couponIndex]._id}?language=${process.env.defaultLanguage}`, {
                     discountPercentage: Number(allCoupons[couponIndex].discountPercentage),
                 }, {
                     headers: {
@@ -162,7 +162,7 @@ export default function UpdateAndDeleteCoupons() {
         try {
             setWaitMsg("Please Wait To Deleting ...");
             setSelectedCouponIndex(couponIndex);
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/coupons/${allCoupons[couponIndex]._id}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/coupons/${allCoupons[couponIndex]._id}?language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

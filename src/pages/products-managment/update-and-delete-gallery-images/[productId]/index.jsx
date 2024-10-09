@@ -71,7 +71,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
 
     const getAllGalleryImages = async () => {
         try {
-            return (await axios.get(`${process.env.BASE_API_URL}/products/all-gallery-images/${productIdAsProperty}`, {
+            return (await axios.get(`${process.env.BASE_API_URL}/products/all-gallery-images/${productIdAsProperty}?language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage)
                 }
@@ -112,7 +112,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
                 setWaitMsg("Please Wait To Updating ...");
                 let formData = new FormData();
                 formData.append("productGalleryImage", newProductGalleryImageFiles[imageIndex]);
-                const result = (await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${productIdAsProperty}?oldGalleryImagePath=${allGalleryImages[imageIndex]}`, formData, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/products/update-product-gallery-image/${productIdAsProperty}?oldGalleryImagePath=${allGalleryImages[imageIndex]}&language=${process.env.defaultLanguage}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }
@@ -157,7 +157,7 @@ export default function UpdateAndDeleteGalleryImages({ productIdAsProperty }) {
         try {
             setWaitMsg("Please Wait To Deleting ...");
             setSelectedGalleryImageIndex(imageIndex);
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/products/gallery-images/${productIdAsProperty}?galleryImagePath=${allGalleryImages[imageIndex]}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/products/gallery-images/${productIdAsProperty}?galleryImagePath=${allGalleryImages[imageIndex]}&language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

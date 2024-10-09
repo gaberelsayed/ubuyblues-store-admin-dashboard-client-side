@@ -73,7 +73,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
         try {
             setWaitMsg("Please Wait To Updating ...");
             setSelectedOrderProductIndex(orderProductIndex);
-            const result = (await axios.put(`${process.env.BASE_API_URL}/orders/products/update-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}`, {
+            const result = (await axios.put(`${process.env.BASE_API_URL}/orders/products/update-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}?language=${process.env.defaultLanguage}`, {
                 quantity: orderDetails.products[orderProductIndex].quantity,
                 name: orderDetails.products[orderProductIndex].name,
                 totalAmount: orderDetails.products[orderProductIndex].totalAmount,
@@ -121,7 +121,7 @@ export default function OrderDetails({ orderIdAsProperty }) {
         try {
             setWaitMsg("Please Wait To Deleting ...");
             setSelectedOrderProductIndex(orderProductIndex);
-            const result = (await axios.delete(`${process.env.BASE_API_URL}/orders/products/delete-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}`, {
+            const result = (await axios.delete(`${process.env.BASE_API_URL}/orders/products/delete-product/${orderDetails._id}/${orderDetails.products[orderProductIndex].productId}?language=${process.env.defaultLanguage}`, {
                 headers: {
                     Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                 }

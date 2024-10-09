@@ -90,7 +90,7 @@ export default function AddNewProductGalleryImage({ productIdAsProperty }) {
                 for (let galleryImageFile of newGalleryImageFiles) {
                     formData.append("productGalleryImage", galleryImageFile);
                 }
-                const result = (await axios.post(`${process.env.BASE_API_URL}/products/add-new-images-to-product-gallery/${productIdAsProperty}`, formData, {
+                const result = (await axios.post(`${process.env.BASE_API_URL}/products/add-new-images-to-product-gallery/${productIdAsProperty}?language=${process.env.defaultLanguage}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }

@@ -142,7 +142,7 @@ export default function StoreDetails({ storeId }) {
             setFormValidationErrors(errorsObject);
             if (Object.keys(errorsObject).length == 0) {
                 setWaitMsg("Please Wait To Updating Store Data ...");
-                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${storeId}`, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/update-store-info/${storeId}?language=${process.env.defaultLanguage}`, {
                     name: storeDetails.name,
                     ownerFirstName: storeDetails.ownerFirstName,
                     ownerLastName: storeDetails.ownerLastName,
@@ -208,7 +208,7 @@ export default function StoreDetails({ storeId }) {
                 setIsWaitChangeStoreImage(true);
                 let formData = new FormData();
                 formData.append("storeImage", storeDetails.image);
-                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/change-store-image/${storeId}`, formData, {
+                const result = (await axios.put(`${process.env.BASE_API_URL}/stores/change-store-image/${storeId}?language=${process.env.defaultLanguage}`, formData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }

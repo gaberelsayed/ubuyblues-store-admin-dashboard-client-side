@@ -69,7 +69,7 @@ export default function ShowAndHideSections() {
     const changeSectionsStatus = async () => {
         try {
             setWaitMsg("Please Wait To Change Sections Status ...");
-            const result = (await axios.put(`${process.env.BASE_API_URL}/appeared-sections/update-sections-status`, {
+            const result = (await axios.put(`${process.env.BASE_API_URL}/appeared-sections/update-sections-status?language=${process.env.defaultLanguage}`, {
                 sectionsStatus: allSections.map((section) => ({ _id: section._id, isAppeared: section.isAppeared })),
             }, {
                 headers: {

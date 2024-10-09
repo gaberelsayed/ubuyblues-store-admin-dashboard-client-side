@@ -116,7 +116,7 @@ export default function AddNewAd() {
                     advertisementData.append("storeId", adminInfo.storeId);
                 }
                 setWaitMsg("Please Waiting To Add New Advertisement ...");
-                const result = (await axios.post(`${process.env.BASE_API_URL}/ads/add-new-${advertisementType}-ad`, advertisementData, {
+                const result = (await axios.post(`${process.env.BASE_API_URL}/ads/add-new-${advertisementType}-ad?language=${process.env.defaultLanguage}`, advertisementData, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
                     }

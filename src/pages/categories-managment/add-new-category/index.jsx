@@ -213,7 +213,7 @@ export default function AddNewCategory() {
                                         ))
                                     }
                                 </ul>
-                                {filteredCategories.length === 0 && selectedCategoryParent && <p className="alert alert-danger mt-4">Sorry, Can't Find Any Category Parent Match This Name !!</p>}
+                                {filteredCategories.length === 0 && selectedCategoryParent?.name !== "No Parent" && <p className="alert alert-danger mt-4">Sorry, Can't Find Any Category Parent Match This Name !!</p>}
                                 {formValidationErrors["categoryParent"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                     <span>{formValidationErrors["categoryParent"]}</span>

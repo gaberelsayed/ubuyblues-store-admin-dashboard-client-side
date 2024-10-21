@@ -90,6 +90,7 @@ export default function AddNewCategory() {
         const searchedCategoryParent = e.target.value;
         setSearchedCategoryParent(searchedCategoryParent);
         if (searchedCategoryParent) {
+            console.log(filteredCategories.filter((category) => category.name.toLowerCase().startsWith(searchedCategoryParent.toLowerCase())))
             setFilteredCategories(filteredCategories.filter((category) => category.name.toLowerCase().startsWith(searchedCategoryParent.toLowerCase())));
         } else {
             setFilteredCategories(allCategories);

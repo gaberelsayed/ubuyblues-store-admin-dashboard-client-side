@@ -24,6 +24,8 @@ export default function AddNewCategory() {
 
     const [categoryName, setCategoryName] = useState("");
 
+    const [searchedCategoryParent, setSearchedCategoryParent] = useState("");
+
     const [selectedCategoryParent, setSelectedCategoryParent] = useState("");
 
     const [waitMsg, setWaitMsg] = useState(false);
@@ -85,9 +87,10 @@ export default function AddNewCategory() {
     }
 
     const handleSearchOfCategoryParent = (e) => {
-        const searchedCountry = e.target.value;
-        if (searchedCountry) {
-            setFilteredCategories(filteredCategories.filter((category) => category.name.toLowerCase().startsWith(searchedCountry.toLowerCase())));
+        const searchedCategoryParent = e.target.value;
+        setSearchedCategoryParent(searchedCategoryParent);
+        if (searchedCategoryParent) {
+            setFilteredCategories(filteredCategories.filter((category) => category.name.toLowerCase().startsWith(searchedCategoryParent.toLowerCase())));
         } else {
             setFilteredCategories(allCategories);
         }
@@ -204,13 +207,13 @@ export default function AddNewCategory() {
                                     onChange={handleSearchOfCategoryParent}
                                 />
                                 <ul className={`categories-list options-list bg-white border ${formValidationErrors["categoryParent"] ? "border-danger mb-4" : "border-dark"}`}>
-                                    {filteredCategories.length > 0 ? <>
-                                        <li onClick={() => handleSelectCategoryParent("")}>No Parent</li>
-                                        {filteredCategories.map((category) => (
+                                    <li onClick={() => handleSelectCategoryParent("")}>No Parent</li>
+                                    {filteredCategories.length > 0 && filteredCategories.map((category) => (
                                             <li key={category} onClick={() => handleSelectCategoryParent(category)}>{category.name}</li>
-                                        ))}
-                                    </> : <li>Sorry, Can't Find Any Category Parent Match This Name !!</li>}
+                                        ))
+                                    }
                                 </ul>
+                                {filteredCategories.length === 0 && selectedCategoryParent && <p className="alert alert-danger mt-4">Sorry, Can't Find Any Category Parent Match This Name !!</p>}
                                 {formValidationErrors["categoryParent"] && <p className="bg-danger p-2 form-field-error-box m-0 text-white">
                                     <span className="me-2"><HiOutlineBellAlert className="alert-icon" /></span>
                                     <span>{formValidationErrors["categoryParent"]}</span>

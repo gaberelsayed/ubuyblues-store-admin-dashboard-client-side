@@ -186,7 +186,7 @@ export default function UpdateAndDeleteCategories() {
 
     const changeCategoryData = (categoryIndex, fieldName, newValue) => {
         setSelectedCategoryIndex(-1);
-        let categoriesTemp = allCategoriesInsideThePage;
+        let categoriesTemp = allCategoriesInsideThePage.map(category => category);
         categoriesTemp[categoryIndex][fieldName] = newValue;
         setAllCategoriesInsideThePage(categoriesTemp);
     }
@@ -228,7 +228,7 @@ export default function UpdateAndDeleteCategories() {
                 setWaitMsg("Please Wait To Updating ...");
                 const result = (await axios.put(`${process.env.BASE_API_URL}/categories/${allCategoriesInsideThePage[categoryIndex]._id}?language=${process.env.defaultLanguage}`, {
                     name: allCategoriesInsideThePage[categoryIndex].name,
-                    parent: allCategoriesInsideThePage[categoryIndex].parent.name !== "No Parent" ? allCategoriesInsideThePage[categoryIndex].parent._id : null,
+                    parent: allCategoriesInsideThePage[categoryIndex].parent?.name !== "No Parent" ? allCategoriesInsideThePage[categoryIndex].parent._id : null,
                 }, {
                     headers: {
                         Authorization: localStorage.getItem(process.env.adminTokenNameInLocalStorage),
